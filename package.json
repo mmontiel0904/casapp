@@ -1,0 +1,41 @@
+{
+  "name": "casapp",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch",
+    "generate-types": "yarn codegen",
+    "update-schema": "node scripts/update-schema.js",
+    "dev:full": "yarn update-schema && yarn dev"
+  },
+  "dependencies": {
+    "@apollo/client": "^3.13.8",
+    "@vue/apollo-composable": "^4.2.2",
+    "graphql": "^16.11.0",
+    "graphql-tag": "^2.12.6",
+    "vue": "^3.5.17"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.7",
+    "@graphql-codegen/schema-ast": "^4.1.0",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "@graphql-codegen/typescript-vue-apollo": "^4.1.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "@vue/compiler-sfc": "^3.5.18",
+    "@vue/tsconfig": "^0.7.0",
+    "dotenv": "^17.2.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.4",
+    "vue-tsc": "^2.2.12"
+  }
+}
