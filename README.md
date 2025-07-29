@@ -5,6 +5,7 @@ A Vue 3 Single Page Application with automated GraphQL client generation and typ
 ## 🚀 Features
 
 - **Vue 3** with TypeScript and Composition API
+- **PivotUI Component Library** - Enterprise-grade Material Design 3 components
 - **Apollo GraphQL Client** with automatic type generation
 - **Scalable API Service Layer** with centralized error handling
 - **Reactive State Management** using Vue composables
@@ -15,9 +16,10 @@ A Vue 3 Single Page Application with automated GraphQL client generation and typ
 ## 🛠️ Tech Stack
 
 - **Frontend**: Vue 3 + TypeScript + Vite
+- **UI Components**: PivotUI (Material Design 3)
 - **GraphQL**: Apollo Client + Vue Apollo Composable
 - **Code Generation**: GraphQL Code Generator
-- **Styling**: Scoped Vue components + CSS
+- **Styling**: PivotUI + Scoped Vue components
 - **Package Manager**: Yarn (node-modules)
 
 ## 📋 Prerequisites

@@ -8,14 +8,16 @@
 
 ## Tech Stack
 - **Frontend**: Vue 3 + TypeScript + Vite
+- **UI Components**: PivotUI - Enterprise-grade Material Design 3 component library
 - **GraphQL Client**: Apollo Client with Vue Apollo Composable
 - **Type Generation**: GraphQL Code Generator
 - **Package Manager**: Yarn with node-modules (not PnP)
-- **Styling**: Scoped Vue component styles + global CSS
+- **Styling**: PivotUI component library + scoped Vue component styles
 
 ## Key Dependencies
 ### Production
 - `vue@^3.5.17` - Vue 3 framework
+- `pivotui@^0.1.5` - Enterprise-grade Material Design 3 component library
 - `@apollo/client@^3.13.8` - GraphQL client
 - `@vue/apollo-composable@^4.2.2` - Vue integration for Apollo
 - `graphql@^16.11.0` - GraphQL implementation
@@ -112,10 +114,12 @@ VITE_PLAYGROUND_ENDPOINT=/playground
 - **Solution**: Added React as devDependency (not bundled in production)
 - **Result**: No console errors, pure Vue app in production
 
-### Styling Approach
-- **Global**: Light theme, removed default Vite dark theme
-- **Components**: Scoped styles with clean form styling
-- **Layout**: Full viewport height, responsive design
+### UI Component Strategy
+- **PivotUI**: Enterprise-grade Material Design 3 component library
+- **Available Components**: Button (5 variants), Table (sorting, density), Typography
+- **Design System**: 8px border radius, OKLCH color space, WCAG 2.1 AA compliance
+- **Professional Palette**: Dark teal and blue-gray colors optimized for ERP/accounting
+- **Future Components**: Forms, navigation, status indicators, pagination (as needed)
 
 ## API Service Architecture (NEW)
 - **Scalable Service Layer**: Type-safe API services with centralized error handling
