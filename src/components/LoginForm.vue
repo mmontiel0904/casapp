@@ -1,36 +1,63 @@
 <template>
-  <div class="login-form">
-    <h2>Login</h2>
-    <form @submit.prevent="handleLogin">
-      <div class="form-group">
-        <label for="email">Email:</label>
-        <input 
-          id="email"
-          v-model="loginForm.email" 
-          type="email" 
-          required 
-        />
+  <div class="card w-96 bg-base-100 shadow-xl mx-auto mt-8">
+    <div class="card-body">
+      <h2 class="card-title text-2xl font-bold text-center justify-center mb-6">Login</h2>
+      
+      <form @submit.prevent="handleLogin" class="space-y-4">
+        <div class="form-control">
+          <label class="label" for="email">
+            <span class="label-text">Email</span>
+          </label>
+          <input 
+            id="email"
+            v-model="loginForm.email" 
+            type="email" 
+            placeholder="Enter your email"
+            class="input input-bordered input-primary w-full"
+            required 
+          />
+        </div>
+        
+        <div class="form-control">
+          <label class="label" for="password">
+            <span class="label-text">Password</span>
+          </label>
+          <input 
+            id="password"
+            v-model="loginForm.password" 
+            type="password" 
+            placeholder="Enter your password"
+            class="input input-bordered input-primary w-full"
+            required 
+          />
+        </div>
+        
+        <div class="form-control mt-6">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            :class="{ 'loading': loading }"
+            :disabled="loading"
+          >
+            <span v-if="!loading">Login</span>
+            <span v-else>Logging in...</span>
+          </button>
+        </div>
+      </form>
+      
+      <div v-if="error" class="alert alert-error mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>{{ error.message }}</span>
       </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input 
-          id="password"
-          v-model="loginForm.password" 
-          type="password" 
-          required 
-        />
+      
+      <div v-if="loginResult" class="alert alert-success mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Login successful! Welcome {{ loginResult.login.user.firstName }}</span>
       </div>
-      <button type="submit" :disabled="loading">
-        {{ loading ? 'Logging in...' : 'Login' }}
-      </button>
-    </form>
-    
-    <div v-if="error" class="error">
-      {{ error.message }}
-    </div>
-    
-    <div v-if="loginResult" class="success">
-      Login successful! Welcome {{ loginResult.login.user.firstName }}
     </div>
   </div>
 </template>
@@ -60,75 +87,3 @@ const handleLogin = async () => {
 }
 </script>
 
-<style scoped>
-.login-form {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: white;
-}
-
-.form-group {
-  margin-bottom: 1rem;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-button:hover:not(:disabled) {
-  background: #0056b3;
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.error {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-}
-
-.success {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  border-radius: 4px;
-}
-</style>

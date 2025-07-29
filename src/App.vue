@@ -1,19 +1,9 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import LoginForm from './components/LoginForm.vue'
+// App component is now just a router outlet with global layout
 </script>
 
 <template>
-  <div class="app">
-    <HelloWorld msg="Welcome to CasApp" />
-    <LoginForm />
+  <div id="app" class="min-h-screen bg-base-200">
+    <router-view />
   </div>
 </template>
-
-<style scoped>
-.app {
-  min-height: 100vh;
-  background: #f5f5f5;
-  padding: 1rem;
-}
-</style>

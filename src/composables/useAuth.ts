@@ -22,8 +22,8 @@ export function useAuth() {
     
     if (result.isSuccess && result.data) {
       // Store token and user data
-      setAuthToken(result.data.token)
-      authToken.value = result.data.token
+      setAuthToken(result.data.accessToken)
+      authToken.value = result.data.accessToken
       currentUser.value = result.data.user
     }
     

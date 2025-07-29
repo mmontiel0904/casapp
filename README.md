@@ -5,7 +5,7 @@ A Vue 3 Single Page Application with automated GraphQL client generation and typ
 ## 🚀 Features
 
 - **Vue 3** with TypeScript and Composition API
-- **PivotUI Component Library** - Enterprise-grade Material Design 3 components
+- **DaisyUI Professional Themes** - Utility-first CSS with corporate/business themes
 - **Apollo GraphQL Client** with automatic type generation
 - **Scalable API Service Layer** with centralized error handling
 - **Reactive State Management** using Vue composables
@@ -16,10 +16,10 @@ A Vue 3 Single Page Application with automated GraphQL client generation and typ
 ## 🛠️ Tech Stack
 
 - **Frontend**: Vue 3 + TypeScript + Vite
-- **UI Components**: PivotUI (Material Design 3)
+- **UI Framework**: DaisyUI + Tailwind CSS v4 (Corporate/Business themes)
 - **GraphQL**: Apollo Client + Vue Apollo Composable
 - **Code Generation**: GraphQL Code Generator
-- **Styling**: PivotUI + Scoped Vue components
+- **Styling**: Utility-first CSS with professional component library
 - **Package Manager**: Yarn (node-modules)
 
 ## 📋 Prerequisites
@@ -217,6 +217,8 @@ The React dependencies are intentionally installed as devDependencies to satisfy
 ## 📚 Documentation
 
 - [Vue 3 Documentation](https://vuejs.org/)
+- [DaisyUI Components](https://daisyui.com/components/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
 - [Apollo Client Vue](https://apollo.vuejs.org/)
 - [GraphQL Code Generator](https://the-guild.dev/graphql/codegen)
 - [Vite Documentation](https://vitejs.dev/)
@@ -232,4 +234,4 @@ The React dependencies are intentionally installed as devDependencies to satisfy
 
 ---
 
-**Built with ❤️ using Vue 3, Apollo GraphQL, and automated type generation**
+**Built with ❤️ using Vue 3, DaisyUI, Apollo GraphQL, and automated type generation**

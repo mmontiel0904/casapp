@@ -7,6 +7,7 @@ import type {
 } from '../generated/graphql'
 import type { DocumentNode, OperationVariables } from '@apollo/client'
 import { gql } from 'graphql-tag'
+import { LOGIN_MUTATION } from '../graphql/mutations'
 
 // Enhanced error types for better error handling
 export interface ApiError {
@@ -159,21 +160,6 @@ export abstract class BaseApiService {
 // Authentication service
 export class AuthService extends BaseApiService {
   async login(email: string, password: string): Promise<ApiResult<AuthPayload>> {
-    const LOGIN_MUTATION = gql`
-      mutation Login($email: String!, $password: String!) {
-        login(input: {email: $email, password: $password}) {
-          token
-          user {
-            id
-            email
-            firstName
-            lastName
-            isEmailVerified
-          }
-        }
-      }
-    `
-    
     const result = await this.executeMutation<{login: AuthPayload}, LoginMutationVariables>(
       LOGIN_MUTATION,
       { email, password }

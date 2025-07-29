@@ -8,22 +8,24 @@
 
 ## Tech Stack
 - **Frontend**: Vue 3 + TypeScript + Vite
-- **UI Components**: PivotUI - Enterprise-grade Material Design 3 component library
+- **UI Framework**: DaisyUI v5.0.49 + Tailwind CSS v4.1.11 with professional themes
 - **GraphQL Client**: Apollo Client with Vue Apollo Composable
 - **Type Generation**: GraphQL Code Generator
 - **Package Manager**: Yarn with node-modules (not PnP)
-- **Styling**: PivotUI component library + scoped Vue component styles
+- **Styling**: DaisyUI utility-first components + Tailwind CSS
 
 ## Key Dependencies
 ### Production
 - `vue@^3.5.17` - Vue 3 framework
-- `pivotui@^0.1.5` - Enterprise-grade Material Design 3 component library
+- `tailwindcss@^4.1.11` - Utility-first CSS framework
+- `@tailwindcss/vite@^4.1.11` - Vite integration for Tailwind CSS
 - `@apollo/client@^3.13.8` - GraphQL client
 - `@vue/apollo-composable@^4.2.2` - Vue integration for Apollo
 - `graphql@^16.11.0` - GraphQL implementation
 - `graphql-tag@^2.12.6` - GraphQL query parsing
 
 ### Development
+- `daisyui@^5.0.49` - Professional component library for Tailwind CSS
 - `@graphql-codegen/cli@^5.0.7` - Code generation CLI
 - `@graphql-codegen/typescript@^4.1.6` - TypeScript types generation
 - `@graphql-codegen/typescript-operations@^4.6.1` - Operation types
@@ -63,6 +65,7 @@ src/
 - `.yarnrc.yml` - Yarn configuration (node-modules instead of PnP)
 - `codegen.ts` - GraphQL code generation config
 - `vite.config.ts` - Vite build configuration
+- `tailwind.config.js` - Tailwind CSS and DaisyUI configuration
 
 ## Environment Variables
 ```bash
@@ -114,12 +117,23 @@ VITE_PLAYGROUND_ENDPOINT=/playground
 - **Solution**: Added React as devDependency (not bundled in production)
 - **Result**: No console errors, pure Vue app in production
 
+### CORS and Authentication Setup
+- **Issue**: CORS preflight failures with `credentials: 'include'`
+- **Solution**: Changed to `credentials: 'omit'` and use Bearer token authentication
+- **Result**: Proper authentication flow with local and remote APIs
+
+### GraphQL Schema Compatibility
+- **Issue**: Generated types expecting `token` field, backend returns `accessToken`/`refreshToken`
+- **Solution**: Updated mutations and composables to match actual backend schema
+- **Result**: Type-safe authentication with proper token handling
+
 ### UI Component Strategy
-- **PivotUI**: Enterprise-grade Material Design 3 component library
-- **Available Components**: Button (5 variants), Table (sorting, density), Typography
-- **Design System**: 8px border radius, OKLCH color space, WCAG 2.1 AA compliance
-- **Professional Palette**: Dark teal and blue-gray colors optimized for ERP/accounting
-- **Future Components**: Forms, navigation, status indicators, pagination (as needed)
+- **DaisyUI**: Utility-first component library built on Tailwind CSS
+- **Professional Themes**: "corporate" (light blue) and "business" (dark) themes
+- **Available Components**: Cards, buttons, forms, alerts, tables with utility classes
+- **Design System**: Consistent spacing, colors, and typography via Tailwind tokens
+- **Theme System**: Automatic dark/light mode support with CSS custom properties
+- **Accessibility**: WCAG-compliant color combinations and focus states built-in
 
 ## API Service Architecture (NEW)
 - **Scalable Service Layer**: Type-safe API services with centralized error handling
@@ -137,6 +151,22 @@ const result = await authService.login(email, password)
 import { useAuth } from '@/composables/useAuth'
 const { login, isLoggingIn, loginError } = useAuth()
 await login(email, password)
+```
+
+### UI Component Usage
+```vue
+<template>
+  <!-- DaisyUI Components -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title">Login</h2>
+      <div class="form-control">
+        <input type="email" class="input input-bordered input-primary" />
+      </div>
+      <button class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+</template>
 ```
 
 ## Development Workflow

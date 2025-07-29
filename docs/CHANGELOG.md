@@ -2,7 +2,95 @@
 
 A chronological record of major development milestones and architectural decisions for CasApp.
 
-## [2025-01-29] - PivotUI Component Library Integration
+## [2025-01-29] - UI Framework Migration: PivotUI → DaisyUI
+
+### 🎨 **Major UI Migration: PivotUI to DaisyUI with Professional Themes**
+
+**Commits**: 
+- Migration from PivotUI to DaisyUI professional component system
+- Fix CORS and GraphQL schema compatibility issues
+
+### Migration Overview
+- **From**: PivotUI v0.1.5 (Enterprise component library)
+- **To**: DaisyUI v5.0.49 + Tailwind CSS v4.1.11 (Utility-first CSS framework)
+- **Reason**: Better ecosystem support, theme system, and development velocity
+
+### Key Changes Made
+
+#### 1. **Dependency Migration**
+- ✅ Removed `pivotui@^0.1.5` from package.json
+- ✅ Added `daisyui@^5.0.49` (devDependency)
+- ✅ Added `tailwindcss@^4.1.11` + `@tailwindcss/vite@^4.1.11` (dependencies)
+- ✅ Configured professional themes: "corporate" (light) + "business" (dark)
+
+#### 2. **Component Rebuilds**
+- **LoginForm.vue**: Rebuilt with DaisyUI components (card, form-control, input, btn, alert)
+- **LoginPage.vue**: Updated with DaisyUI styling and professional layout
+- **DashboardPage.vue**: Migrated custom Card/Button components to DaisyUI equivalents
+- **ApiTestingPage.vue**: Removed PivotUI imports (build-compatible)
+- **App.vue**: Updated background colors to use DaisyUI theme tokens
+
+#### 3. **Theme Configuration**
+```javascript
+// tailwind.config.js
+daisyui: {
+  themes: [
+    "corporate", // Professional blue theme (light mode)
+    "business",  // Professional dark theme
+  ],
+  darkTheme: "business",
+}
+```
+
+#### 4. **Technical Fixes**
+
+##### **CORS Resolution**
+- **Issue**: `credentials: 'include'` causing CORS preflight failures
+- **Solution**: Changed to `credentials: 'omit'` in Apollo HTTP link
+- **Impact**: Now uses Bearer token authentication instead of cookies
+
+##### **GraphQL Schema Compatibility**
+- **Issue**: Local schema used `accessToken`/`refreshToken`, mutations expected `token`
+- **Solution**: Updated mutations and types to match actual backend schema
+- **Fixed**: CodeGen configuration to import `Ref` from Vue instead of apollo-composable
+
+#### 5. **Updated Files**
+- `src/main.ts` - Removed PivotUI imports
+- `src/style.css` - Updated to DaisyUI imports
+- `src/lib/apollo.ts` - Fixed CORS credentials issue
+- `src/graphql/mutations.ts` - Updated LOGIN_MUTATION for new schema
+- `src/composables/useAuth.ts` - Updated to use `accessToken` field
+- `codegen.ts` - Fixed Vue import configuration
+- `tailwind.config.js` - Added DaisyUI configuration
+
+### Professional Theme Benefits
+- **Corporate Theme**: Clean blue-based palette for professional applications
+- **Business Theme**: Dark mode with proper contrast ratios
+- **Built-in Components**: Cards, buttons, forms, alerts with consistent styling
+- **Theme Switching**: Automatic dark/light mode support
+- **Accessibility**: WCAG-compliant color combinations built-in
+
+### Developer Experience Improvements
+- **Faster Development**: Utility classes instead of custom component imports
+- **Better Documentation**: DaisyUI has extensive documentation and examples
+- **Theme Consistency**: Design tokens ensure consistent colors and spacing
+- **No Custom CSS**: Reduced maintenance overhead with utility-first approach
+
+### Breaking Changes
+- ❌ All PivotUI component imports removed
+- ❌ Custom UI components (Card, Button, Alert) no longer available
+- ✅ Replaced with DaisyUI equivalent classes and structure
+
+### Migration Benefits
+1. **Ecosystem**: Better Tailwind CSS ecosystem support
+2. **Themes**: Professional pre-built themes vs custom color definitions  
+3. **Maintenance**: Utility-first reduces custom CSS maintenance
+4. **Documentation**: Better community resources and examples
+5. **Performance**: Smaller bundle size with tree-shaking
+
+---
+
+## [2025-01-29] - PivotUI Component Library Integration (DEPRECATED)
 
 ### 🎨 **Integration: PivotUI Enterprise Component Library**
 

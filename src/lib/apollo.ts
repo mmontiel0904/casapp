@@ -39,7 +39,7 @@ const authLink = setContext((_, { headers }) => {
 // HTTP link for GraphQL endpoint
 const httpLink = createHttpLink({
   uri: `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_GRAPHQL_ENDPOINT}`,
-  credentials: 'include' // Include cookies for CORS
+  credentials: 'omit' // Don't send credentials, use Bearer token instead
 })
 
 // Enhanced cache configuration

@@ -3,8 +3,16 @@ schema {
   mutation: MutationRoot
 }
 
+input AcceptInvitationInput {
+  firstName: String
+  invitationToken: String!
+  lastName: String
+  password: String!
+}
+
 type AuthPayload {
-  token: String!
+  accessToken: String!
+  refreshToken: String!
   user: User!
 }
 
@@ -14,6 +22,20 @@ Implement the DateTime<Utc> scalar
 The input/output is a string in RFC3339 format.
 """
 scalar DateTime
+
+type Invitation {
+  createdAt: DateTime!
+  email: String!
+  expiresAt: DateTime!
+  id: UUID!
+  inviterUserId: UUID!
+  isUsed: Boolean!
+  usedAt: DateTime
+}
+
+input InviteUserInput {
+  email: String!
+}
 
 input LoginInput {
   email: String!
@@ -25,14 +47,25 @@ type MessageResponse {
 }
 
 type MutationRoot {
+  acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
+  inviteUser(input: InviteUserInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
+  logout: MessageResponse!
+  refreshToken(input: RefreshTokenInput!): AuthPayload!
   register(input: RegisterInput!): User!
+  requestPasswordReset(input: RequestPasswordResetInput!): MessageResponse!
+  resetPassword(input: ResetPasswordInput!): MessageResponse!
   verifyEmail(token: String!): MessageResponse!
 }
 
 type QueryRoot {
   health: String!
   me: User!
+  myInvitations: [Invitation!]!
+}
+
+input RefreshTokenInput {
+  refreshToken: String!
 }
 
 input RegisterInput {
@@ -40,6 +73,15 @@ input RegisterInput {
   firstName: String
   lastName: String
   password: String!
+}
+
+input RequestPasswordResetInput {
+  email: String!
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
 }
 
 """
