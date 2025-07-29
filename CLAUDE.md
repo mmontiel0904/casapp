@@ -35,14 +35,22 @@ src/
 ├── components/
 │   ├── HelloWorld.vue          # Welcome component
 │   └── LoginForm.vue           # GraphQL login form with styling
+├── composables/                # Vue 3 composables
+│   ├── useApiState.ts         # Reactive API state management
+│   └── useAuth.ts             # Authentication composable
 ├── generated/                  # Auto-generated GraphQL files
 │   ├── graphql.ts             # Types + Vue composables
 │   └── schema.graphql         # Local schema copy
 ├── graphql/
 │   └── mutations.ts           # GraphQL operations
 ├── lib/
-│   ├── apollo.ts              # Apollo Client setup
+│   ├── apollo.ts              # Enhanced Apollo Client with error handling
 │   └── apollo-provider.ts     # Vue provider integration
+├── services/                   # API service layer
+│   ├── api.ts                 # Base API services with type safety
+│   └── README.md              # Service architecture documentation
+├── types/
+│   └── feedback.ts            # Feedback system types for UI components
 ├── App.vue                    # Main app component
 └── main.ts                    # App entry point
 ```
@@ -109,11 +117,29 @@ VITE_PLAYGROUND_ENDPOINT=/playground
 - **Components**: Scoped styles with clean form styling
 - **Layout**: Full viewport height, responsive design
 
+## API Service Architecture (NEW)
+- **Scalable Service Layer**: Type-safe API services with centralized error handling
+- **Reactive State Management**: Vue composables for loading/error states
+- **Enhanced Apollo Client**: Error links, auth headers, optimized caching
+- **Future-Ready Feedback**: Prepared types for UI notification components
+
+### Service Usage
+```typescript
+// Using API services directly
+import { authService } from '@/services/api'
+const result = await authService.login(email, password)
+
+// Using reactive composables
+import { useAuth } from '@/composables/useAuth'
+const { login, isLoggingIn, loginError } = useAuth()
+await login(email, password)
+```
+
 ## Development Workflow
 1. **Schema Updates**: Run `yarn update-schema` to sync with API changes
 2. **New Operations**: Add GraphQL operations to `src/graphql/` files
 3. **Type Generation**: Run `yarn generate-types` after adding operations
-4. **Component Development**: Use generated composables with full type safety
+4. **Component Development**: Use generated composables or service layer with full type safety
 5. **Build & Deploy**: `yarn build` creates optimized bundle for Railway
 
 ## VS Code Setup

@@ -6,6 +6,8 @@ A Vue 3 Single Page Application with automated GraphQL client generation and typ
 
 - **Vue 3** with TypeScript and Composition API
 - **Apollo GraphQL Client** with automatic type generation
+- **Scalable API Service Layer** with centralized error handling
+- **Reactive State Management** using Vue composables
 - **Zero-maintenance GraphQL integration** - types auto-generated from remote schema
 - **Railway-ready deployment** configuration
 - **Full type safety** for all GraphQL operations
@@ -92,19 +94,17 @@ The project automatically generates TypeScript types and Vue composables from yo
 ```
 src/
 ├── components/           # Vue components
-│   ├── HelloWorld.vue   # Welcome component  
-│   └── LoginForm.vue    # Login form with GraphQL
+├── composables/         # Vue 3 composables (useAuth, useApiState)
+├── services/            # API service layer with type safety
+├── types/               # TypeScript type definitions
 ├── generated/           # Auto-generated GraphQL files
-│   ├── graphql.ts      # Types + composables
-│   └── schema.graphql  # Schema copy
 ├── graphql/            # GraphQL operations
-│   └── mutations.ts    # Mutation definitions
-├── lib/                # Core libraries
-│   ├── apollo.ts       # Apollo Client setup
-│   └── apollo-provider.ts # Vue provider
+├── lib/                # Enhanced Apollo Client setup
 ├── App.vue             # Main app component
 └── main.ts             # Application entry point
 ```
+
+> 📖 See `docs/CHANGELOG.md` for detailed development history
 
 ## 📡 GraphQL API Integration
 
@@ -151,12 +151,18 @@ The API provides these operations:
    yarn generate-types
    ```
 
-3. **Use in components**:
+3. **Use in components** (choose your approach):
    ```vue
+   <!-- Option A: Generated composables -->
    <script setup lang="ts">
    import { useMyQueryQuery } from '../generated/graphql'
-   
    const { result, loading, error } = useMyQueryQuery()
+   </script>
+   
+   <!-- Option B: Service layer -->
+   <script setup lang="ts">  
+   import { useAuth } from '../composables/useAuth'
+   const { login, isLoggingIn, loginError } = useAuth()
    </script>
    ```
 
