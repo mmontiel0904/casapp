@@ -1,32 +1,7 @@
 <template>
   <div class="min-h-screen bg-base-200">
-    <!-- Header -->
-    <header class="bg-base-100 shadow-sm border-b border-base-300">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <!-- Logo/Title -->
-          <div class="flex items-center">
-            <h1 class="text-xl font-semibold">
-              CasApp Dashboard
-            </h1>
-          </div>
-
-          <!-- User Menu -->
-          <div class="flex items-center space-x-4">
-            <span class="text-sm text-base-content/70">
-              Welcome, {{ userDisplayName }}
-            </span>
-            
-            <button
-              class="btn btn-outline"
-              @click="handleLogout"
-            >
-              Sign out
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
+    <!-- Navigation Bar -->
+    <NavBar />
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
@@ -160,13 +135,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useHealthQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
+import NavBar from '../components/NavBar.vue'
 
-const router = useRouter()
-const { currentUser, logout } = useAuth()
+const { currentUser } = useAuth()
 
 // Apollo health query with feedback
 const { result: healthResult, error: healthError } = useHealthQuery()
@@ -217,10 +191,7 @@ const emailVerifiedClasses = computed(() => {
 })
 
 // Methods
-const handleLogout = async () => {
-  await logout()
-  router.push('/login')
-}
+// Logout is now handled by NavBar component
 
 // Health check is now automatic with Apollo query - no manual function needed
 

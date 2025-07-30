@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useLoginMutation } from '../generated/graphql'
 import { useAuth } from '../composables/useAuth'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
@@ -60,6 +61,8 @@ const loginForm = reactive({
   password: ''
 })
 
+const router = useRouter()
+
 // Apollo's generated composable - fully type-safe
 const { mutate: login, loading, error } = useLoginMutation()
 const { setUser } = useAuth()
@@ -68,8 +71,9 @@ const loginResult = ref<any>(null)
 // Auto-handle feedback for login operations
 const feedback = useApolloFeedback()
 feedback.handleMutation(loading, error, () => {
-  // Success callback - clear any previous results
+  // Success callback - redirect to dashboard
   loginResult.value = null
+  router.push('/')
 }, {
   successTitle: 'Welcome!',
   successMessage: 'Successfully logged in',
