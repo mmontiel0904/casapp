@@ -1,50 +1,88 @@
 <template>
-  <div class="card w-96 bg-base-100 shadow-xl mx-auto mt-8">
-    <div class="card-body">
-      <h2 class="card-title text-2xl font-bold text-center justify-center mb-6">Login</h2>
+  <div class="card w-full max-w-lg bg-base-100 shadow-2xl mx-auto">
+    <div class="card-body p-8">
+      <!-- Header Section -->
+      <div class="text-center mb-8">
+        <h2 class="card-title text-3xl font-bold justify-center text-base-content mb-2">
+          Welcome Back
+        </h2>
+        <p class="text-base-content/70 text-sm">
+          Sign in to your account to continue
+        </p>
+      </div>
       
-      <form @submit.prevent="handleLogin" class="space-y-4">
+      <!-- Login Form -->
+      <form @submit.prevent="handleLogin" class="space-y-6">
+        <!-- Email Field -->
         <div class="form-control">
-          <label class="label" for="email">
-            <span class="label-text">Email</span>
+          <label class="label pb-2" for="email">
+            <span class="label-text font-medium text-base-content">Email Address</span>
           </label>
           <input 
             id="email"
             v-model="loginForm.email" 
             type="email" 
-            placeholder="Enter your email"
-            class="input input-bordered input-primary w-full"
+            placeholder="your@email.com"
+            class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+            :class="{ 'input-error': error && error.message.toLowerCase().includes('email') }"
             required 
+            autocomplete="email"
           />
         </div>
         
+        <!-- Password Field -->
         <div class="form-control">
-          <label class="label" for="password">
-            <span class="label-text">Password</span>
+          <label class="label pb-2" for="password">
+            <span class="label-text font-medium text-base-content">Password</span>
           </label>
           <input 
             id="password"
             v-model="loginForm.password" 
             type="password" 
             placeholder="Enter your password"
-            class="input input-bordered input-primary w-full"
+            class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+            :class="{ 'input-error': error && error.message.toLowerCase().includes('password') }"
             required 
+            autocomplete="current-password"
           />
+          <label class="label pt-1">
+            <span class="label-text-alt"></span>
+            <a href="#" class="label-text-alt link link-hover text-accent">
+              Forgot password?
+            </a>
+          </label>
         </div>
         
-        <div class="form-control mt-6">
+        <!-- Submit Button -->
+        <div class="form-control mt-8">
           <button 
             type="submit" 
-            class="btn btn-primary"
+            class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
             :class="{ 'loading': loading }"
             :disabled="loading"
           >
-            <span v-if="!loading">Login</span>
-            <span v-else>Logging in...</span>
+            <span v-if="!loading" class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign In
+            </span>
+            <span v-else class="loading loading-spinner loading-sm"></span>
           </button>
         </div>
       </form>
+
+      <!-- Footer Section -->
+      <div class="divider text-base-content/50 text-xs">OR</div>
       
+      <div class="text-center">
+        <p class="text-base-content/70 text-sm">
+          Don't have an account? 
+          <a href="#" class="link link-accent font-medium">
+            Contact Administrator
+          </a>
+        </p>
+      </div>
     </div>
   </div>
 </template>
