@@ -8,7 +8,7 @@
 
 ## Tech Stack
 - **Frontend**: Vue 3 + TypeScript + Vite
-- **UI Framework**: DaisyUI v5.0.49 + Tailwind CSS v4.1.11 with professional themes
+- **UI Framework**: DaisyUI v5.0.49 + Tailwind CSS v4.1.11 with garden/forest themes
 - **GraphQL Client**: Apollo Client with Vue Apollo Composable
 - **Type Generation**: GraphQL Code Generator
 - **Package Manager**: Yarn with node-modules (not PnP)
@@ -130,7 +130,7 @@ VITE_PLAYGROUND_ENDPOINT=/playground
 
 ### UI Component Strategy
 - **DaisyUI**: Utility-first component library built on Tailwind CSS
-- **Professional Themes**: "corporate" (light blue) and "business" (dark) themes
+- **Professional Themes**: "garden" (fresh green light) and "forest" (natural dark) themes
 - **Available Components**: Cards, buttons, forms, alerts, tables with utility classes
 - **Design System**: Consistent spacing, colors, and typography via Tailwind tokens
 - **Theme System**: Automatic dark/light mode support with CSS custom properties

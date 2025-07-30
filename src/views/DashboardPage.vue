@@ -177,17 +177,17 @@ const userDisplayName = computed(() => {
 
 const healthStatusClasses = computed(() => {
   if (healthStatus.value?.toLowerCase().includes('healthy') || healthStatus.value?.toLowerCase().includes('ok')) {
-    return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
+    return 'badge badge-success badge-sm'
   }
-  return 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
+  return 'badge badge-error badge-sm'
 })
 
 const emailVerifiedClasses = computed(() => {
   if (!currentUser.value) return ''
   
   return currentUser.value.isEmailVerified
-    ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
-    : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800'
+    ? 'badge badge-success badge-sm'
+    : 'badge badge-warning badge-sm'
 })
 
 // Methods

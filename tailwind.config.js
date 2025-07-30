@@ -8,11 +8,4 @@ export default {
     extend: {},
   },
   plugins: [require("daisyui")],
-  daisyui: {
-    themes: [
-      "corporate", // Professional blue theme for light mode
-      "business",  // Professional dark theme
-    ],
-    darkTheme: "business",
-  },
 }
