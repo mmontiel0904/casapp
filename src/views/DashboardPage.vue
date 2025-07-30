@@ -163,12 +163,20 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useHealthQuery } from '../generated/graphql'
+import { useApolloFeedback } from '../composables/useApolloFeedback'
 
 const router = useRouter()
 const { currentUser, logout } = useAuth()
 
-// Apollo health query
+// Apollo health query with feedback
 const { result: healthResult, error: healthError } = useHealthQuery()
+
+// Auto-handle health query errors (but don't show success - it's just background data)
+const feedback = useApolloFeedback()
+feedback.handleQuery(healthError, {
+  errorTitle: 'Health Check Failed',
+  showNetworkErrors: true
+})
 
 // Local state
 const showUserProfile = ref(false)

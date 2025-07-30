@@ -45,19 +45,6 @@
         </div>
       </form>
       
-      <div v-if="error" class="alert alert-error mt-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>{{ error.message }}</span>
-      </div>
-      
-      <div v-if="loginResult" class="alert alert-success mt-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>Login successful! Welcome {{ loginResult.login.user.firstName }}</span>
-      </div>
     </div>
   </div>
 </template>
@@ -66,6 +53,7 @@
 import { reactive, ref } from 'vue'
 import { useLoginMutation } from '../generated/graphql'
 import { useAuth } from '../composables/useAuth'
+import { useApolloFeedback } from '../composables/useApolloFeedback'
 
 const loginForm = reactive({
   email: '',
@@ -76,6 +64,17 @@ const loginForm = reactive({
 const { mutate: login, loading, error } = useLoginMutation()
 const { setUser } = useAuth()
 const loginResult = ref<any>(null)
+
+// Auto-handle feedback for login operations
+const feedback = useApolloFeedback()
+feedback.handleMutation(loading, error, () => {
+  // Success callback - clear any previous results
+  loginResult.value = null
+}, {
+  successTitle: 'Welcome!',
+  successMessage: 'Successfully logged in',
+  errorTitle: 'Login Failed'
+})
 
 const handleLogin = async () => {
   try {

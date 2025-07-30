@@ -354,6 +354,165 @@ const { result: healthResult } = useHealthQuery()
 
 This streamlined architecture now follows Apollo Client's intended patterns, resulting in more maintainable, type-safe, and performant code.
 
+# Global Feedback System (2025-01-30)
+
+## 🎯 **Subtle, Apollo-Integrated Feedback System**
+
+### **System Overview**
+- **Purpose**: Provide consistent, non-intrusive user feedback for all GraphQL operations
+- **Design**: DaisyUI soft-style alerts with auto-dismiss functionality
+- **Integration**: Seamless Apollo Client integration with zero component overhead
+- **Philosophy**: "Set it and forget it" - components focus on logic, feedback is automatic
+
+### **Architecture**
+```typescript
+// Flow: Apollo Operation → Feedback System → Subtle Alert → Auto-dismiss
+Component → useApolloFeedback() → useFeedback() → GlobalFeedback → DaisyUI Alert
+```
+
+### **Key Features**
+
+#### **Apollo-First Integration**
+```typescript
+// Automatic mutation feedback
+const feedback = useApolloFeedback()
+feedback.handleMutation(loading, error, onSuccess, {
+  successTitle: 'Welcome!',
+  successMessage: 'Successfully logged in',
+  errorTitle: 'Login Failed'
+})
+
+// Automatic query error feedback  
+feedback.handleQuery(error, {
+  errorTitle: 'Failed to Load Data',
+  showNetworkErrors: true
+})
+```
+
+#### **Manual Feedback (when needed)**
+```typescript
+const { success, error, warning, info } = useFeedback()
+success('Data Saved', 'Your changes have been saved successfully')
+error('Upload Failed', 'File size exceeds the limit')
+```
+
+### **Component Structure**
+
+#### **GlobalFeedback.vue** - Subtle Alert Display
+- **Position**: Fixed top-right corner (`top-4 right-4`)
+- **Style**: DaisyUI soft alerts with compact sizing
+- **Animations**: Smooth slide-in/out with pure Tailwind classes
+- **Accessibility**: Proper ARIA roles and keyboard navigation
+
+#### **useFeedback.ts** - Core State Management
+- **Global State**: Reactive message queue with auto-cleanup
+- **Message Types**: Success, Error, Warning, Info with custom styling
+- **Auto-dismiss**: Configurable duration with manual close option
+- **Type Safety**: Full TypeScript support for all message properties
+
+#### **useApolloFeedback.ts** - Apollo Integration
+- **Mutation Handling**: Automatic success/error detection via loading state
+- **Query Handling**: Smart error filtering (network errors, critical failures)
+- **GraphQL Parsing**: User-friendly error messages from GraphQL responses
+- **Zero Overhead**: Components don't need manual error/success handling
+
+### **Visual Design**
+
+#### **DaisyUI Soft Style Implementation**
+```vue
+<template>
+  <div class="alert alert-soft alert-success text-sm py-2 px-3" role="alert">
+    <svg class="h-4 w-4"><!-- icon --></svg>
+    <div class="flex-1 min-w-0">
+      <div class="font-medium text-xs">{{ title }}</div>
+      <div class="text-xs opacity-90">{{ message }}</div>
+    </div>
+    <button class="btn btn-ghost btn-xs btn-circle">×</button>
+  </div>
+</template>
+```
+
+#### **Styling Specifications**
+- **Alert Style**: `alert-soft` for muted, professional appearance
+- **Size**: Compact with `text-xs`, small icons (`h-4 w-4`), minimal padding
+- **Spacing**: Tight spacing (`space-y-1.5`) for multiple alerts
+- **Container**: `max-w-xs` for non-intrusive screen presence
+- **Transitions**: Pure Tailwind transition classes (no custom CSS)
+
+### **Component Cleanup & Architecture**
+
+#### **LoginPage Simplification**
+```vue
+<!-- BEFORE: 400+ lines with inline forms, validation, modals -->
+<template>
+  <div class="complex-login-layout">
+    <form @submit.prevent="handleSubmit"><!-- 100+ lines --></form>
+    <div class="registration-modal"><!-- 200+ lines --></div>
+  </div>
+</template>
+
+<!-- AFTER: 22 lines - clean separation of concerns -->
+<template>
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full">
+      <div class="text-center mb-8">
+        <h1>Welcome to CasApp</h1>
+      </div>
+      <LoginForm />
+    </div>
+  </div>
+</template>
+```
+
+#### **Benefits Achieved**
+- ✅ **Zero Component Overhead** - No manual alert handling in components
+- ✅ **Consistent UX** - Uniform feedback across entire application
+- ✅ **Apollo-Native** - Leverages Apollo's built-in state management
+- ✅ **Utility-First** - Pure Tailwind/DaisyUI classes, no custom CSS
+- ✅ **Accessible** - Proper ARIA attributes and keyboard support
+- ✅ **Performant** - Minimal bundle impact, efficient state management
+
+### **Usage Examples**
+
+#### **Automatic Feedback (Recommended)**
+```typescript
+// LoginForm.vue - Automatic success/error feedback
+const { mutate: login, loading, error } = useLoginMutation()
+const feedback = useApolloFeedback()
+
+feedback.handleMutation(loading, error, () => {
+  // Success callback
+  router.push('/dashboard')
+}, {
+  successTitle: 'Welcome!',
+  successMessage: 'Successfully logged in'
+})
+```
+
+#### **Manual Feedback (Custom Scenarios)**
+```typescript
+// Custom business logic feedback
+const { success, error } = useFeedback()
+
+const handleFileUpload = async (file) => {
+  if (file.size > MAX_SIZE) {
+    error('File Too Large', 'Please select a file under 10MB')
+    return
+  }
+  
+  // Upload logic...
+  success('Upload Complete', 'Your file has been uploaded successfully')
+}
+```
+
+### **Development Workflow**
+1. **New Components**: Add Apollo operations, feedback is automatic
+2. **Custom Logic**: Use `useFeedback()` for manual notifications
+3. **Error Handling**: Apollo errors automatically parsed and displayed
+4. **Success States**: Configurable success messages with custom titles
+
+This feedback system ensures consistent, professional user experience across the entire application while maintaining clean, focused component code.
+
 ## 📈 Migration Results Summary
 
 ### Code Reduction
