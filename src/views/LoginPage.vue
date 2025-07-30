@@ -225,9 +225,14 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { useLoginMutation, useRegisterMutation } from '../generated/graphql'
 
 const router = useRouter()
-const { login, register, isLoggingIn, isRegistering, loginError, registerError } = useAuth()
+const { setUser } = useAuth()
+
+// Apollo composables for authentication
+const { mutate: loginMutate, loading: isLoggingIn, error: loginError } = useLoginMutation()
+const { mutate: registerMutate, loading: isRegistering, error: registerError } = useRegisterMutation()
 
 // Login form
 const form = ref({
@@ -306,10 +311,24 @@ const handleSubmit = async () => {
   
   if (!isFormValid.value) return
 
-  const result = await login(form.value.email, form.value.password)
-  
-  if (result.isSuccess) {
-    router.push('/')
+  try {
+    const result = await loginMutate({
+      email: form.value.email,
+      password: form.value.password
+    })
+    
+    if (result?.data?.login) {
+      const { accessToken, user } = result.data.login
+      const fullUser = {
+        ...user,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      setUser(fullUser, accessToken)
+      router.push('/')
+    }
+  } catch (error) {
+    console.error('Login failed:', error)
   }
 }
 
@@ -324,23 +343,29 @@ const handleRegister = async () => {
     return
   }
 
-  const result = await register({
-    email: registerForm.value.email,
-    password: registerForm.value.password,
-    firstName: registerForm.value.firstName || undefined,
-    lastName: registerForm.value.lastName || undefined
-  })
+  try {
+    const result = await registerMutate({
+      input: {
+        email: registerForm.value.email,
+        password: registerForm.value.password,
+        firstName: registerForm.value.firstName || undefined,
+        lastName: registerForm.value.lastName || undefined
+      }
+    })
 
-  if (result.isSuccess) {
-    registerSuccess.value = true
-    showRegisterForm.value = false
-    // Reset form
-    registerForm.value = {
-      email: '',
-      password: '',
-      firstName: '',
-      lastName: ''
+    if (result?.data?.register) {
+      registerSuccess.value = true
+      showRegisterForm.value = false
+      // Reset form
+      registerForm.value = {
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: ''
+      }
     }
+  } catch (error) {
+    console.error('Registration failed:', error)
   }
 }
 

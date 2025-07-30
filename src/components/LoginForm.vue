@@ -65,22 +65,37 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useLoginMutation } from '../generated/graphql'
+import { useAuth } from '../composables/useAuth'
 
 const loginForm = reactive({
   email: '',
   password: ''
 })
 
+// Apollo's generated composable - fully type-safe
 const { mutate: login, loading, error } = useLoginMutation()
+const { setUser } = useAuth()
 const loginResult = ref<any>(null)
 
 const handleLogin = async () => {
   try {
-    const result = await login({
-      email: loginForm.email,
-      password: loginForm.password
+    // Use generated mutation variables structure
+    const result = await login({ 
+      email: loginForm.email, 
+      password: loginForm.password 
     })
-    loginResult.value = result?.data
+    
+    if (result?.data?.login) {
+      const { accessToken, user } = result.data.login
+      // Type-safe user with all required fields
+      const fullUser = {
+        ...user,
+        createdAt: new Date().toISOString(), // Temp until we get from API
+        updatedAt: new Date().toISOString()
+      }
+      setUser(fullUser, accessToken)
+      loginResult.value = result.data
+    }
   } catch (err) {
     console.error('Login failed:', err)
   }

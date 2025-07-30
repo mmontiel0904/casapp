@@ -25,13 +25,23 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 // Auth link for adding authentication headers
 const authLink = setContext((_, { headers }) => {
+  // Skip auth headers for local development to avoid CORS issues
+  if (import.meta.env.VITE_API_BASE_URL?.includes('127.0.0.1') || 
+      import.meta.env.VITE_API_BASE_URL?.includes('localhost')) {
+    console.log('Local development detected - skipping auth headers to avoid CORS')
+    return { headers }
+  }
+  
   // Get token from localStorage or state management
   const token = localStorage.getItem('auth_token')
+  
+  // Only add authorization header if token exists to avoid CORS preflight issues
+  const authHeaders = token ? { authorization: `Bearer ${token}` } : {}
   
   return {
     headers: {
       ...headers,
-      ...(token && { authorization: `Bearer ${token}` })
+      ...authHeaders
     }
   }
 })
@@ -42,44 +52,12 @@ const httpLink = createHttpLink({
   credentials: 'omit' // Don't send credentials, use Bearer token instead
 })
 
-// Enhanced cache configuration
-const cache = new InMemoryCache({
-  typePolicies: {
-    User: {
-      fields: {
-        // Cache user data more aggressively
-        id: {
-          merge: false
-        }
-      }
-    },
-    Query: {
-      fields: {
-        me: {
-          // Cache user profile for 5 minutes
-          merge: true
-        }
-      }
-    }
-  }
-})
+// Simple Apollo cache - let Apollo handle optimization
+const cache = new InMemoryCache()
 
 export const apolloClient = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
   cache,
-  defaultOptions: {
-    watchQuery: {
-      errorPolicy: 'all',
-      fetchPolicy: 'cache-first'
-    },
-    query: {
-      errorPolicy: 'all',
-      fetchPolicy: 'cache-first'
-    },
-    mutate: {
-      errorPolicy: 'all'
-    }
-  },
   connectToDevTools: import.meta.env.DEV
 })
 

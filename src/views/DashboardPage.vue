@@ -20,10 +20,8 @@
             <button
               class="btn btn-outline"
               @click="handleLogout"
-              :disabled="isLoggingOut"
             >
-              <span v-if="isLoggingOut">Signing out...</span>
-              <span v-else>Sign out</span>
+              Sign out
             </button>
           </div>
         </div>
@@ -62,7 +60,7 @@
         </div>
 
         <!-- API Testing Card (Admin Only) -->
-        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer" @click="navigateToApiTesting">
+        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
           <div class="card-body">
             <div class="flex items-center mb-2">
               <div class="h-8 w-8 bg-secondary/20 rounded-lg flex items-center justify-center mr-3">
@@ -79,7 +77,7 @@
         </div>
 
         <!-- Health Check Card -->
-        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow cursor-pointer" @click="checkApiHealth">
+        <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow">
           <div class="card-body">
             <div class="flex items-center mb-2">
               <div class="h-8 w-8 bg-accent/20 rounded-lg flex items-center justify-center mr-3">
@@ -161,18 +159,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
-import { healthService } from '../services/api'
+import { useHealthQuery } from '../generated/graphql'
 
 const router = useRouter()
-const { currentUser, logout, isLoggingOut, getCurrentUser } = useAuth()
+const { currentUser, logout } = useAuth()
+
+// Apollo health query
+const { result: healthResult, error: healthError } = useHealthQuery()
 
 // Local state
 const showUserProfile = ref(false)
-const healthStatus = ref<string | null>(null)
-const healthError = ref<any>(null)
+
+// Computed health status from Apollo
+const healthStatus = computed(() => healthResult.value?.health || null)
 
 // Computed properties
 const userDisplayName = computed(() => {
@@ -212,22 +214,7 @@ const handleLogout = async () => {
   router.push('/login')
 }
 
-const navigateToApiTesting = () => {
-  router.push('/api-testing')
-}
-
-const checkApiHealth = async () => {
-  healthError.value = null
-  healthStatus.value = null
-  
-  const result = await healthService.checkHealth()
-  
-  if (result.isSuccess) {
-    healthStatus.value = result.data!
-  } else {
-    healthError.value = result.error
-  }
-}
+// Health check is now automatic with Apollo query - no manual function needed
 
 const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -237,14 +224,5 @@ const formatDate = (dateString: string) => {
   })
 }
 
-// Lifecycle
-onMounted(async () => {
-  // Ensure we have fresh user data
-  if (!currentUser.value) {
-    await getCurrentUser()
-  }
-  
-  // Auto-check health on load
-  await checkApiHealth()
-})
+// Apollo automatically handles queries - no manual lifecycle needed
 </script>
