@@ -168,11 +168,46 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = { login: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
 
 export type RegisterMutationVariables = Exact<{
-  input: RegisterInput;
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type RegisterMutation = { register: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any } };
+export type RegisterMutation = { register: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any } };
+
+export type InviteUserMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type InviteUserMutation = { inviteUser: { id: any, email: string, inviterUserId: any, isUsed: boolean, createdAt: any, expiresAt: any } };
+
+export type AcceptInvitationMutationVariables = Exact<{
+  invitationToken: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type AcceptInvitationMutation = { acceptInvitation: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
+
+export type RequestPasswordResetMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type RequestPasswordResetMutation = { requestPasswordReset: { message: string } };
+
+export type ResetPasswordMutationVariables = Exact<{
+  token: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type ResetPasswordMutation = { resetPassword: { message: string } };
 
 export type VerifyEmailMutationVariables = Exact<{
   token: Scalars['String']['input'];
@@ -181,15 +216,22 @@ export type VerifyEmailMutationVariables = Exact<{
 
 export type VerifyEmailMutation = { verifyEmail: { message: string } };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type RefreshTokenMutationVariables = Exact<{
+  refreshToken: Scalars['String']['input'];
+}>;
 
 
-export type MeQuery = { me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any } };
+export type RefreshTokenMutation = { refreshToken: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
 
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type HealthQuery = { health: string };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeQuery = { me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any } };
 
 
 export const LoginDocument = gql`
@@ -231,14 +273,17 @@ export function useLoginMutation(options: VueApolloComposable.UseMutationOptions
 }
 export type LoginMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($input: RegisterInput!) {
-  register(input: $input) {
+    mutation Register($email: String!, $password: String!, $firstName: String, $lastName: String) {
+  register(
+    input: {email: $email, password: $password, firstName: $firstName, lastName: $lastName}
+  ) {
     id
     email
     firstName
     lastName
     isEmailVerified
     createdAt
+    updatedAt
   }
 }
     `;
@@ -256,7 +301,10 @@ export const RegisterDocument = gql`
  * @example
  * const { mutate, loading, error, onDone } = useRegisterMutation({
  *   variables: {
- *     input: // value for 'input'
+ *     email: // value for 'email'
+ *     password: // value for 'password'
+ *     firstName: // value for 'firstName'
+ *     lastName: // value for 'lastName'
  *   },
  * });
  */
@@ -264,6 +312,141 @@ export function useRegisterMutation(options: VueApolloComposable.UseMutationOpti
   return VueApolloComposable.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
 }
 export type RegisterMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RegisterMutation, RegisterMutationVariables>;
+export const InviteUserDocument = gql`
+    mutation InviteUser($email: String!) {
+  inviteUser(input: {email: $email}) {
+    id
+    email
+    inviterUserId
+    isUsed
+    createdAt
+    expiresAt
+  }
+}
+    `;
+
+/**
+ * __useInviteUserMutation__
+ *
+ * To run a mutation, you first call `useInviteUserMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useInviteUserMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useInviteUserMutation({
+ *   variables: {
+ *     email: // value for 'email'
+ *   },
+ * });
+ */
+export function useInviteUserMutation(options: VueApolloComposable.UseMutationOptions<InviteUserMutation, InviteUserMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<InviteUserMutation, InviteUserMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, options);
+}
+export type InviteUserMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<InviteUserMutation, InviteUserMutationVariables>;
+export const AcceptInvitationDocument = gql`
+    mutation AcceptInvitation($invitationToken: String!, $password: String!, $firstName: String, $lastName: String) {
+  acceptInvitation(
+    input: {invitationToken: $invitationToken, password: $password, firstName: $firstName, lastName: $lastName}
+  ) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      firstName
+      lastName
+      isEmailVerified
+    }
+  }
+}
+    `;
+
+/**
+ * __useAcceptInvitationMutation__
+ *
+ * To run a mutation, you first call `useAcceptInvitationMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptInvitationMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAcceptInvitationMutation({
+ *   variables: {
+ *     invitationToken: // value for 'invitationToken'
+ *     password: // value for 'password'
+ *     firstName: // value for 'firstName'
+ *     lastName: // value for 'lastName'
+ *   },
+ * });
+ */
+export function useAcceptInvitationMutation(options: VueApolloComposable.UseMutationOptions<AcceptInvitationMutation, AcceptInvitationMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AcceptInvitationMutation, AcceptInvitationMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AcceptInvitationMutation, AcceptInvitationMutationVariables>(AcceptInvitationDocument, options);
+}
+export type AcceptInvitationMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AcceptInvitationMutation, AcceptInvitationMutationVariables>;
+export const RequestPasswordResetDocument = gql`
+    mutation RequestPasswordReset($email: String!) {
+  requestPasswordReset(input: {email: $email}) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useRequestPasswordResetMutation__
+ *
+ * To run a mutation, you first call `useRequestPasswordResetMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRequestPasswordResetMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRequestPasswordResetMutation({
+ *   variables: {
+ *     email: // value for 'email'
+ *   },
+ * });
+ */
+export function useRequestPasswordResetMutation(options: VueApolloComposable.UseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>(RequestPasswordResetDocument, options);
+}
+export type RequestPasswordResetMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+export const ResetPasswordDocument = gql`
+    mutation ResetPassword($token: String!, $newPassword: String!) {
+  resetPassword(input: {token: $token, newPassword: $newPassword}) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useResetPasswordMutation__
+ *
+ * To run a mutation, you first call `useResetPasswordMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useResetPasswordMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useResetPasswordMutation({
+ *   variables: {
+ *     token: // value for 'token'
+ *     newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useResetPasswordMutation(options: VueApolloComposable.UseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, options);
+}
+export type ResetPasswordMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<ResetPasswordMutation, ResetPasswordMutationVariables>;
 export const VerifyEmailDocument = gql`
     mutation VerifyEmail($token: String!) {
   verifyEmail(token: $token) {
@@ -293,6 +476,68 @@ export function useVerifyEmailMutation(options: VueApolloComposable.UseMutationO
   return VueApolloComposable.useMutation<VerifyEmailMutation, VerifyEmailMutationVariables>(VerifyEmailDocument, options);
 }
 export type VerifyEmailMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<VerifyEmailMutation, VerifyEmailMutationVariables>;
+export const RefreshTokenDocument = gql`
+    mutation RefreshToken($refreshToken: String!) {
+  refreshToken(input: {refreshToken: $refreshToken}) {
+    accessToken
+    refreshToken
+    user {
+      id
+      email
+      firstName
+      lastName
+      isEmailVerified
+    }
+  }
+}
+    `;
+
+/**
+ * __useRefreshTokenMutation__
+ *
+ * To run a mutation, you first call `useRefreshTokenMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRefreshTokenMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRefreshTokenMutation({
+ *   variables: {
+ *     refreshToken: // value for 'refreshToken'
+ *   },
+ * });
+ */
+export function useRefreshTokenMutation(options: VueApolloComposable.UseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RefreshTokenMutation, RefreshTokenMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
+}
+export type RefreshTokenMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RefreshTokenMutation, RefreshTokenMutationVariables>;
+export const HealthDocument = gql`
+    query Health {
+  health
+}
+    `;
+
+/**
+ * __useHealthQuery__
+ *
+ * To run a query within a Vue component, call `useHealthQuery` and pass it any options that fit your needs.
+ * When your component renders, `useHealthQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useHealthQuery();
+ */
+export function useHealthQuery(options: VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<HealthQuery, HealthQueryVariables>(HealthDocument, {}, options);
+}
+export function useHealthLazyQuery(options: VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<HealthQuery, HealthQueryVariables>(HealthDocument, {}, options);
+}
+export type HealthQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<HealthQuery, HealthQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -326,28 +571,3 @@ export function useMeLazyQuery(options: VueApolloComposable.UseQueryOptions<MeQu
   return VueApolloComposable.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, {}, options);
 }
 export type MeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MeQuery, MeQueryVariables>;
-export const HealthDocument = gql`
-    query Health {
-  health
-}
-    `;
-
-/**
- * __useHealthQuery__
- *
- * To run a query within a Vue component, call `useHealthQuery` and pass it any options that fit your needs.
- * When your component renders, `useHealthQuery` returns an object from Apollo Client that contains result, loading and error properties
- * you can use to render your UI.
- *
- * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
- *
- * @example
- * const { result, loading, error } = useHealthQuery();
- */
-export function useHealthQuery(options: VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> = {}) {
-  return VueApolloComposable.useQuery<HealthQuery, HealthQueryVariables>(HealthDocument, {}, options);
-}
-export function useHealthLazyQuery(options: VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<HealthQuery, HealthQueryVariables>> = {}) {
-  return VueApolloComposable.useLazyQuery<HealthQuery, HealthQueryVariables>(HealthDocument, {}, options);
-}
-export type HealthQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<HealthQuery, HealthQueryVariables>;

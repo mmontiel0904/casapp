@@ -47,9 +47,9 @@
           />
           <label class="label pt-1">
             <span class="label-text-alt"></span>
-            <a href="#" class="label-text-alt link link-hover text-accent">
+            <router-link to="/forgot-password" class="label-text-alt link link-hover text-accent">
               Forgot password?
-            </a>
+            </router-link>
           </label>
         </div>
         
@@ -127,14 +127,15 @@ const handleLogin = async () => {
     })
     
     if (result?.data?.login) {
-      const { accessToken, user } = result.data.login
+      const { accessToken, refreshToken, user } = result.data.login
       // Type-safe user with all required fields
       const fullUser = {
         ...user,
         createdAt: new Date().toISOString(), // Temp until we get from API
         updatedAt: new Date().toISOString()
       }
-      setUser(fullUser, accessToken)
+      // Store both access and refresh tokens
+      setUser(fullUser, accessToken, refreshToken)
       loginResult.value = result.data
     }
   } catch (err) {

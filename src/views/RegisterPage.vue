@@ -1,0 +1,306 @@
+<template>
+  <div class="min-h-screen bg-gradient-to-br from-base-200 to-base-300 flex items-center justify-center py-8 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-lg">
+      <!-- App Branding -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-accent rounded-2xl shadow-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-accent-content" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </div>
+        <router-link to="/" class="text-4xl font-bold text-base-content mb-2 hover:text-accent transition-colors">
+          CasApp
+        </router-link>
+        <p class="text-base-content/60 text-sm">
+          {{ isInvitation ? 'Complete your invitation' : 'Create your account' }}
+        </p>
+      </div>
+
+      <!-- Registration Form -->
+      <div class="card w-full bg-base-100 shadow-2xl">
+        <div class="card-body p-8">
+          <!-- Header Section -->
+          <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-base-content mb-2">
+              {{ isInvitation ? 'Accept Invitation' : 'Create Account' }}
+            </h2>
+            <p class="text-base-content/70 text-sm">
+              {{ isInvitation 
+                ? `You've been invited to join CasApp. Complete your profile to get started.`
+                : 'Fill in your details to create a new account.'
+              }}
+            </p>
+          </div>
+
+          <!-- Invalid Token Message for Invitations -->
+          <div v-if="isInvitation && !isValidToken" class="alert alert-error mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h3 class="font-bold">Invalid or Expired Invitation</h3>
+              <div class="text-xs">This invitation link is invalid or has expired.</div>
+            </div>
+          </div>
+          
+          <!-- Registration Form -->
+          <form v-if="!isInvitation || isValidToken" @submit.prevent="handleRegistration" class="space-y-6">
+            <!-- Email Field (readonly for invitations) -->
+            <div class="form-control">
+              <label class="label pb-2" for="email">
+                <span class="label-text font-medium text-base-content">Email Address</span>
+              </label>
+              <input 
+                id="email"
+                v-model="registerForm.email" 
+                type="email" 
+                placeholder="your@email.com"
+                class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+                :class="{ 
+                  'input-error': error && error.message.toLowerCase().includes('email'),
+                  'input-disabled': isInvitation 
+                }"
+                :readonly="isInvitation"
+                required 
+                autocomplete="email"
+              />
+            </div>
+
+            <!-- Name Fields Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- First Name -->
+              <div class="form-control">
+                <label class="label pb-2" for="firstName">
+                  <span class="label-text font-medium text-base-content">First Name</span>
+                </label>
+                <input 
+                  id="firstName"
+                  v-model="registerForm.firstName" 
+                  type="text" 
+                  placeholder="John"
+                  class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+                  autocomplete="given-name"
+                />
+              </div>
+
+              <!-- Last Name -->
+              <div class="form-control">
+                <label class="label pb-2" for="lastName">
+                  <span class="label-text font-medium text-base-content">Last Name</span>
+                </label>
+                <input 
+                  id="lastName"
+                  v-model="registerForm.lastName" 
+                  type="text" 
+                  placeholder="Doe"
+                  class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+                  autocomplete="family-name"
+                />
+              </div>
+            </div>
+            
+            <!-- Password Field -->
+            <div class="form-control">
+              <label class="label pb-2" for="password">
+                <span class="label-text font-medium text-base-content">Password</span>
+              </label>
+              <input 
+                id="password"
+                v-model="registerForm.password" 
+                type="password" 
+                placeholder="Create a strong password"
+                class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+                :class="{ 'input-error': error && error.message.toLowerCase().includes('password') }"
+                required 
+                minlength="8"
+                autocomplete="new-password"
+              />
+              <label class="label pt-1">
+                <span class="label-text-alt text-base-content/60">Minimum 8 characters</span>
+              </label>
+            </div>
+
+            <!-- Confirm Password Field -->
+            <div class="form-control">
+              <label class="label pb-2" for="confirmPassword">
+                <span class="label-text font-medium text-base-content">Confirm Password</span>
+              </label>
+              <input 
+                id="confirmPassword"
+                v-model="registerForm.confirmPassword" 
+                type="password" 
+                placeholder="Confirm your password"
+                class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
+                :class="{ 'input-error': passwordMismatch }"
+                required 
+                minlength="8"
+                autocomplete="new-password"
+              />
+              <label v-if="passwordMismatch" class="label pt-1">
+                <span class="label-text-alt text-error">Passwords do not match</span>
+              </label>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="form-control mt-8">
+              <button 
+                type="submit" 
+                class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
+                :disabled="loading || passwordMismatch || !registerForm.password || !registerForm.confirmPassword || !registerForm.email"
+              >
+                <span v-if="!loading" class="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {{ isInvitation ? 'Complete Registration' : 'Create Account' }}
+                </span>
+                <span v-else class="loading loading-spinner loading-sm"></span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Footer Section -->
+          <div class="divider text-base-content/50 text-xs">OR</div>
+          
+          <div class="text-center">
+            <p class="text-base-content/70 text-sm">
+              Already have an account? 
+              <router-link to="/login" class="link link-accent font-medium">
+                Sign In
+              </router-link>
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <p class="text-base-content/50 text-xs">
+          © 2025 CasApp. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useRegisterMutation, useAcceptInvitationMutation } from '../generated/graphql'
+import { useAuth } from '../composables/useAuth'
+import { useApolloFeedback } from '../composables/useApolloFeedback'
+
+const router = useRouter()
+const route = useRoute()
+const { setUser } = useAuth()
+
+const registerForm = reactive({
+  email: '',
+  firstName: '',
+  lastName: '',
+  password: '',
+  confirmPassword: ''
+})
+
+const invitationToken = ref('')
+const isValidToken = ref(true)
+
+// Check if this is an invitation flow
+const isInvitation = computed(() => !!invitationToken.value)
+
+// Check if passwords match
+const passwordMismatch = computed(() => {
+  return registerForm.confirmPassword && registerForm.password !== registerForm.confirmPassword
+})
+
+// Apollo composables
+const { mutate: register, loading: registerLoading, error: registerError } = useRegisterMutation()
+const { mutate: acceptInvitation, loading: invitationLoading, error: invitationError } = useAcceptInvitationMutation()
+
+// Compute combined loading and error states
+const loading = computed(() => registerLoading.value || invitationLoading.value)
+const error = computed(() => registerError.value || invitationError.value)
+
+// Auto-handle feedback for registration operations
+const feedback = useApolloFeedback()
+feedback.handleMutation(loading, error, () => {
+  // Success callback - redirect to login or dashboard
+  if (isInvitation.value) {
+    // For invitations, user is automatically logged in
+    router.push('/')
+  } else {
+    // For regular registration, redirect to login
+    setTimeout(() => {
+      router.push('/login')
+    }, 2000)
+  }
+}, {
+  successTitle: isInvitation.value ? 'Welcome to CasApp!' : 'Account Created!',
+  successMessage: isInvitation.value 
+    ? 'Your account has been created and you are now logged in'
+    : 'Please check your email to verify your account',
+  errorTitle: isInvitation.value ? 'Invitation Failed' : 'Registration Failed'
+})
+
+onMounted(() => {
+  // Check for invitation token in URL
+  const token = route.query.token as string
+  if (token) {
+    invitationToken.value = token
+    // For invitations, email might be provided in the query params
+    const email = route.query.email as string
+    if (email) {
+      registerForm.email = email
+    }
+  }
+})
+
+const handleRegistration = async () => {
+  if (passwordMismatch.value) return
+  
+  try {
+    if (isInvitation.value) {
+      // Handle invitation acceptance
+      const result = await acceptInvitation({
+        invitationToken: invitationToken.value,
+        password: registerForm.password,
+        firstName: registerForm.firstName || null,
+        lastName: registerForm.lastName || null
+      })
+      
+      if (result?.data?.acceptInvitation) {
+        const { accessToken, refreshToken, user } = result.data.acceptInvitation
+        // Set user session for invitation acceptance
+        const fullUser = {
+          ...user,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+        setUser(fullUser, accessToken, refreshToken)
+      }
+    } else {
+      // Handle regular registration
+      const result = await register({
+        email: registerForm.email,
+        password: registerForm.password,
+        firstName: registerForm.firstName || null,
+        lastName: registerForm.lastName || null
+      })
+      
+      if (result?.data?.register) {
+        // Success is handled by the feedback system
+        console.log('User registered:', result.data.register)
+      }
+    }
+  } catch (err) {
+    console.error('Registration failed:', err)
+    // Check if it's a token error for invitations
+    if (isInvitation.value && err && typeof err === 'object' && 'message' in err) {
+      const errorMessage = (err as any).message.toLowerCase()
+      if (errorMessage.includes('token') || errorMessage.includes('expired') || errorMessage.includes('invalid') || errorMessage.includes('invitation')) {
+        isValidToken.value = false
+      }
+    }
+  }
+}
+</script>
