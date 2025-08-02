@@ -42,6 +42,10 @@ export type AcceptInvitationInput = {
   password: Scalars['String']['input'];
 };
 
+export type AdminResetUserPasswordInput = {
+  userId: Scalars['UUID']['input'];
+};
+
 export type AssignRoleInput = {
   roleId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
@@ -51,6 +55,11 @@ export type AuthPayload = {
   accessToken: Scalars['String']['output'];
   refreshToken: Scalars['String']['output'];
   user: User;
+};
+
+export type ChangePasswordInput = {
+  currentPassword: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
 };
 
 export type Invitation = {
@@ -84,7 +93,9 @@ export type MessageResponse = {
 
 export type MutationRoot = {
   acceptInvitation: AuthPayload;
+  adminResetUserPassword: MessageResponse;
   assignRole: User;
+  changePassword: MessageResponse;
   inviteUser: Invitation;
   inviteUserWithRole: Invitation;
   login: AuthPayload;
@@ -103,8 +114,18 @@ export type MutationRootAcceptInvitationArgs = {
 };
 
 
+export type MutationRootAdminResetUserPasswordArgs = {
+  input: AdminResetUserPasswordInput;
+};
+
+
 export type MutationRootAssignRoleArgs = {
   input: AssignRoleInput;
+};
+
+
+export type MutationRootChangePasswordArgs = {
+  input: ChangePasswordInput;
 };
 
 

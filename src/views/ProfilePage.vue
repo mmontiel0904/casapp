@@ -124,73 +124,7 @@
         </div>
 
         <!-- Security Section -->
-        <div class="card bg-base-100 shadow-xl">
-          <div class="card-body">
-            <h2 class="card-title text-xl mb-6">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Security Settings
-            </h2>
-
-            <!-- Password Change Form -->
-            <form @submit.prevent="handlePasswordChange" class="space-y-6">
-              <div class="alert alert-info">
-                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>Password change functionality will be available soon. Use "Forgot Password" on login for now.</span>
-              </div>
-
-              <div class="form-control">
-                <label class="label">
-                  <span class="label-text font-medium">Current Password</span>
-                </label>
-                <input 
-                  v-model="passwordForm.currentPassword"
-                  type="password" 
-                  placeholder="Enter current password"
-                  class="input input-bordered focus:input-secondary"
-                  disabled
-                />
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">New Password</span>
-                  </label>
-                  <input 
-                    v-model="passwordForm.newPassword"
-                    type="password" 
-                    placeholder="Enter new password"
-                    class="input input-bordered focus:input-secondary"
-                    disabled
-                  />
-                </div>
-
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">Confirm New Password</span>
-                  </label>
-                  <input 
-                    v-model="passwordForm.confirmPassword"
-                    type="password" 
-                    placeholder="Confirm new password"
-                    class="input input-bordered focus:input-secondary"
-                    disabled
-                  />
-                </div>
-              </div>
-
-              <div class="flex justify-end">
-                <button type="submit" class="btn btn-secondary" disabled>
-                  Change Password
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <PasswordChangeForm />
       </div>
 
       <!-- Sidebar Information -->
@@ -290,6 +224,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { usePermissions } from '../composables/usePermissions'
+import PasswordChangeForm from '../components/PasswordChangeForm.vue'
 import type { Role } from '../generated/graphql'
 
 // Auth and permissions
@@ -303,11 +238,6 @@ const profileForm = ref({
   email: ''
 })
 
-const passwordForm = ref({
-  currentPassword: '',
-  newPassword: '',
-  confirmPassword: ''
-})
 
 const updateLoading = ref(false)
 
@@ -389,10 +319,6 @@ const handleUpdateProfile = async () => {
   }
 }
 
-const handlePasswordChange = async () => {
-  // TODO: Implement password change when API supports it
-  console.log('Password change requested')
-}
 
 // Initialize form with current user data
 onMounted(() => {

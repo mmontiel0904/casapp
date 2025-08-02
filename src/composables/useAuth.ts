@@ -44,16 +44,23 @@ export function useAuth() {
     if (user.role && user.id) {
       try {
         const permissionsResult = await loadPermissions(undefined, { userId: user.id })
-        const permissions = permissionsResult?.data?.userPermissions || []
         
-        // Update user with permissions
-        authUser.permissions = permissions
-        currentUser.value = authUser
-        
-        // Update permission service with complete data
-        permissionService.setUser(authUser)
-        
-        console.log('User permissions loaded:', permissions)
+        // Handle the result properly - it can be false or the actual result
+        if (permissionsResult && typeof permissionsResult === 'object' && 'data' in permissionsResult) {
+          const data = permissionsResult.data as { userPermissions: string[] } | undefined
+          const permissions = data?.userPermissions || []
+          
+          // Update user with permissions
+          authUser.permissions = permissions
+          currentUser.value = authUser
+          
+          // Update permission service with complete data
+          permissionService.setUser(authUser)
+          
+          console.log('User permissions loaded:', permissions)
+        } else {
+          console.warn('Permissions query returned unexpected result:', permissionsResult)
+        }
       } catch (error) {
         console.warn('Could not load user permissions:', error)
         // Continue without permissions if fetch fails
@@ -85,16 +92,24 @@ export function useAuth() {
     if (currentUser.value?.id) {
       try {
         const permissionsResult = await loadPermissions(undefined, { userId: currentUser.value.id })
-        const permissions = permissionsResult?.data?.userPermissions || []
         
-        // Update user with new permissions
-        if (currentUser.value) {
-          currentUser.value.permissions = permissions
-          permissionService.setUser(currentUser.value)
+        // Handle the result properly - it can be false or the actual result
+        if (permissionsResult && typeof permissionsResult === 'object' && 'data' in permissionsResult) {
+          const data = permissionsResult.data as { userPermissions: string[] } | undefined
+          const permissions = data?.userPermissions || []
+          
+          // Update user with new permissions
+          if (currentUser.value) {
+            currentUser.value.permissions = permissions
+            permissionService.setUser(currentUser.value)
+          }
+          
+          console.log('User permissions refreshed:', permissions)
+          return permissions
+        } else {
+          console.warn('Permissions refresh returned unexpected result:', permissionsResult)
+          return []
         }
-        
-        console.log('User permissions refreshed:', permissions)
-        return permissions
       } catch (error) {
         console.warn('Could not refresh user permissions:', error)
         return []

@@ -127,7 +127,7 @@
                 </div>
 
                 <!-- Role Management Actions -->
-                <div v-if="canEditUserRoles && canManageUser(user)" class="dropdown dropdown-end">
+                <div v-if="canEditUserRoles && canManageUser(convertToAuthUser(user))" class="dropdown dropdown-end">
                   <label tabindex="0" class="btn btn-ghost btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
@@ -248,24 +248,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { 
   useAllUsersQuery, 
   useAllRolesQuery, 
   useAssignRoleMutation,
   useRemoveUserRoleMutation,
   useInviteUserWithRoleMutation,
-  type UserWithRole,
-  type Role
+  type Role,
+  type AllUsersQuery
 } from '../generated/graphql'
 import { usePermissions } from '../composables/usePermissions'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 import type { AuthUser } from '../services/permissions'
 
+// Type aliases for actual GraphQL query results
+type QueryUser = AllUsersQuery['allUsers'][0]
+type QueryRole = NonNullable<QueryUser['role']>
+
+// Helper to convert GraphQL role to full Role type
+const convertToFullRole = (queryRole: QueryRole): Role => ({
+  ...queryRole,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  isActive: true
+})
+
+// Helper to convert GraphQL query user to AuthUser with proper type handling
+const convertToAuthUser = (user: QueryUser): AuthUser => {
+  // Create a copy of the user with proper role conversion
+  const authUser: AuthUser = {
+    id: user.id,
+    email: user.email,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    isEmailVerified: user.isEmailVerified,
+    permissions: user.permissions,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    role: user.role ? convertToFullRole(user.role) : null
+  }
+  return authUser
+}
+
 // Permissions
 const { 
   canInviteUsers, 
-  canManageUsers, 
   canEditUserRoles, 
   canAssignRole, 
   canManageUser 
@@ -292,14 +320,26 @@ const filteredUsers = computed(() => {
   return users.value.filter(user => user.role?.name === selectedRoleFilter.value)
 })
 
-// Role assignment permissions
+// Role assignment permissions - all roles should be assignable if user has permission
 const assignableRoles = computed(() => {
-  return activeRoles.value.filter(role => canAssignRole(role))
+  return activeRoles.value.filter(role => {
+    // Convert AllRoles query result to Role type for permission checking
+    const fullRole: Role = {
+      id: role.id,
+      name: role.name,
+      level: role.level,
+      description: role.description,
+      isActive: role.isActive,
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt
+    }
+    return canAssignRole(fullRole)
+  })
 })
 
 // Mutations
 const { mutate: assignRole, loading: assignRoleLoading } = useAssignRoleMutation()
-const { mutate: removeRole, loading: removeRoleLoading } = useRemoveUserRoleMutation()
+const { mutate: removeRole } = useRemoveUserRoleMutation()
 const { mutate: inviteUserWithRole, loading: inviteUserLoading } = useInviteUserWithRoleMutation()
 
 // Apollo feedback
@@ -308,7 +348,7 @@ const feedback = useApolloFeedback()
 // Modal state
 const showInviteModal = ref(false)
 const showRoleModal = ref(false)
-const selectedUser = ref<UserWithRole | null>(null)
+const selectedUser = ref<QueryUser | null>(null)
 const selectedRoleId = ref('')
 
 // Form state
@@ -318,7 +358,7 @@ const inviteForm = ref({
 })
 
 // Helper functions
-const getUserInitials = (user: UserWithRole): string => {
+const getUserInitials = (user: QueryUser): string => {
   const firstName = user.firstName || ''
   const lastName = user.lastName || ''
   if (firstName && lastName) return `${firstName[0]}${lastName[0]}`.toUpperCase()
@@ -327,7 +367,7 @@ const getUserInitials = (user: UserWithRole): string => {
   return user.email[0].toUpperCase()
 }
 
-const getRoleBadgeClass = (role: Role): string => {
+const getRoleBadgeClass = (role: QueryRole | Role): string => {
   if (role.level >= 100) return 'badge-error' // Super admin
   if (role.level >= 50) return 'badge-warning' // Admin
   if (role.level >= 25) return 'badge-info' // Manager
@@ -335,7 +375,7 @@ const getRoleBadgeClass = (role: Role): string => {
 }
 
 // Actions
-const openRoleAssignmentModal = (user: UserWithRole) => {
+const openRoleAssignmentModal = (user: QueryUser) => {
   selectedUser.value = user
   selectedRoleId.value = user.role?.id || ''
   showRoleModal.value = true
@@ -363,8 +403,9 @@ const handleAssignRole = async () => {
   }
 }
 
-const removeUserRole = async (user: UserWithRole) => {
-  if (!canManageUser(user as AuthUser)) return
+const removeUserRole = async (user: QueryUser) => {
+  const authUser = convertToAuthUser(user)
+  if (!canManageUser(authUser)) return
 
   try {
     await removeRole({ userId: user.id })
@@ -391,19 +432,6 @@ const handleInviteUser = async () => {
   }
 }
 
-// Setup feedback handling
-feedback.handleMutation(assignRoleLoading, null, () => {}, {
-  successTitle: 'Role Assigned',
-  errorTitle: 'Assignment Failed'
-})
-
-feedback.handleMutation(removeRoleLoading, null, () => {}, {
-  successTitle: 'Role Removed', 
-  errorTitle: 'Removal Failed'
-})
-
-feedback.handleMutation(inviteUserLoading, null, () => {}, {
-  successTitle: 'Invitation Sent',
-  errorTitle: 'Invitation Failed'
-})
+// Note: Apollo feedback is handled manually in the action functions above
+// since we need different success messages for different operations
 </script>

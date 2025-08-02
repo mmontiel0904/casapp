@@ -3,7 +3,7 @@ import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
 
 // Permission-based route guard
 export function requirePermission(permission: string) {
-  return (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  return (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (permissionService.hasPermission(permission)) {
       next()
     } else {
@@ -18,7 +18,7 @@ export function requirePermission(permission: string) {
 
 // Role level-based route guard
 export function requireRoleLevel(minLevel: number) {
-  return (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  return (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (permissionService.hasRoleLevel(minLevel)) {
       next()
     } else {
@@ -37,7 +37,7 @@ export function requireAdmin() {
 
 // Super admin guard (convenience function)
 export function requireSuperAdmin() {
-  return (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  return (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     if (permissionService.isSuperAdmin()) {
       next()
     } else {
@@ -51,7 +51,7 @@ export function requireSuperAdmin() {
 
 // Combined auth + permission guard
 export function requireAuthAndPermission(permission: string) {
-  return (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
+  return (_to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
     // First check if user is authenticated (this will be handled by main auth guard)
     // Then check permission
     if (permissionService.hasPermission(permission)) {

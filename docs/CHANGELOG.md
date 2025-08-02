@@ -2,6 +2,36 @@
 
 A chronological record of major development milestones and architectural decisions for CasApp.
 
+## [2025-08-02] - User Profile & UI Enhancements
+
+### 🚀 **New Feature: User Profile Page**
+
+**Objective**: Provide users with a dedicated page to manage their profile information and security settings.
+
+- **Added `ProfilePage.vue`**: A new view available at `/profile` for authenticated users.
+- **Refactored `PasswordChangeForm.vue`**: Extracted the password change functionality into its own reusable component for better separation of concerns.
+- **New `changePassword` Mutation**: Integrated the new GraphQL mutation to allow users to change their own password securely.
+
+### 🎨 **UI/UX: Enhanced Navigation and Role Display**
+
+**Objective**: Improve user experience by providing clearer navigation and visual cues for user roles and permissions.
+
+- **Dynamic Role Badges**: The user avatar in the `NavBar` now displays a badge indicating the user's role (e.g., Super Admin, Admin, User).
+  - Badges are color-coded (`error` for Super Admin, `warning` for Admin) for quick identification.
+  - Icons (crown, shield) are used to further distinguish high-level roles.
+- **Improved User Menu**: The user dropdown now displays the full role name and level, providing more context.
+- **Streamlined Navigation**: Added direct `router-link`s to the Profile and Dashboard pages in both mobile and desktop navigation.
+
+### 🔧 **Technical Improvements & Refactoring**
+
+- **Type Safety in `UserManagementPage`**:
+  - Implemented helper functions (`convertToAuthUser`, `convertToFullRole`) to safely convert GraphQL query results into the application's internal `AuthUser` and `Role` types.
+  - This ensures that all permission checks are performed with consistent and correct data structures.
+- **Robustness in `useAuth`**:
+  - Added stricter checks for the results of `loadPermissions` and `refreshPermissions` queries to prevent potential runtime errors if the API returns unexpected data.
+- **API Schema Expansion**:
+  - Added `changePassword` and `adminResetUserPassword` mutations to the GraphQL schema.
+
 ## [2025-08-02] - API-Compliant Invitation Flow
 
 ### 🚀 **Feature: Align Invitation Flow with API Specification**

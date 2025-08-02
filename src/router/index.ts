@@ -9,6 +9,7 @@ const RegisterPage = () => import('../views/RegisterPage.vue')
 const ForgotPasswordPage = () => import('../views/ForgotPasswordPage.vue')
 const ResetPasswordPage = () => import('../views/ResetPasswordPage.vue')
 const UserManagementPage = () => import('../views/UserManagementPage.vue')
+const ProfilePage = () => import('../views/ProfilePage.vue')
 
 const routes = [
   {
@@ -45,6 +46,12 @@ const routes = [
     path: '/',
     name: 'Dashboard',
     component: DashboardPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: ProfilePage,
     meta: { requiresAuth: true }
   },
   {

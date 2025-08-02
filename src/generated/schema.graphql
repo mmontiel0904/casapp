@@ -10,6 +10,10 @@ input AcceptInvitationInput {
   password: String!
 }
 
+input AdminResetUserPasswordInput {
+  userId: UUID!
+}
+
 input AssignRoleInput {
   roleId: UUID!
   userId: UUID!
@@ -19,6 +23,11 @@ type AuthPayload {
   accessToken: String!
   refreshToken: String!
   user: User!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
 }
 
 """
@@ -59,7 +68,9 @@ type MessageResponse {
 
 type MutationRoot {
   acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
+  adminResetUserPassword(input: AdminResetUserPasswordInput!): MessageResponse!
   assignRole(input: AssignRoleInput!): User!
+  changePassword(input: ChangePasswordInput!): MessageResponse!
   inviteUser(input: InviteUserInput!): Invitation!
   inviteUserWithRole(input: InviteUserWithRoleInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
