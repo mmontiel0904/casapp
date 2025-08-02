@@ -128,14 +128,24 @@ const handleLogin = async () => {
     
     if (result?.data?.login) {
       const { accessToken, refreshToken, user } = result.data.login
-      // Type-safe user with all required fields
+      // Type-safe user with all required fields (now includes role data)
       const fullUser = {
         ...user,
         createdAt: new Date().toISOString(), // Temp until we get from API
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
+        // Ensure role has all required fields for Role type
+        role: user.role ? {
+          ...user.role,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          isActive: true // Assume active if returned from login
+        } : null
       }
-      // Store both access and refresh tokens
-      setUser(fullUser, accessToken, refreshToken)
+      
+      console.log('Login successful, user role:', user.role)
+      
+      // Store tokens and sync permissions (now async)
+      await setUser(fullUser, accessToken, refreshToken)
       loginResult.value = result.data
     }
   } catch (err) {

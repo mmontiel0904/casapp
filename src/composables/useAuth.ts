@@ -1,10 +1,12 @@
 import { ref, computed } from 'vue'
 import { setAuthToken, clearAuthData } from '../lib/apollo'
 import { tokenManager } from '../lib/cookies'
+import { permissionService, type AuthUser } from '../services/permissions'
+import { useMyPermissionsLazyQuery } from '../generated/graphql'
 import type { User } from '../generated/graphql'
 
 // Enhanced auth state management with refresh token support
-const currentUser = ref<User | null>(null)
+const currentUser = ref<AuthUser | null>(null)
 const authToken = ref<string | null>(tokenManager.getAccessToken())
 const refreshToken = ref<string | null>(tokenManager.getRefreshToken())
 
@@ -12,9 +14,18 @@ export function useAuth() {
   const isAuthenticated = computed(() => !!currentUser.value && !!authToken.value)
   const hasRefreshToken = computed(() => !!refreshToken.value)
 
-  // Set user with both access and refresh tokens
-  const setUser = (user: User, accessToken: string, newRefreshToken?: string) => {
-    currentUser.value = user
+  // Lazy query for user permissions
+  const { load: loadPermissions } = useMyPermissionsLazyQuery()
+
+  // Set user with both access and refresh tokens and sync permissions
+  const setUser = async (user: User, accessToken: string, newRefreshToken?: string) => {
+    // Convert User to AuthUser and set basic data
+    const authUser: AuthUser = {
+      ...user,
+      permissions: [] // Will be populated after fetching
+    }
+    
+    currentUser.value = authUser
     authToken.value = accessToken
     
     if (newRefreshToken) {
@@ -24,6 +35,29 @@ export function useAuth() {
     } else {
       // Backward compatibility - only access token provided
       setAuthToken(accessToken)
+    }
+
+    // Update permission service with user data
+    permissionService.setUser(authUser)
+
+    // Fetch user permissions if user has a role
+    if (user.role && user.id) {
+      try {
+        const permissionsResult = await loadPermissions(undefined, { userId: user.id })
+        const permissions = permissionsResult?.data?.userPermissions || []
+        
+        // Update user with permissions
+        authUser.permissions = permissions
+        currentUser.value = authUser
+        
+        // Update permission service with complete data
+        permissionService.setUser(authUser)
+        
+        console.log('User permissions loaded:', permissions)
+      } catch (error) {
+        console.warn('Could not load user permissions:', error)
+        // Continue without permissions if fetch fails
+      }
     }
   }
 
@@ -41,6 +75,32 @@ export function useAuth() {
     refreshToken.value = null
     tokenManager.clearTokens()
     clearAuthData()
+    
+    // Clear permission service data
+    permissionService.clearUser()
+  }
+
+  // Refresh user permissions
+  const refreshPermissions = async () => {
+    if (currentUser.value?.id) {
+      try {
+        const permissionsResult = await loadPermissions(undefined, { userId: currentUser.value.id })
+        const permissions = permissionsResult?.data?.userPermissions || []
+        
+        // Update user with new permissions
+        if (currentUser.value) {
+          currentUser.value.permissions = permissions
+          permissionService.setUser(currentUser.value)
+        }
+        
+        console.log('User permissions refreshed:', permissions)
+        return permissions
+      } catch (error) {
+        console.warn('Could not refresh user permissions:', error)
+        return []
+      }
+    }
+    return []
   }
 
   // Initialize auth state from storage (cookies + localStorage fallback)
@@ -55,6 +115,9 @@ export function useAuth() {
     if (storedRefreshToken) {
       refreshToken.value = storedRefreshToken
     }
+
+    // Note: We don't restore user/permissions from storage
+    // They will be fetched fresh on next API call or login
   }
 
   // Check if we need to refresh the token (called from Apollo interceptor)
@@ -75,6 +138,7 @@ export function useAuth() {
     updateTokens,
     logout,
     initializeAuth,
-    shouldRefreshToken
+    shouldRefreshToken,
+    refreshPermissions
   }
 }

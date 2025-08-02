@@ -11,6 +11,12 @@ export const LOGIN_MUTATION = gql`
         firstName
         lastName
         isEmailVerified
+        role {
+          id
+          name
+          level
+          description
+        }
       }
     }
   }
@@ -93,6 +99,59 @@ export const REFRESH_TOKEN_MUTATION = gql`
         firstName
         lastName
         isEmailVerified
+      }
+    }
+  }
+`
+
+// RBAC Mutations - Apollo will generate Vue composables automatically!
+export const ASSIGN_ROLE_MUTATION = gql`
+  mutation AssignRole($userId: UUID!, $roleId: UUID!) {
+    assignRole(input: { userId: $userId, roleId: $roleId }) {
+      id
+      email
+      firstName
+      lastName
+      role {
+        id
+        name
+        level
+        description
+      }
+    }
+  }
+`
+
+export const REMOVE_USER_ROLE_MUTATION = gql`
+  mutation RemoveUserRole($userId: UUID!) {
+    removeUserRole(userId: $userId) {
+      id
+      email
+      firstName
+      lastName
+      role {
+        id
+        name
+        level
+      }
+    }
+  }
+`
+
+export const INVITE_USER_WITH_ROLE_MUTATION = gql`
+  mutation InviteUserWithRole($email: String!, $roleId: UUID) {
+    inviteUserWithRole(input: { email: $email, roleId: $roleId }) {
+      id
+      email
+      inviterUserId
+      isUsed
+      createdAt
+      expiresAt
+      role {
+        id
+        name
+        level
+        description
       }
     }
   }

@@ -10,6 +10,11 @@ input AcceptInvitationInput {
   password: String!
 }
 
+input AssignRoleInput {
+  roleId: UUID!
+  userId: UUID!
+}
+
 type AuthPayload {
   accessToken: String!
   refreshToken: String!
@@ -30,11 +35,17 @@ type Invitation {
   id: UUID!
   inviterUserId: UUID!
   isUsed: Boolean!
+  role: Role
   usedAt: DateTime
 }
 
 input InviteUserInput {
   email: String!
+}
+
+input InviteUserWithRoleInput {
+  email: String!
+  roleId: UUID
 }
 
 input LoginInput {
@@ -48,20 +59,28 @@ type MessageResponse {
 
 type MutationRoot {
   acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
+  assignRole(input: AssignRoleInput!): User!
   inviteUser(input: InviteUserInput!): Invitation!
+  inviteUserWithRole(input: InviteUserWithRoleInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
   logout: MessageResponse!
   refreshToken(input: RefreshTokenInput!): AuthPayload!
   register(input: RegisterInput!): User!
+  removeUserRole(userId: UUID!): User!
   requestPasswordReset(input: RequestPasswordResetInput!): MessageResponse!
   resetPassword(input: ResetPasswordInput!): MessageResponse!
   verifyEmail(token: String!): MessageResponse!
 }
 
 type QueryRoot {
+  allRoles: [Role!]!
+  allUsers: [UserWithRole!]!
   health: String!
   me: User!
   myInvitations: [Invitation!]!
+  userById(userId: UUID!): UserWithRole!
+  userPermissions(userId: UUID!): [String!]!
+  usersByRole(roleName: String!): [UserWithRole!]!
 }
 
 input RefreshTokenInput {
@@ -84,6 +103,16 @@ input ResetPasswordInput {
   token: String!
 }
 
+type Role {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  level: Int!
+  name: String!
+  updatedAt: DateTime!
+}
+
 """
 A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
 Strings within GraphQL. UUIDs are used to assign unique identifiers to
@@ -103,5 +132,18 @@ type User {
   id: UUID!
   isEmailVerified: Boolean!
   lastName: String
+  role: Role
+  updatedAt: DateTime!
+}
+
+type UserWithRole {
+  createdAt: DateTime!
+  email: String!
+  firstName: String
+  id: UUID!
+  isEmailVerified: Boolean!
+  lastName: String
+  permissions: [String!]!
+  role: Role
   updatedAt: DateTime!
 }

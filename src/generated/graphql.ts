@@ -42,6 +42,11 @@ export type AcceptInvitationInput = {
   password: Scalars['String']['input'];
 };
 
+export type AssignRoleInput = {
+  roleId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
 export type AuthPayload = {
   accessToken: Scalars['String']['output'];
   refreshToken: Scalars['String']['output'];
@@ -55,11 +60,17 @@ export type Invitation = {
   id: Scalars['UUID']['output'];
   inviterUserId: Scalars['UUID']['output'];
   isUsed: Scalars['Boolean']['output'];
+  role?: Maybe<Role>;
   usedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type InviteUserInput = {
   email: Scalars['String']['input'];
+};
+
+export type InviteUserWithRoleInput = {
+  email: Scalars['String']['input'];
+  roleId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 export type LoginInput = {
@@ -73,11 +84,14 @@ export type MessageResponse = {
 
 export type MutationRoot = {
   acceptInvitation: AuthPayload;
+  assignRole: User;
   inviteUser: Invitation;
+  inviteUserWithRole: Invitation;
   login: AuthPayload;
   logout: MessageResponse;
   refreshToken: AuthPayload;
   register: User;
+  removeUserRole: User;
   requestPasswordReset: MessageResponse;
   resetPassword: MessageResponse;
   verifyEmail: MessageResponse;
@@ -89,8 +103,18 @@ export type MutationRootAcceptInvitationArgs = {
 };
 
 
+export type MutationRootAssignRoleArgs = {
+  input: AssignRoleInput;
+};
+
+
 export type MutationRootInviteUserArgs = {
   input: InviteUserInput;
+};
+
+
+export type MutationRootInviteUserWithRoleArgs = {
+  input: InviteUserWithRoleInput;
 };
 
 
@@ -109,6 +133,11 @@ export type MutationRootRegisterArgs = {
 };
 
 
+export type MutationRootRemoveUserRoleArgs = {
+  userId: Scalars['UUID']['input'];
+};
+
+
 export type MutationRootRequestPasswordResetArgs = {
   input: RequestPasswordResetInput;
 };
@@ -124,9 +153,29 @@ export type MutationRootVerifyEmailArgs = {
 };
 
 export type QueryRoot = {
+  allRoles: Array<Role>;
+  allUsers: Array<UserWithRole>;
   health: Scalars['String']['output'];
   me: User;
   myInvitations: Array<Invitation>;
+  userById: UserWithRole;
+  userPermissions: Array<Scalars['String']['output']>;
+  usersByRole: Array<UserWithRole>;
+};
+
+
+export type QueryRootUserByIdArgs = {
+  userId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootUserPermissionsArgs = {
+  userId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootUsersByRoleArgs = {
+  roleName: Scalars['String']['input'];
 };
 
 export type RefreshTokenInput = {
@@ -149,6 +198,16 @@ export type ResetPasswordInput = {
   token: Scalars['String']['input'];
 };
 
+export type Role = {
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  level: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type User = {
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
@@ -156,6 +215,19 @@ export type User = {
   id: Scalars['UUID']['output'];
   isEmailVerified: Scalars['Boolean']['output'];
   lastName?: Maybe<Scalars['String']['output']>;
+  role?: Maybe<Role>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type UserWithRole = {
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  firstName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isEmailVerified: Scalars['Boolean']['output'];
+  lastName?: Maybe<Scalars['String']['output']>;
+  permissions: Array<Scalars['String']['output']>;
+  role?: Maybe<Role>;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -165,7 +237,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { login: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
+export type LoginMutation = { login: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, role?: { id: any, name: string, level: number, description?: string | null } | null } } };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -220,6 +292,29 @@ export type RefreshTokenMutationVariables = Exact<{
 
 export type RefreshTokenMutation = { refreshToken: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
 
+export type AssignRoleMutationVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+  roleId: Scalars['UUID']['input'];
+}>;
+
+
+export type AssignRoleMutation = { assignRole: { id: any, email: string, firstName?: string | null, lastName?: string | null, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
+export type RemoveUserRoleMutationVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type RemoveUserRoleMutation = { removeUserRole: { id: any, email: string, firstName?: string | null, lastName?: string | null, role?: { id: any, name: string, level: number } | null } };
+
+export type InviteUserWithRoleMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  roleId?: InputMaybe<Scalars['UUID']['input']>;
+}>;
+
+
+export type InviteUserWithRoleMutation = { inviteUserWithRole: { id: any, email: string, inviterUserId: any, isUsed: boolean, createdAt: any, expiresAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -228,7 +323,52 @@ export type HealthQuery = { health: string };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any } };
+export type MeQuery = { me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
+export type MyPermissionsQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type MyPermissionsQuery = { userPermissions: Array<string> };
+
+export type MeWithPermissionsQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type MeWithPermissionsQuery = { userPermissions: Array<string>, me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
+export type AllUsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllUsersQuery = { allUsers: Array<{ id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null }> };
+
+export type AllRolesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllRolesQuery = { allRoles: Array<{ id: any, name: string, level: number, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any }> };
+
+export type UserPermissionsQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type UserPermissionsQuery = { userPermissions: Array<string> };
+
+export type UserByIdQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type UserByIdQuery = { userById: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
+export type UsersByRoleQueryVariables = Exact<{
+  roleName: Scalars['String']['input'];
+}>;
+
+
+export type UsersByRoleQuery = { usersByRole: Array<{ id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null }> };
 
 
 export const LoginDocument = gql`
@@ -242,6 +382,12 @@ export const LoginDocument = gql`
       firstName
       lastName
       isEmailVerified
+      role {
+        id
+        name
+        level
+        description
+      }
     }
   }
 }
@@ -504,6 +650,123 @@ export function useRefreshTokenMutation(options: VueApolloComposable.UseMutation
   return VueApolloComposable.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
 }
 export type RefreshTokenMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RefreshTokenMutation, RefreshTokenMutationVariables>;
+export const AssignRoleDocument = gql`
+    mutation AssignRole($userId: UUID!, $roleId: UUID!) {
+  assignRole(input: {userId: $userId, roleId: $roleId}) {
+    id
+    email
+    firstName
+    lastName
+    role {
+      id
+      name
+      level
+      description
+    }
+  }
+}
+    `;
+
+/**
+ * __useAssignRoleMutation__
+ *
+ * To run a mutation, you first call `useAssignRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAssignRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAssignRoleMutation({
+ *   variables: {
+ *     userId: // value for 'userId'
+ *     roleId: // value for 'roleId'
+ *   },
+ * });
+ */
+export function useAssignRoleMutation(options: VueApolloComposable.UseMutationOptions<AssignRoleMutation, AssignRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AssignRoleMutation, AssignRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AssignRoleMutation, AssignRoleMutationVariables>(AssignRoleDocument, options);
+}
+export type AssignRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AssignRoleMutation, AssignRoleMutationVariables>;
+export const RemoveUserRoleDocument = gql`
+    mutation RemoveUserRole($userId: UUID!) {
+  removeUserRole(userId: $userId) {
+    id
+    email
+    firstName
+    lastName
+    role {
+      id
+      name
+      level
+    }
+  }
+}
+    `;
+
+/**
+ * __useRemoveUserRoleMutation__
+ *
+ * To run a mutation, you first call `useRemoveUserRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveUserRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRemoveUserRoleMutation({
+ *   variables: {
+ *     userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useRemoveUserRoleMutation(options: VueApolloComposable.UseMutationOptions<RemoveUserRoleMutation, RemoveUserRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RemoveUserRoleMutation, RemoveUserRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RemoveUserRoleMutation, RemoveUserRoleMutationVariables>(RemoveUserRoleDocument, options);
+}
+export type RemoveUserRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RemoveUserRoleMutation, RemoveUserRoleMutationVariables>;
+export const InviteUserWithRoleDocument = gql`
+    mutation InviteUserWithRole($email: String!, $roleId: UUID) {
+  inviteUserWithRole(input: {email: $email, roleId: $roleId}) {
+    id
+    email
+    inviterUserId
+    isUsed
+    createdAt
+    expiresAt
+    role {
+      id
+      name
+      level
+      description
+    }
+  }
+}
+    `;
+
+/**
+ * __useInviteUserWithRoleMutation__
+ *
+ * To run a mutation, you first call `useInviteUserWithRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useInviteUserWithRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useInviteUserWithRoleMutation({
+ *   variables: {
+ *     email: // value for 'email'
+ *     roleId: // value for 'roleId'
+ *   },
+ * });
+ */
+export function useInviteUserWithRoleMutation(options: VueApolloComposable.UseMutationOptions<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>(InviteUserWithRoleDocument, options);
+}
+export type InviteUserWithRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>;
 export const HealthDocument = gql`
     query Health {
   health
@@ -537,6 +800,12 @@ export const MeDocument = gql`
     firstName
     lastName
     isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+    }
     createdAt
     updatedAt
   }
@@ -562,3 +831,261 @@ export function useMeLazyQuery(options: VueApolloComposable.UseQueryOptions<MeQu
   return VueApolloComposable.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, {}, options);
 }
 export type MeQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MeQuery, MeQueryVariables>;
+export const MyPermissionsDocument = gql`
+    query MyPermissions($userId: UUID!) {
+  userPermissions(userId: $userId)
+}
+    `;
+
+/**
+ * __useMyPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useMyPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useMyPermissionsQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useMyPermissionsQuery(variables: MyPermissionsQueryVariables | VueCompositionApi.Ref<MyPermissionsQueryVariables> | ReactiveFunction<MyPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, variables, options);
+}
+export function useMyPermissionsLazyQuery(variables?: MyPermissionsQueryVariables | VueCompositionApi.Ref<MyPermissionsQueryVariables> | ReactiveFunction<MyPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyPermissionsQuery, MyPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, variables, options);
+}
+export type MyPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MyPermissionsQuery, MyPermissionsQueryVariables>;
+export const MeWithPermissionsDocument = gql`
+    query MeWithPermissions($userId: UUID!) {
+  me {
+    id
+    email
+    firstName
+    lastName
+    isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+    }
+    createdAt
+    updatedAt
+  }
+  userPermissions(userId: $userId)
+}
+    `;
+
+/**
+ * __useMeWithPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useMeWithPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeWithPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useMeWithPermissionsQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useMeWithPermissionsQuery(variables: MeWithPermissionsQueryVariables | VueCompositionApi.Ref<MeWithPermissionsQueryVariables> | ReactiveFunction<MeWithPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>(MeWithPermissionsDocument, variables, options);
+}
+export function useMeWithPermissionsLazyQuery(variables?: MeWithPermissionsQueryVariables | VueCompositionApi.Ref<MeWithPermissionsQueryVariables> | ReactiveFunction<MeWithPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>(MeWithPermissionsDocument, variables, options);
+}
+export type MeWithPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MeWithPermissionsQuery, MeWithPermissionsQueryVariables>;
+export const AllUsersDocument = gql`
+    query AllUsers {
+  allUsers {
+    id
+    email
+    firstName
+    lastName
+    isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+    }
+    permissions
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAllUsersQuery__
+ *
+ * To run a query within a Vue component, call `useAllUsersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllUsersQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAllUsersQuery();
+ */
+export function useAllUsersQuery(options: VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, {}, options);
+}
+export function useAllUsersLazyQuery(options: VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllUsersQuery, AllUsersQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AllUsersQuery, AllUsersQueryVariables>(AllUsersDocument, {}, options);
+}
+export type AllUsersQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AllUsersQuery, AllUsersQueryVariables>;
+export const AllRolesDocument = gql`
+    query AllRoles {
+  allRoles {
+    id
+    name
+    level
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAllRolesQuery__
+ *
+ * To run a query within a Vue component, call `useAllRolesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllRolesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAllRolesQuery();
+ */
+export function useAllRolesQuery(options: VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AllRolesQuery, AllRolesQueryVariables>(AllRolesDocument, {}, options);
+}
+export function useAllRolesLazyQuery(options: VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllRolesQuery, AllRolesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AllRolesQuery, AllRolesQueryVariables>(AllRolesDocument, {}, options);
+}
+export type AllRolesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AllRolesQuery, AllRolesQueryVariables>;
+export const UserPermissionsDocument = gql`
+    query UserPermissions($userId: UUID!) {
+  userPermissions(userId: $userId)
+}
+    `;
+
+/**
+ * __useUserPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useUserPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useUserPermissionsQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useUserPermissionsQuery(variables: UserPermissionsQueryVariables | VueCompositionApi.Ref<UserPermissionsQueryVariables> | ReactiveFunction<UserPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<UserPermissionsQuery, UserPermissionsQueryVariables>(UserPermissionsDocument, variables, options);
+}
+export function useUserPermissionsLazyQuery(variables?: UserPermissionsQueryVariables | VueCompositionApi.Ref<UserPermissionsQueryVariables> | ReactiveFunction<UserPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UserPermissionsQuery, UserPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<UserPermissionsQuery, UserPermissionsQueryVariables>(UserPermissionsDocument, variables, options);
+}
+export type UserPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UserPermissionsQuery, UserPermissionsQueryVariables>;
+export const UserByIdDocument = gql`
+    query UserById($userId: UUID!) {
+  userById(userId: $userId) {
+    id
+    email
+    firstName
+    lastName
+    isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+    }
+    permissions
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUserByIdQuery__
+ *
+ * To run a query within a Vue component, call `useUserByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserByIdQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useUserByIdQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useUserByIdQuery(variables: UserByIdQueryVariables | VueCompositionApi.Ref<UserByIdQueryVariables> | ReactiveFunction<UserByIdQueryVariables>, options: VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<UserByIdQuery, UserByIdQueryVariables>(UserByIdDocument, variables, options);
+}
+export function useUserByIdLazyQuery(variables?: UserByIdQueryVariables | VueCompositionApi.Ref<UserByIdQueryVariables> | ReactiveFunction<UserByIdQueryVariables>, options: VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UserByIdQuery, UserByIdQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<UserByIdQuery, UserByIdQueryVariables>(UserByIdDocument, variables, options);
+}
+export type UserByIdQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UserByIdQuery, UserByIdQueryVariables>;
+export const UsersByRoleDocument = gql`
+    query UsersByRole($roleName: String!) {
+  usersByRole(roleName: $roleName) {
+    id
+    email
+    firstName
+    lastName
+    isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+    }
+    permissions
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUsersByRoleQuery__
+ *
+ * To run a query within a Vue component, call `useUsersByRoleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUsersByRoleQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useUsersByRoleQuery({
+ *   roleName: // value for 'roleName'
+ * });
+ */
+export function useUsersByRoleQuery(variables: UsersByRoleQueryVariables | VueCompositionApi.Ref<UsersByRoleQueryVariables> | ReactiveFunction<UsersByRoleQueryVariables>, options: VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<UsersByRoleQuery, UsersByRoleQueryVariables>(UsersByRoleDocument, variables, options);
+}
+export function useUsersByRoleLazyQuery(variables?: UsersByRoleQueryVariables | VueCompositionApi.Ref<UsersByRoleQueryVariables> | ReactiveFunction<UsersByRoleQueryVariables>, options: VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<UsersByRoleQuery, UsersByRoleQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<UsersByRoleQuery, UsersByRoleQueryVariables>(UsersByRoleDocument, variables, options);
+}
+export type UsersByRoleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UsersByRoleQuery, UsersByRoleQueryVariables>;

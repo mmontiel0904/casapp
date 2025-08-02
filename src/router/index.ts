@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
+import { permissionService } from '../services/permissions'
 
 // Route components
 const LoginPage = () => import('../views/LoginPage.vue')
@@ -7,6 +8,7 @@ const DashboardPage = () => import('../views/DashboardPage.vue')
 const RegisterPage = () => import('../views/RegisterPage.vue')
 const ForgotPasswordPage = () => import('../views/ForgotPasswordPage.vue')
 const ResetPasswordPage = () => import('../views/ResetPasswordPage.vue')
+const UserManagementPage = () => import('../views/UserManagementPage.vue')
 
 const routes = [
   {
@@ -46,6 +48,15 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/admin/users',
+    name: 'UserManagement',
+    component: UserManagementPage,
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'user_management'
+    }
+  },
+  {
     // Catch all route - redirect to login or dashboard
     path: '/:pathMatch(.*)*',
     redirect: () => {
@@ -60,7 +71,7 @@ const router = createRouter({
   routes
 })
 
-// Authentication guard
+// Authentication and permission guard
 router.beforeEach((to, _from, next) => {
   const { isAuthenticated, initializeAuth } = useAuth()
   
@@ -77,6 +88,20 @@ router.beforeEach((to, _from, next) => {
   if (to.meta.requiresGuest && isAuthenticated.value) {
     next('/')
     return
+  }
+
+  // Check permission requirements for authenticated routes
+  if (isAuthenticated.value && to.meta.requiresPermission) {
+    const requiredPermission = to.meta.requiresPermission as string
+    
+    if (!permissionService.hasPermission(requiredPermission)) {
+      // Redirect to dashboard with permission error
+      next({ 
+        path: '/', 
+        query: { error: 'insufficient_permissions', required: requiredPermission }
+      })
+      return
+    }
   }
 
   next()

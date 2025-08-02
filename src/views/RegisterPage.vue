@@ -146,7 +146,7 @@
               <button 
                 type="submit" 
                 class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
-                :disabled="loading || passwordMismatch || !registerForm.password || !registerForm.confirmPassword || (!registerForm.email && !isInvitation )"
+                :disabled="loading || passwordMismatch || !registerForm.password || !registerForm.confirmPassword || (!registerForm.email && !isInvitation )"do w
               >
                 <span v-if="!loading" class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
