@@ -2,6 +2,40 @@
 
 A chronological record of major development milestones and architectural decisions for CasApp.
 
+## [2025-08-02] - API-Compliant Invitation Flow
+
+### 🚀 **Feature: Align Invitation Flow with API Specification**
+
+**Objective**: Update the user invitation acceptance process to be fully compliant with the backend API specification, improving security and data consistency.
+
+### 🔧 **Key Technical Changes**
+
+#### 1. **API-Compliant Route**
+- **Before**: `/invite?token=...&email=...`
+- **After**: `/accept-invitation?token=...`
+- **Reason**: Aligned with the API specification and removed redundant email parameter from the URL.
+
+#### 2. **GraphQL Mutation Refactor**
+- The `AcceptInvitation` mutation was updated to accept a single `input` object (`AcceptInvitationInput`) instead of multiple arguments.
+- **Benefit**: This makes the mutation more extensible and aligns with GraphQL best practices.
+
+```graphql
+// BEFORE
+mutation AcceptInvitation($invitationToken: String!, $password: String!, ...)
+
+// AFTER
+mutation AcceptInvitation($input: AcceptInvitationInput!)
+```
+
+#### 3. **Frontend Logic Update (`RegisterPage.vue`)**
+- The registration form now correctly handles the `accept-invitation` route.
+- The email field is no longer pre-filled from URL parameters, requiring the user to enter it.
+- The `handleRegistration` method was updated to use the new `AcceptInvitation` mutation structure.
+
+#### 4. **Updated Generated Types**
+- Ran GraphQL Code Generator to update `graphql.ts` with the new mutation signature and types.
+
+
 ## [2025-01-30] - Apollo Client Streamlining & Architecture Optimization
 
 ### 🚀 **Major Architecture Refactor: Pure Apollo Client Integration**
