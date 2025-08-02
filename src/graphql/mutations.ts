@@ -44,17 +44,16 @@ export const INVITE_USER_MUTATION = gql`
 `
 
 export const ACCEPT_INVITATION_MUTATION = gql`
-  mutation AcceptInvitation($invitationToken: String!, $password: String!, $firstName: String, $lastName: String) {
-    acceptInvitation(input: { invitationToken: $invitationToken, password: $password, firstName: $firstName, lastName: $lastName }) {
-      accessToken
-      refreshToken
+  mutation AcceptInvitation($input: AcceptInvitationInput!) {
+    acceptInvitation(input: $input) {
       user {
         id
         email
         firstName
         lastName
-        isEmailVerified
       }
+      accessToken
+      refreshToken
     }
   }
 `

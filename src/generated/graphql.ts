@@ -185,14 +185,11 @@ export type InviteUserMutationVariables = Exact<{
 export type InviteUserMutation = { inviteUser: { id: any, email: string, inviterUserId: any, isUsed: boolean, createdAt: any, expiresAt: any } };
 
 export type AcceptInvitationMutationVariables = Exact<{
-  invitationToken: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  firstName?: InputMaybe<Scalars['String']['input']>;
-  lastName?: InputMaybe<Scalars['String']['input']>;
+  input: AcceptInvitationInput;
 }>;
 
 
-export type AcceptInvitationMutation = { acceptInvitation: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
+export type AcceptInvitationMutation = { acceptInvitation: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null } } };
 
 export type RequestPasswordResetMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -347,19 +344,16 @@ export function useInviteUserMutation(options: VueApolloComposable.UseMutationOp
 }
 export type InviteUserMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<InviteUserMutation, InviteUserMutationVariables>;
 export const AcceptInvitationDocument = gql`
-    mutation AcceptInvitation($invitationToken: String!, $password: String!, $firstName: String, $lastName: String) {
-  acceptInvitation(
-    input: {invitationToken: $invitationToken, password: $password, firstName: $firstName, lastName: $lastName}
-  ) {
-    accessToken
-    refreshToken
+    mutation AcceptInvitation($input: AcceptInvitationInput!) {
+  acceptInvitation(input: $input) {
     user {
       id
       email
       firstName
       lastName
-      isEmailVerified
     }
+    accessToken
+    refreshToken
   }
 }
     `;
@@ -377,10 +371,7 @@ export const AcceptInvitationDocument = gql`
  * @example
  * const { mutate, loading, error, onDone } = useAcceptInvitationMutation({
  *   variables: {
- *     invitationToken: // value for 'invitationToken'
- *     password: // value for 'password'
- *     firstName: // value for 'firstName'
- *     lastName: // value for 'lastName'
+ *     input: // value for 'input'
  *   },
  * });
  */

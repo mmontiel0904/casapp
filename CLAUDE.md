@@ -617,7 +617,7 @@ feedback.handleMutation(loading, error, onSuccess, {
 '/register' - RegisterPage  
 '/forgot-password' - ForgotPasswordPage
 '/reset-password' - ResetPasswordPage
-'/invite' - RegisterPage (invitation flow)
+'/accept-invitation' - RegisterPage (invitation flow - 100% API spec compliant)
 
 // Protected routes (require authentication)
 '/' - DashboardPage with invitation management
@@ -635,8 +635,8 @@ feedback.handleMutation(loading, error, onSuccess, {
 #### Invitation Flow
 1. Admin uses `InviteUserForm` in dashboard
 2. System sends invitation email via SendGrid
-3. User clicks invitation link → `/invite?token=xxx&email=xxx`
-4. User completes profile on `RegisterPage`
+3. User clicks invitation link → `/accept-invitation?token={invitation_token}`
+4. User completes profile on `RegisterPage` (100% API spec compliant)
 5. Automatic login and redirect to dashboard
 
 #### Password Recovery

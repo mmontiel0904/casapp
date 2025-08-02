@@ -46,7 +46,7 @@
           <!-- Registration Form -->
           <form v-if="!isInvitation || isValidToken" @submit.prevent="handleRegistration" class="space-y-6">
             <!-- Email Field (readonly for invitations) -->
-            <div class="form-control">
+            <div class="form-control" v-if="!isInvitation">
               <label class="label pb-2" for="email">
                 <span class="label-text font-medium text-base-content">Email Address</span>
               </label>
@@ -146,7 +146,7 @@
               <button 
                 type="submit" 
                 class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
-                :disabled="loading || passwordMismatch || !registerForm.password || !registerForm.confirmPassword || !registerForm.email"
+                :disabled="loading || passwordMismatch || !registerForm.password || !registerForm.confirmPassword || (!registerForm.email && !isInvitation )"
               >
                 <span v-if="!loading" class="flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -243,15 +243,11 @@ feedback.handleMutation(loading, error, () => {
 })
 
 onMounted(() => {
-  // Check for invitation token in URL
+  // Check for invitation token in URL - API spec: /accept-invitation?token={token}
   const token = route.query.token as string
   if (token) {
     invitationToken.value = token
-    // For invitations, email might be provided in the query params
-    const email = route.query.email as string
-    if (email) {
-      registerForm.email = email
-    }
+    // API spec: only token parameter, email is entered by user
   }
 })
 
@@ -260,12 +256,14 @@ const handleRegistration = async () => {
   
   try {
     if (isInvitation.value) {
-      // Handle invitation acceptance
+      // Handle invitation acceptance - API spec compliant
       const result = await acceptInvitation({
-        invitationToken: invitationToken.value,
-        password: registerForm.password,
-        firstName: registerForm.firstName || null,
-        lastName: registerForm.lastName || null
+        input: {
+          invitationToken: invitationToken.value,
+          password: registerForm.password,
+          firstName: registerForm.firstName || undefined,
+          lastName: registerForm.lastName || undefined
+        }
       })
       
       if (result?.data?.acceptInvitation) {
@@ -273,6 +271,7 @@ const handleRegistration = async () => {
         // Set user session for invitation acceptance
         const fullUser = {
           ...user,
+          isEmailVerified: true, // Accepting invitation implies email verification
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         }

@@ -34,7 +34,7 @@ const routes = [
     meta: { requiresGuest: true }
   },
   {
-    path: '/invite',
+    path: '/accept-invitation',
     name: 'AcceptInvitation',
     component: RegisterPage,
     meta: { requiresGuest: true }
