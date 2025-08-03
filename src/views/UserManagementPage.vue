@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class="flex justify-between items-center mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-base-content">User Management</h1>
+        <h1 class="text-3xl font-bold font-serif text-base-content">User Management</h1>
         <p class="text-base-content/70 mt-2">Manage users, roles, and permissions</p>
       </div>
       
@@ -41,19 +41,19 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="stat bg-base-100 shadow rounded-lg">
           <div class="stat-title">Total Users</div>
-          <div class="stat-value text-primary">{{ users?.length || 0 }}</div>
+          <div class="stat-value text-primary font-mono">{{ users?.length || 0 }}</div>
           <div class="stat-desc">Active users in system</div>
         </div>
         
         <div class="stat bg-base-100 shadow rounded-lg">
           <div class="stat-title">Admin Users</div>
-          <div class="stat-value text-accent">{{ adminCount }}</div>
+          <div class="stat-value text-accent font-mono">{{ adminCount }}</div>
           <div class="stat-desc">Users with admin roles</div>
         </div>
         
         <div class="stat bg-base-100 shadow rounded-lg">
           <div class="stat-title">Available Roles</div>
-          <div class="stat-value text-secondary">{{ activeRoles?.length || 0 }}</div>
+          <div class="stat-value text-secondary font-mono">{{ activeRoles?.length || 0 }}</div>
           <div class="stat-desc">Active role definitions</div>
         </div>
       </div>
@@ -62,7 +62,7 @@
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
           <div class="flex justify-between items-center mb-6">
-            <h2 class="card-title text-2xl">Users</h2>
+            <h2 class="card-title text-2xl font-serif">Users</h2>
             
             <!-- Filter Controls -->
             <div class="flex gap-4">

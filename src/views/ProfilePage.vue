@@ -3,7 +3,7 @@
     <!-- Page Header -->
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-base-content">Profile Settings</h1>
+        <h1 class="text-3xl font-bold font-serif text-base-content">Profile Settings</h1>
         <p class="text-base-content/70 mt-2">Manage your account information and preferences</p>
       </div>
       
@@ -34,7 +34,7 @@
         <!-- Personal Information Card -->
         <div class="card bg-base-100 shadow-xl">
           <div class="card-body">
-            <h2 class="card-title text-xl mb-6">
+            <h2 class="card-title text-xl font-serif mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>

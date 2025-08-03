@@ -7,7 +7,7 @@
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <!-- Welcome Section -->
       <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-2">
+        <h2 class="text-2xl font-bold font-serif mb-2">
           Welcome back!
         </h2>
         <p class="text-base-content/70">
@@ -26,7 +26,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold">Profile</h3>
+              <h3 class="text-lg font-semibold font-serif">Profile</h3>
             </div>
             <p class="text-base-content/70">
               View and manage your account information
@@ -43,7 +43,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold">Invite Users</h3>
+              <h3 class="text-lg font-semibold font-serif">Invite Users</h3>
             </div>
             <p class="text-base-content/70">
               Send invitations to new team members
@@ -60,7 +60,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 class="text-lg font-semibold">API Health</h3>
+              <h3 class="text-lg font-semibold font-serif">API Health</h3>
             </div>
             <p class="text-base-content/70">
               Check the status of the API server

@@ -2,7 +2,7 @@
   <nav class="navbar bg-base-100 shadow-sm border-b border-base-300 px-4 lg:px-6">
     <div class="navbar-start">
       <!-- Logo/Brand -->
-      <router-link to="/" class="btn btn-ghost text-xl font-bold text-primary">
+      <router-link to="/" class="btn btn-ghost text-xl font-bold font-serif text-primary">
         CasApp
       </router-link>
     </div>
