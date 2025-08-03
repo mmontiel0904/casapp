@@ -3,10 +3,10 @@
     <div class="card-body p-8">
       <!-- Header Section -->
       <div class="text-center mb-8">
-        <h2 class="card-title text-3xl font-bold justify-center text-base-content mb-2">
+        <h2 class="card-title text-3xl font-serif font-bold justify-center text-base-content mb-2">
           Welcome Back
         </h2>
-        <p class="text-base-content/70 text-sm">
+        <p class="text-base-content/70 text-sm font-sans">
           Sign in to your account to continue
         </p>
       </div>
@@ -15,37 +15,31 @@
       <form @submit.prevent="handleLogin" class="space-y-6">
         <!-- Email Field -->
         <div class="form-control">
-          <label class="label pb-2" for="email">
-            <span class="label-text font-medium text-base-content">Email Address</span>
-          </label>
-          <input 
-            id="email"
-            v-model="loginForm.email" 
-            type="email" 
+          <InputField
+            v-model="loginForm.email"
+            type="email"
+            label="Email Address"
             placeholder="your@email.com"
-            class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
-            required 
+            required
             autocomplete="email"
+            class="font-sans"
           />
         </div>
         
         <!-- Password Field -->
         <div class="form-control">
-          <label class="label pb-2" for="password">
-            <span class="label-text font-medium text-base-content">Password</span>
-          </label>
-          <input 
-            id="password"
-            v-model="loginForm.password" 
-            type="password" 
+          <InputField
+            v-model="loginForm.password"
+            type="password"
+            label="Password"
             placeholder="Enter your password"
-            class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
-            required 
+            required
             autocomplete="current-password"
+            class="font-sans"
           />
           <label class="label pt-1">
             <span class="label-text-alt"></span>
-            <router-link to="/forgot-password" class="label-text-alt link link-hover text-accent">
+            <router-link to="/forgot-password" class="label-text-alt link link-hover text-accent font-sans">
               Forgot password?
             </router-link>
           </label>
@@ -55,7 +49,7 @@
         <div class="form-control mt-8">
           <button 
             type="submit" 
-            class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
+            class="btn btn-accent btn-lg w-full text-accent-content font-semibold font-sans rounded-lg shadow-md"
             :class="{ 'loading': isLoading }"
             :disabled="isLoading"
           >
@@ -71,12 +65,11 @@
       </form>
 
       <!-- Footer Section -->
-      <div class="divider text-base-content/50 text-xs">OR</div>
-      
+      <div class="divider text-base-content/50 text-xs font-sans">OR</div>
       <div class="text-center">
-        <p class="text-base-content/70 text-sm">
+        <p class="text-base-content/70 text-sm font-sans">
           Don't have an account? 
-          <a href="#" class="link link-accent font-medium">
+          <a href="#" class="link link-accent font-medium font-sans">
             Contact Administrator
           </a>
         </p>
@@ -85,11 +78,13 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
+import InputField from './ui/InputField.vue'
 
 const loginForm = reactive({
   email: '',
