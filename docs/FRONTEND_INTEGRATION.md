@@ -2,6 +2,127 @@
 
 This guide shows how to integrate FreshAPI with your TypeScript/Vue.js frontend, including complete RBAC (Role-Based Access Control) implementation.
 
+
+## 🎨 UI Style & Componentization Guideline
+
+### Material Design 3 Principles & Implementation
+
+CasApp follows Material Design 3 (MD3) principles for a modern, accessible, and professional UI. All components and pages should reflect these guidelines using Tailwind utility classes and DaisyUI tokens.
+
+**Key MD3 Principles:**
+- **Color:** Use DaisyUI theme tokens for backgrounds, surfaces, and accents. Do not define custom color palettes in Tailwind.
+- **Elevation:** Use Tailwind's `shadow-*` and `border` classes to represent elevation (e.g., `shadow-sm`, `shadow-lg`, `border`, `border-base-200`).
+- **Shape:** Use `rounded-lg` (8px) for all cards, modals, and surfaces. For smaller elements, use `rounded` or `rounded-md` as appropriate.
+- **Typography:**
+  - Use the font stack defined above: `font-sans` (Inter) for body/UI, `font-serif` (Source Serif Pro) for headings, `font-mono` (JetBrains Mono) for code/data.
+  - Use Tailwind's `text-*` and `font-*` utilities to match MD3's typographic scale (e.g., `text-2xl font-bold` for headlines, `text-base` for body).
+- **Spacing:** Use Tailwind's spacing utilities (`p-*`, `m-*`, `gap-*`) to maintain consistent padding and margin, following an 8px grid system.
+- **State:** Use DaisyUI's state classes for hover, focus, and disabled states (e.g., `hover:bg-base-200`, `focus:ring`, `disabled:opacity-50`).
+- **Iconography:** Use SVG icons with consistent sizing (`h-4 w-4`, `h-5 w-5`) and color (`text-primary`, `text-base-content`).
+- **Accessibility:** Ensure all interactive elements have focus states and sufficient color contrast (DaisyUI themes are WCAG-compliant by default).
+
+**Component Patterns:**
+- **Cards:** Use `card` class from DaisyUI, with `shadow-*`, `rounded-lg`, and theme background classes.
+- **Buttons:** Use DaisyUI's `btn` classes, with `btn-primary`, `btn-secondary`, etc. for color, and `rounded-lg` for shape.
+- **Inputs/Forms:** Use DaisyUI's `input`, `form-control`, and `label` classes, with proper spacing and focus states.
+- **Alerts/Feedback:** Use DaisyUI's `alert` classes, with color and icon matching the alert type.
+
+**Example:**
+
+```vue
+<template>
+  <div class="card bg-base-100 shadow-lg rounded-lg">
+    <div class="card-body">
+      <h2 class="card-title text-2xl font-serif font-bold mb-2">Material 3 Card</h2>
+      <p class="text-base font-sans">This card uses MD3 elevation, shape, and typography.</p>
+      <button class="btn btn-primary rounded-lg mt-4">Action</button>
+    </div>
+  </div>
+</template>
+```
+
+**Summary:**
+- Use DaisyUI for color and component structure.
+- Use Tailwind for spacing, shape, typography, and elevation.
+- Follow MD3 patterns for all new and refactored components.
+
+
+### Font Self-Hosting & Usage
+
+**Fonts:**
+- Inter (UI elements, body text)
+- Source Serif Pro (Headers, emphasis)
+- JetBrains Mono (Data, code, numbers)
+
+**How to self-host:**
+1. Download font files (woff2 preferred) for all weights/styles needed.
+2. Place them in `public/fonts/` (e.g., `public/fonts/inter.woff2`, etc).
+3. In `src/style.css`, define `@font-face` for each font:
+
+```css
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Source Serif Pro';
+  src: url('/fonts/source-serif-pro.woff2') format('woff2');
+  font-weight: 200 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono.woff2') format('woff2');
+  font-weight: 400 800;
+  font-display: swap;
+}
+```
+
+**Tailwind config:**
+Extend the `theme.fontFamily` in `tailwind.config.js`:
+
+```js
+theme: {
+  extend: {
+    fontFamily: {
+      sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+      serif: ['Source Serif Pro', 'ui-serif', 'Georgia'],
+      mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular'],
+    },
+  },
+},
+```
+
+**Usage:**
+- Use `font-sans` for UI/body, `font-serif` for headings, `font-mono` for code/data.
+- Do not use CDN or Google Fonts; all fonts are bundled and loaded locally.
+
+### Where to Define Styles: Tailwind vs DaisyUI
+
+- **Typography, spacing, shape, font, and layout:**
+  - Define in Tailwind config and use Tailwind utility classes in components.
+  - Use DaisyUI only for component structure and theme tokens.
+- **Colors:**
+  - Use DaisyUI theme settings for all color tokens (background, surface, accent, etc).
+  - Do not define custom color palettes in Tailwind; keep color config simple.
+- **Component variants (e.g., button, card):**
+  - Use DaisyUI classes and props for variants, elevation, and state.
+- **No custom CSS:**
+  - All styling must be via utility classes or DaisyUI classes. Only use custom CSS for font-face declarations.
+
+**Summary:**
+- Tailwind: for layout, spacing, font, typography, and shape.
+- DaisyUI: for color, theme, and component structure.
+
+### Color Strategy
+
+- Use DaisyUI theme settings (`daisyui.themes` in `tailwind.config.js`) for all color management.
+- Do not create custom color tokens in Tailwind; rely on DaisyUI’s built-in tokens for consistency and simplicity.
+
+---
+
 ## 🔄 Schema Synchronization
 
 ### Available Endpoints (Development Only)
