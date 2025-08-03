@@ -143,6 +143,7 @@ type User {
   id: UUID!
   isEmailVerified: Boolean!
   lastName: String
+  permissions: [String!]!
   role: Role
   updatedAt: DateTime!
 }

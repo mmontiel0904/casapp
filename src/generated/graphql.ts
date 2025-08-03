@@ -236,6 +236,7 @@ export type User = {
   id: Scalars['UUID']['output'];
   isEmailVerified: Scalars['Boolean']['output'];
   lastName?: Maybe<Scalars['String']['output']>;
+  permissions: Array<Scalars['String']['output']>;
   role?: Maybe<Role>;
   updatedAt: Scalars['DateTime']['output'];
 };
