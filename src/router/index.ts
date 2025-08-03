@@ -79,7 +79,7 @@ const router = createRouter({
 })
 
 // Authentication and permission guard
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const { isAuthenticated, initializeAuth } = useAuth()
   
   // Initialize auth state from localStorage
@@ -101,11 +101,24 @@ router.beforeEach((to, _from, next) => {
   if (isAuthenticated.value && to.meta.requiresPermission) {
     const requiredPermission = to.meta.requiresPermission as string
     
-    if (!permissionService.hasPermission(requiredPermission)) {
-      // Redirect to dashboard with permission error
+    try {
+      // Use async permission check - this properly handles permission loading
+      const hasPermission = await permissionService.hasPermission(requiredPermission)
+      
+      if (!hasPermission) {
+        // Redirect to dashboard with permission error
+        next({ 
+          path: '/', 
+          query: { error: 'insufficient_permissions', required: requiredPermission }
+        })
+        return
+      }
+    } catch (error) {
+      console.error('Permission check failed:', error)
+      // On permission check failure, redirect to dashboard
       next({ 
         path: '/', 
-        query: { error: 'insufficient_permissions', required: requiredPermission }
+        query: { error: 'permission_check_failed' }
       })
       return
     }

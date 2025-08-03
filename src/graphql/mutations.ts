@@ -104,6 +104,14 @@ export const REFRESH_TOKEN_MUTATION = gql`
   }
 `
 
+export const LOGOUT_MUTATION = gql`
+  mutation Logout {
+    logout {
+      message
+    }
+  }
+`
+
 // RBAC Mutations - Apollo will generate Vue composables automatically!
 export const ASSIGN_ROLE_MUTATION = gql`
   mutation AssignRole($userId: UUID!, $roleId: UUID!) {

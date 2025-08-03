@@ -314,6 +314,11 @@ export type RefreshTokenMutationVariables = Exact<{
 
 export type RefreshTokenMutation = { refreshToken: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean } } };
 
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { logout: { message: string } };
+
 export type AssignRoleMutationVariables = Exact<{
   userId: Scalars['UUID']['input'];
   roleId: Scalars['UUID']['input'];
@@ -391,6 +396,25 @@ export type UsersByRoleQueryVariables = Exact<{
 
 
 export type UsersByRoleQuery = { usersByRole: Array<{ id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null }> };
+
+export type FastLoginMutationVariables = Exact<{
+  input: LoginInput;
+}>;
+
+
+export type FastLoginMutation = { login: { accessToken: string, refreshToken: string, user: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any } } };
+
+export type GetCurrentUserQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCurrentUserQuery = { me: { id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any } | null } };
+
+export type GetUserPermissionsQueryVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type GetUserPermissionsQuery = { userPermissions: Array<string> };
 
 
 export const LoginDocument = gql`
@@ -672,6 +696,31 @@ export function useRefreshTokenMutation(options: VueApolloComposable.UseMutation
   return VueApolloComposable.useMutation<RefreshTokenMutation, RefreshTokenMutationVariables>(RefreshTokenDocument, options);
 }
 export type RefreshTokenMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RefreshTokenMutation, RefreshTokenMutationVariables>;
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout {
+    message
+  }
+}
+    `;
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useLogoutMutation();
+ */
+export function useLogoutMutation(options: VueApolloComposable.UseMutationOptions<LogoutMutation, LogoutMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<LogoutMutation, LogoutMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+}
+export type LogoutMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<LogoutMutation, LogoutMutationVariables>;
 export const AssignRoleDocument = gql`
     mutation AssignRole($userId: UUID!, $roleId: UUID!) {
   assignRole(input: {userId: $userId, roleId: $roleId}) {
@@ -1111,3 +1160,112 @@ export function useUsersByRoleLazyQuery(variables?: UsersByRoleQueryVariables | 
   return VueApolloComposable.useLazyQuery<UsersByRoleQuery, UsersByRoleQueryVariables>(UsersByRoleDocument, variables, options);
 }
 export type UsersByRoleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UsersByRoleQuery, UsersByRoleQueryVariables>;
+export const FastLoginDocument = gql`
+    mutation FastLogin($input: LoginInput!) {
+  login(input: $input) {
+    user {
+      id
+      email
+      firstName
+      lastName
+      isEmailVerified
+      createdAt
+      updatedAt
+    }
+    accessToken
+    refreshToken
+  }
+}
+    `;
+
+/**
+ * __useFastLoginMutation__
+ *
+ * To run a mutation, you first call `useFastLoginMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useFastLoginMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useFastLoginMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useFastLoginMutation(options: VueApolloComposable.UseMutationOptions<FastLoginMutation, FastLoginMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<FastLoginMutation, FastLoginMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<FastLoginMutation, FastLoginMutationVariables>(FastLoginDocument, options);
+}
+export type FastLoginMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<FastLoginMutation, FastLoginMutationVariables>;
+export const GetCurrentUserDocument = gql`
+    query GetCurrentUser {
+  me {
+    id
+    email
+    firstName
+    lastName
+    isEmailVerified
+    role {
+      id
+      name
+      level
+      description
+      isActive
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetCurrentUserQuery__
+ *
+ * To run a query within a Vue component, call `useGetCurrentUserQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetCurrentUserQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetCurrentUserQuery();
+ */
+export function useGetCurrentUserQuery(options: VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, {}, options);
+}
+export function useGetCurrentUserLazyQuery(options: VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetCurrentUserQuery, GetCurrentUserQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetCurrentUserQuery, GetCurrentUserQueryVariables>(GetCurrentUserDocument, {}, options);
+}
+export type GetCurrentUserQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetCurrentUserQuery, GetCurrentUserQueryVariables>;
+export const GetUserPermissionsDocument = gql`
+    query GetUserPermissions($userId: UUID!) {
+  userPermissions(userId: $userId)
+}
+    `;
+
+/**
+ * __useGetUserPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useGetUserPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetUserPermissionsQuery({
+ *   userId: // value for 'userId'
+ * });
+ */
+export function useGetUserPermissionsQuery(variables: GetUserPermissionsQueryVariables | VueCompositionApi.Ref<GetUserPermissionsQueryVariables> | ReactiveFunction<GetUserPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>(GetUserPermissionsDocument, variables, options);
+}
+export function useGetUserPermissionsLazyQuery(variables?: GetUserPermissionsQueryVariables | VueCompositionApi.Ref<GetUserPermissionsQueryVariables> | ReactiveFunction<GetUserPermissionsQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>(GetUserPermissionsDocument, variables, options);
+}
+export type GetUserPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetUserPermissionsQuery, GetUserPermissionsQueryVariables>;

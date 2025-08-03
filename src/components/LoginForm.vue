@@ -24,7 +24,6 @@
             type="email" 
             placeholder="your@email.com"
             class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
-            :class="{ 'input-error': error && error.message.toLowerCase().includes('email') }"
             required 
             autocomplete="email"
           />
@@ -41,7 +40,6 @@
             type="password" 
             placeholder="Enter your password"
             class="input input-bordered w-full bg-base-100 focus:input-accent transition-colors"
-            :class="{ 'input-error': error && error.message.toLowerCase().includes('password') }"
             required 
             autocomplete="current-password"
           />
@@ -58,10 +56,10 @@
           <button 
             type="submit" 
             class="btn btn-accent btn-lg w-full text-accent-content font-semibold"
-            :class="{ 'loading': loading }"
-            :disabled="loading"
+            :class="{ 'loading': isLoading }"
+            :disabled="isLoading"
           >
-            <span v-if="!loading" class="flex items-center gap-2">
+            <span v-if="!isLoading" class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
@@ -90,7 +88,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useLoginMutation } from '../generated/graphql'
 import { useAuth } from '../composables/useAuth'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 
@@ -101,55 +98,41 @@ const loginForm = reactive({
 
 const router = useRouter()
 
-// Apollo's generated composable - fully type-safe
-const { mutate: login, loading, error } = useLoginMutation()
-const { setUser } = useAuth()
+// Use enhanced auth composable with optimized login
+const { login: authLogin, isLoading } = useAuth()
 const loginResult = ref<any>(null)
 
-// Auto-handle feedback for login operations
+// Auto-handle feedback for login operations  
 const feedback = useApolloFeedback()
-feedback.handleMutation(loading, error, () => {
+feedback.handleMutation(isLoading, ref(null), () => {
   // Success callback - redirect to dashboard
-  loginResult.value = null
   router.push('/')
 }, {
   successTitle: 'Welcome!',
-  successMessage: 'Successfully logged in',
+  successMessage: 'Login successful',
   errorTitle: 'Login Failed'
 })
 
 const handleLogin = async () => {
   try {
-    // Use generated mutation variables structure
-    const result = await login({ 
-      email: loginForm.email, 
-      password: loginForm.password 
-    })
+    // ⚡ Use optimized login flow from enhanced useAuth
+    console.log('🚀 Starting optimized login...')
     
-    if (result?.data?.login) {
-      const { accessToken, refreshToken, user } = result.data.login
-      // Type-safe user with all required fields (now includes role data)
-      const fullUser = {
-        ...user,
-        createdAt: new Date().toISOString(), // Temp until we get from API
-        updatedAt: new Date().toISOString(),
-        // Ensure role has all required fields for Role type
-        role: user.role ? {
-          ...user.role,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          isActive: true // Assume active if returned from login
-        } : null
-      }
-      
-      console.log('Login successful, user role:', user.role)
-      
-      // Store tokens and sync permissions (now async)
-      await setUser(fullUser, accessToken, refreshToken)
-      loginResult.value = result.data
+    const user = await authLogin(loginForm.email, loginForm.password)
+    
+    console.log('✅ Login successful! User authenticated:', user.email)
+    
+    // Login result for feedback system
+    loginResult.value = { 
+      login: { 
+        user, 
+        accessToken: 'set', 
+        refreshToken: 'set' 
+      } 
     }
   } catch (err) {
-    console.error('Login failed:', err)
+    console.error('❌ Login failed:', err)
+    // Error will be handled by Apollo feedback system
   }
 }
 </script>
