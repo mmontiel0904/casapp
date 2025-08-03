@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
@@ -100,18 +100,9 @@ const router = useRouter()
 
 // Use enhanced auth composable with optimized login
 const { login: authLogin, isLoading } = useAuth()
-const loginResult = ref<any>(null)
 
-// Auto-handle feedback for login operations  
+// Manual feedback handling to avoid timing issues
 const feedback = useApolloFeedback()
-feedback.handleMutation(isLoading, ref(null), () => {
-  // Success callback - redirect to dashboard
-  router.push('/')
-}, {
-  successTitle: 'Welcome!',
-  successMessage: 'Login successful',
-  errorTitle: 'Login Failed'
-})
 
 const handleLogin = async () => {
   try {
@@ -122,17 +113,13 @@ const handleLogin = async () => {
     
     console.log('✅ Login successful! User authenticated:', user.email)
     
-    // Login result for feedback system
-    loginResult.value = { 
-      login: { 
-        user, 
-        accessToken: 'set', 
-        refreshToken: 'set' 
-      } 
-    }
+    // Show success feedback and redirect
+    feedback.success('Welcome!', 'Login successful', 3000)
+    router.push('/')
   } catch (err) {
     console.error('❌ Login failed:', err)
-    // Error will be handled by Apollo feedback system
+    // Show error feedback using Apollo error handler
+    feedback.fromApolloError(err, 'Login Failed')
   }
 }
 </script>

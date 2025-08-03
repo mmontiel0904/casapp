@@ -8,6 +8,10 @@ A chronological record of major development milestones and architectural decisio
 
 **Objective**: Implement high-performance authentication architecture following FRONTEND_INTEGRATION guide best practices for ~80% faster login and instant permission-based UI updates.
 
+### 🐛 **Bug Fixes**
+- **Login Error Handling**: Fixed issue where authentication failures were showing success feedback despite Apollo GraphQL errors in console. The `LoginForm.vue` now properly passes error state to `useApolloFeedback` for accurate user feedback.
+- **Duplicate Feedback Messages**: Fixed timing issue where both success and error messages were showing simultaneously during login failures. Replaced automatic watcher-based feedback with manual feedback handling to ensure only one message appears at a time.
+
 ### ⚡ **Performance Improvements**
 
 #### Authentication Speed Optimization
