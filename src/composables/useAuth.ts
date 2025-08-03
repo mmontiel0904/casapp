@@ -10,6 +10,7 @@ const authToken = ref<string | null>(tokenManager.getAccessToken())
 const refreshToken = ref<string | null>(tokenManager.getRefreshToken())
 const isLoading = ref(false)
 const permissionsLoading = ref(false)
+const isInitializing = ref(false)
 
 export function useAuth() {
   const isAuthenticated = computed(() => !!currentUser.value && !!authToken.value)
@@ -186,24 +187,120 @@ export function useAuth() {
   }
 
   /**
-   * Initialize auth state from storage
-   * Called on app startup
+   * Enhanced session restoration with smart token validation
+   * Called on app startup - handles both token restoration and user data recovery
    */
-  const initializeAuth = () => {
-    const accessToken = tokenManager.getAccessToken()
-    const storedRefreshToken = tokenManager.getRefreshToken()
-    
-    if (accessToken) {
-      authToken.value = accessToken
-    }
-    
-    if (storedRefreshToken) {
-      refreshToken.value = storedRefreshToken
+  const initializeAuth = async (): Promise<boolean> => {
+    if (isInitializing.value) {
+      console.log('🔄 Auth initialization already in progress')
+      return false
     }
 
-    // Note: We don't restore user/permissions from storage
-    // They will be fetched fresh on next API call or page load
-    console.log('🔄 Auth state initialized from storage')
+    isInitializing.value = true
+    
+    try {
+      const accessToken = tokenManager.getAccessToken()
+      const storedRefreshToken = tokenManager.getRefreshToken()
+      
+      console.log('🔄 Initializing auth state from storage...', {
+        hasAccessToken: !!accessToken,
+        hasRefreshToken: !!storedRefreshToken
+      })
+
+      // No tokens at all - user needs to login
+      if (!accessToken && !storedRefreshToken) {
+        console.log('✅ No stored tokens - user needs to login')
+        return false
+      }
+
+      // Set tokens in state
+      if (accessToken) authToken.value = accessToken
+      if (storedRefreshToken) refreshToken.value = storedRefreshToken
+
+      // Strategy 1: Try to restore user data with current access token
+      if (accessToken) {
+        try {
+          console.log('🔄 Attempting to restore user session with access token...')
+          const userData = await authService.getCurrentUser()
+          
+          // Success! User session restored
+          currentUser.value = userData
+          permissionService.setUser(userData)
+          
+          // Load permissions in background if user ID available
+          if (userData.id) {
+            loadCompleteUserDataInBackground(userData.id)
+          }
+          
+          console.log('✅ Session restored successfully with access token')
+          return true
+          
+        } catch (error) {
+          console.warn('⚠️ Access token invalid, trying refresh token...', error)
+          // Access token expired/invalid, try refresh token
+        }
+      }
+
+      // Strategy 2: Try refresh token to get new access token + user data
+      if (storedRefreshToken) {
+        try {
+          console.log('🔄 Attempting token refresh and session restore...')
+          const refreshResult = await authService.refreshTokens()
+          
+          // Update tokens
+          authToken.value = refreshResult.accessToken
+          refreshToken.value = refreshResult.refreshToken
+          
+          // Get user data (refresh token mutation includes basic user data)
+          const userData = await authService.getCurrentUser()
+          currentUser.value = userData
+          permissionService.setUser(userData)
+          
+          // Load permissions in background
+          if (userData.id) {
+            loadCompleteUserDataInBackground(userData.id)
+          }
+          
+          console.log('✅ Session restored successfully with refresh token')
+          return true
+          
+        } catch (error) {
+          console.warn('⚠️ Token refresh failed - clearing invalid session', error)
+          // Both tokens invalid, clear everything
+          await clearInvalidSession()
+          return false
+        }
+      }
+
+      // No valid restoration path
+      console.log('❌ No valid tokens available for session restoration')
+      return false
+      
+    } catch (error) {
+      console.error('❌ Auth initialization failed:', error)
+      await clearInvalidSession()
+      return false
+    } finally {
+      isInitializing.value = false
+    }
+  }
+
+  /**
+   * Clear invalid session data
+   * Called when tokens are expired/invalid
+   */
+  const clearInvalidSession = async () => {
+    console.log('🧹 Clearing invalid session data...')
+    
+    currentUser.value = null
+    authToken.value = null
+    refreshToken.value = null
+    
+    tokenManager.clearTokens()
+    clearAuthData()
+    permissionService.clearUser()
+    
+    console.log('✅ Invalid session cleared')
   }
 
   /**
@@ -222,6 +319,7 @@ export function useAuth() {
     hasRefreshToken,
     isLoading: computed(() => isLoading.value),
     permissionsLoading: computed(() => permissionsLoading.value),
+    isInitializing: computed(() => isInitializing.value),
     
     // Actions
     login,
@@ -231,6 +329,7 @@ export function useAuth() {
     initializeAuth,
     shouldRefreshToken,
     refreshPermissions,
-    refreshCurrentUser
+    refreshCurrentUser,
+    clearInvalidSession
   }
 }

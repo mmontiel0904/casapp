@@ -82,11 +82,20 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   const { isAuthenticated, initializeAuth } = useAuth()
   
-  // Initialize auth state from localStorage
-  initializeAuth()
+  // Initialize auth state with async user data restoration
+  const authRestored = await initializeAuth()
+  
+  console.log('🛡️ Router guard - Auth check:', {
+    route: to.path,
+    requiresAuth: to.meta.requiresAuth,
+    requiresGuest: to.meta.requiresGuest,
+    isAuthenticated: isAuthenticated.value,
+    authRestored
+  })
 
   // Check authentication requirements
   if (to.meta.requiresAuth && !isAuthenticated.value) {
+    console.log('🚫 Protected route accessed without authentication, redirecting to login')
     next('/login')
     return
   }
