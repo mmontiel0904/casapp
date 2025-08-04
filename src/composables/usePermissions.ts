@@ -1,5 +1,6 @@
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { permissionService, type AuthUser } from '../services/permissions'
+import { useAuth } from './useAuth'
 import type { Role } from '../generated/graphql'
 
 /**
@@ -7,9 +8,55 @@ import type { Role } from '../generated/graphql'
  * Implements the optimized RBAC patterns from FRONTEND_INTEGRATION guide
  */
 export function usePermissions() {
+  const { currentUser: authUser } = useAuth()
+  
   const user = ref<AuthUser | null>(permissionService.getUser())
   const permissionsLoaded = ref(permissionService.arePermissionsLoaded())
   const permissionsLoading = ref(false)
+
+  // ========================================
+  // ASYNC PERMISSION LOADING
+  // ========================================
+
+  /**
+   * Load permissions in background for instant sync checks
+   */
+  const loadPermissions = async (): Promise<void> => {
+    if (permissionsLoaded.value || permissionsLoading.value) return
+    
+    permissionsLoading.value = true
+    try {
+      await permissionService.preloadPermissions()
+      permissionsLoaded.value = true
+    } catch (error) {
+      console.warn('⚠️ Could not preload permissions:', error)
+    } finally {
+      permissionsLoading.value = false
+    }
+  }
+
+  // Watch for auth user changes and sync with permission service
+  watch(authUser, (newUser) => {
+    if (newUser) {
+      // Update local user state and sync with permission service
+      user.value = newUser
+      permissionService.setUser(newUser)
+      
+      // Update permissions loaded state based on new user data
+      permissionsLoaded.value = permissionService.arePermissionsLoaded()
+      
+      // If permissions aren't loaded for this user, load them
+      if (!permissionsLoaded.value && !permissionsLoading.value) {
+        loadPermissions()
+      }
+    } else {
+      // User logged out, clear everything
+      user.value = null
+      permissionService.clearUser()
+      permissionsLoaded.value = false
+    }
+  }, { immediate: true })
+
 
   // Update user and sync with permission service
   const setUser = (newUser: AuthUser | null) => {
@@ -46,13 +93,15 @@ export function usePermissions() {
   }
 
   // Computed permission checks (reactive)
-  const canInviteUsers = computed(() => 
-    permissionsLoaded.value && permissionService.canInviteUsersSync()
-  )
+  const canInviteUsers = computed(() => {
+    const result = permissionsLoaded.value && permissionService.canInviteUsersSync()
+    return result
+  })
   
-  const canManageUsers = computed(() => 
-    permissionsLoaded.value && permissionService.canManageUsersSync()
-  )
+  const canManageUsers = computed(() => {
+    const result = permissionsLoaded.value && permissionService.canManageUsersSync()
+    return result
+  })
 
   const canAdminSystem = computed(() => 
     permissionsLoaded.value && permissionService.canAdminSystemSync()
@@ -87,27 +136,6 @@ export function usePermissions() {
     permissionsLoaded.value && permissionService.canAccessProjectsSync()
   )
 
-  // ========================================
-  // ASYNC PERMISSION LOADING
-  // ========================================
-
-  /**
-   * Load permissions in background for instant sync checks
-   */
-  const loadPermissions = async (): Promise<void> => {
-    if (permissionsLoaded.value || permissionsLoading.value) return
-    
-    permissionsLoading.value = true
-    try {
-      await permissionService.preloadPermissions()
-      permissionsLoaded.value = true
-      console.log('✅ Permissions preloaded for instant checks')
-    } catch (error) {
-      console.warn('⚠️ Could not preload permissions:', error)
-    } finally {
-      permissionsLoading.value = false
-    }
-  }
 
   /**
    * Force refresh permissions (clears cache and reloads)

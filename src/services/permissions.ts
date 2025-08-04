@@ -18,10 +18,27 @@ export class PermissionService {
   private permissionsPromise: Promise<string[]> | null = null
 
   setUser(user: AuthUser) {
+    const previousUserId = this.user?.id
     this.user = user
-    // Clear permissions cache when user changes
-    this.permissionsCache = null
-    this.permissionsPromise = null
+    
+    // If this is a different user, clear permissions cache
+    if (previousUserId && previousUserId !== user.id) {
+      this.permissionsCache = null
+      this.permissionsPromise = null
+    }
+    // If this is the same user with updated permissions, update the cache
+    else if (user.permissions && user.permissions.length > 0) {
+      this.permissionsCache = user.permissions
+    }
+    // If this is the same user but no permissions in user object, keep existing cache if available
+    else if (!user.permissions && this.permissionsCache) {
+      // Keep existing cache
+    }
+    // Otherwise, clear cache to force reload
+    else {
+      this.permissionsCache = null
+      this.permissionsPromise = null
+    }
   }
 
   getUser(): AuthUser | null {

@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuth } from './composables/useAuth'
+import AppLayout from './components/AppLayout.vue'
 import GlobalFeedback from './components/GlobalFeedback.vue'
 
-const { isInitializing } = useAuth()
+const route = useRoute()
+const { isInitializing, isAuthenticated } = useAuth()
 
 // Show loading screen during auth initialization
 const showLoadingScreen = computed(() => isInitializing.value)
+
+// Guest routes that don't need the app layout (navbar)
+const guestRoutes = ['/login', '/register', '/forgot-password', '/reset-password', '/accept-invitation']
+const isGuestRoute = computed(() => guestRoutes.includes(route.path))
+
+// Show app layout for authenticated users on non-guest routes
+const showAppLayout = computed(() => !showLoadingScreen.value && isAuthenticated.value && !isGuestRoute.value)
 </script>
 
 <template>
@@ -22,7 +32,12 @@ const showLoadingScreen = computed(() => isInitializing.value)
       </div>
     </div>
     
-    <!-- Main app content -->
+    <!-- App with persistent navigation layout -->
+    <AppLayout v-else-if="showAppLayout">
+      <router-view />
+    </AppLayout>
+    
+    <!-- Guest pages without navigation -->
     <router-view v-else />
     
     <!-- Global feedback system -->

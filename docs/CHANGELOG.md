@@ -1,6 +1,21 @@
 
 # Development Changelog
 
+## [2025-08-04] - Navigation Refactor & Permission Improvements
+
+### 🧭 **Navigation & Layout Refactor**
+- **Removed `NavBar.vue`**: Navigation bar logic and UI moved to new `AppLayout.vue` for a unified, persistent layout.
+- **Added `AppLayout.vue`**: Provides a sticky navigation bar, user menu, and main navigation for all authenticated pages.
+- **Updated `App.vue`**: Now uses `AppLayout` for authenticated routes and guest layout for login/register/forgot/reset pages.
+- **Dashboard & My Tasks Layout**: Refactored `DashboardPage.vue` and `MyTasksPage.vue` to remove direct NavBar usage and rely on the new layout system.
+
+### 🛡️ **Permission System Enhancements**
+- **Refactored `usePermissions.ts`**: Now watches for auth user changes, syncs with permission service, and auto-loads permissions as needed. Improved reactivity and cache handling.
+- **Enhanced `permissions.ts`**: Permission service now supports smarter cache invalidation, user switching, and permission preloading. Handles user/role/permission changes more robustly.
+
+### 🧹 **Cleanup**
+- Removed legacy NavBar component and related imports from all views.
+
 ## [2025-08-04] - My Tasks Page & Task Views
 
 ### ✨ **New Features & Enhancements**

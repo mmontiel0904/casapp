@@ -1,10 +1,6 @@
 <template>
-  <div class="min-h-screen bg-base-200">
-    <!-- Navigation Bar -->
-    <NavBar />
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       <!-- Welcome Section -->
       <div class="mb-8">
         <h2 class="text-2xl font-bold font-serif mb-2">
@@ -134,8 +130,7 @@
           </svg>
         </button>
       </div>
-    </main>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -143,7 +138,6 @@ import { ref, computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useHealthQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
-import NavBar from '../components/NavBar.vue'
 import InviteUserForm from '../components/InviteUserForm.vue'
 
 const { currentUser } = useAuth()
