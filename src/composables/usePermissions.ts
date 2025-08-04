@@ -70,6 +70,23 @@ export function usePermissions() {
     permissionsLoaded.value && permissionService.canEditUserRolesSync()
   )
 
+  // Task system permissions
+  const canAccessTasks = computed(() => 
+    permissionsLoaded.value && permissionService.canAccessTasksSync()
+  )
+
+  const canCreateTasks = computed(() => 
+    permissionsLoaded.value && permissionService.canCreateTasksSync()
+  )
+
+  const canManageTasks = computed(() => 
+    permissionsLoaded.value && permissionService.canManageTasksSync()
+  )
+
+  const canAccessProjects = computed(() => 
+    permissionsLoaded.value && permissionService.canAccessProjectsSync()
+  )
+
   // ========================================
   // ASYNC PERMISSION LOADING
   // ========================================
@@ -235,6 +252,12 @@ export function usePermissions() {
     canAssignRoles,
     canViewAllUsers,
     canEditUserRoles,
+    
+    // Task system permissions
+    canAccessTasks,
+    canCreateTasks,
+    canManageTasks,
+    canAccessProjects,
     
     // Hierarchy checks
     canAssignRole,

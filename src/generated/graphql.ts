@@ -567,6 +567,118 @@ export type InviteUserWithRoleMutationVariables = Exact<{
 
 export type InviteUserWithRoleMutation = { inviteUserWithRole: { id: any, email: string, inviterUserId: any, isUsed: boolean, createdAt: any, expiresAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
 
+export type MyProjectsQueryVariables = Exact<{
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type MyProjectsQuery = { myProjects: Array<{ id: any, name: string, description?: string | null, ownerId: any, isActive: boolean, createdAt: any, updatedAt: any, owner?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, members: Array<{ id: any, role: string, joinedAt: any, user: { id: any, email: string, firstName?: string | null, lastName?: string | null } }> }> };
+
+export type ProjectQueryVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+}>;
+
+
+export type ProjectQuery = { project?: { id: any, name: string, description?: string | null, ownerId: any, isActive: boolean, createdAt: any, updatedAt: any, owner?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, members: Array<{ id: any, role: string, joinedAt: any, user: { id: any, email: string, firstName?: string | null, lastName?: string | null } }>, tasks: Array<{ id: any, name: string, status: string, priority: string, dueDate?: any | null, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> } | null };
+
+export type CreateProjectMutationVariables = Exact<{
+  input: CreateProjectInput;
+}>;
+
+
+export type CreateProjectMutation = { createProject: { id: any, name: string, description?: string | null, ownerId: any, createdAt: any } };
+
+export type UpdateProjectMutationVariables = Exact<{
+  input: UpdateProjectInput;
+}>;
+
+
+export type UpdateProjectMutation = { updateProject: { id: any, name: string, description?: string | null, updatedAt: any } };
+
+export type DeleteProjectMutationVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteProjectMutation = { deleteProject: { message: string } };
+
+export type ProjectTasksQueryVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+  status?: InputMaybe<Scalars['String']['input']>;
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type ProjectTasksQuery = { projectTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
+
+export type MyAssignedTasksQueryVariables = Exact<{
+  status?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type MyAssignedTasksQuery = { myAssignedTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, updatedAt: any, project?: { id: any, name: string } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
+
+export type ProjectTaskStatsQueryVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+}>;
+
+
+export type ProjectTaskStatsQuery = { projectTaskStats: { total: number, todo: number, inProgress: number, completed: number, cancelled: number, overdue: number } };
+
+export type CreateTaskMutationVariables = Exact<{
+  input: CreateTaskInput;
+}>;
+
+
+export type CreateTaskMutation = { createTask: { id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null } };
+
+export type UpdateTaskMutationVariables = Exact<{
+  input: UpdateTaskInput;
+}>;
+
+
+export type UpdateTaskMutation = { updateTask: { id: any, name: string, description?: string | null, status: string, priority: string, dueDate?: any | null, updatedAt: any } };
+
+export type AssignTaskMutationVariables = Exact<{
+  input: AssignTaskInput;
+}>;
+
+
+export type AssignTaskMutation = { assignTask: { id: any, assigneeId?: any | null, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null } };
+
+export type DeleteTaskMutationVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteTaskMutation = { deleteTask: { message: string } };
+
+export type AddProjectMemberMutationVariables = Exact<{
+  input: AddProjectMemberInput;
+}>;
+
+
+export type AddProjectMemberMutation = { addProjectMember: { message: string } };
+
+export type UpdateMemberRoleMutationVariables = Exact<{
+  input: UpdateMemberRoleInput;
+}>;
+
+
+export type UpdateMemberRoleMutation = { updateMemberRole: { message: string } };
+
+export type RemoveProjectMemberMutationVariables = Exact<{
+  input: RemoveProjectMemberInput;
+}>;
+
+
+export type RemoveProjectMemberMutation = { removeProjectMember: { message: string } };
+
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1124,6 +1236,599 @@ export function useInviteUserWithRoleMutation(options: VueApolloComposable.UseMu
   return VueApolloComposable.useMutation<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>(InviteUserWithRoleDocument, options);
 }
 export type InviteUserWithRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>;
+export const MyProjectsDocument = gql`
+    query MyProjects($limit: Int, $offset: Int) {
+  myProjects(limit: $limit, offset: $offset) {
+    id
+    name
+    description
+    ownerId
+    isActive
+    createdAt
+    updatedAt
+    owner {
+      id
+      email
+      firstName
+      lastName
+    }
+    members {
+      id
+      role
+      joinedAt
+      user {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyProjectsQuery__
+ *
+ * To run a query within a Vue component, call `useMyProjectsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyProjectsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useMyProjectsQuery({
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useMyProjectsQuery(variables: MyProjectsQueryVariables | VueCompositionApi.Ref<MyProjectsQueryVariables> | ReactiveFunction<MyProjectsQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, variables, options);
+}
+export function useMyProjectsLazyQuery(variables: MyProjectsQueryVariables | VueCompositionApi.Ref<MyProjectsQueryVariables> | ReactiveFunction<MyProjectsQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyProjectsQuery, MyProjectsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<MyProjectsQuery, MyProjectsQueryVariables>(MyProjectsDocument, variables, options);
+}
+export type MyProjectsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MyProjectsQuery, MyProjectsQueryVariables>;
+export const ProjectDocument = gql`
+    query Project($projectId: UUID!) {
+  project(projectId: $projectId) {
+    id
+    name
+    description
+    ownerId
+    isActive
+    createdAt
+    updatedAt
+    owner {
+      id
+      email
+      firstName
+      lastName
+    }
+    members {
+      id
+      role
+      joinedAt
+      user {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+    tasks(limit: 10) {
+      id
+      name
+      status
+      priority
+      dueDate
+      assignee {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useProjectQuery__
+ *
+ * To run a query within a Vue component, call `useProjectQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useProjectQuery({
+ *   projectId: // value for 'projectId'
+ * });
+ */
+export function useProjectQuery(variables: ProjectQueryVariables | VueCompositionApi.Ref<ProjectQueryVariables> | ReactiveFunction<ProjectQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ProjectQuery, ProjectQueryVariables>(ProjectDocument, variables, options);
+}
+export function useProjectLazyQuery(variables?: ProjectQueryVariables | VueCompositionApi.Ref<ProjectQueryVariables> | ReactiveFunction<ProjectQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectQuery, ProjectQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ProjectQuery, ProjectQueryVariables>(ProjectDocument, variables, options);
+}
+export type ProjectQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectQuery, ProjectQueryVariables>;
+export const CreateProjectDocument = gql`
+    mutation CreateProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    id
+    name
+    description
+    ownerId
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useCreateProjectMutation__
+ *
+ * To run a mutation, you first call `useCreateProjectMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProjectMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateProjectMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateProjectMutation(options: VueApolloComposable.UseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument, options);
+}
+export type CreateProjectMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateProjectMutation, CreateProjectMutationVariables>;
+export const UpdateProjectDocument = gql`
+    mutation UpdateProject($input: UpdateProjectInput!) {
+  updateProject(input: $input) {
+    id
+    name
+    description
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateProjectMutation__
+ *
+ * To run a mutation, you first call `useUpdateProjectMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateProjectMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateProjectMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateProjectMutation(options: VueApolloComposable.UseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateProjectMutation, UpdateProjectMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateProjectMutation, UpdateProjectMutationVariables>(UpdateProjectDocument, options);
+}
+export type UpdateProjectMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateProjectMutation, UpdateProjectMutationVariables>;
+export const DeleteProjectDocument = gql`
+    mutation DeleteProject($projectId: UUID!) {
+  deleteProject(projectId: $projectId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeleteProjectMutation__
+ *
+ * To run a mutation, you first call `useDeleteProjectMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteProjectMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeleteProjectMutation({
+ *   variables: {
+ *     projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useDeleteProjectMutation(options: VueApolloComposable.UseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeleteProjectMutation, DeleteProjectMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeleteProjectMutation, DeleteProjectMutationVariables>(DeleteProjectDocument, options);
+}
+export type DeleteProjectMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteProjectMutation, DeleteProjectMutationVariables>;
+export const ProjectTasksDocument = gql`
+    query ProjectTasks($projectId: UUID!, $status: String, $assigneeId: UUID, $limit: Int, $offset: Int) {
+  projectTasks(
+    projectId: $projectId
+    status: $status
+    assigneeId: $assigneeId
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    name
+    description
+    projectId
+    assigneeId
+    creatorId
+    status
+    priority
+    dueDate
+    createdAt
+    updatedAt
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
+    creator {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useProjectTasksQuery__
+ *
+ * To run a query within a Vue component, call `useProjectTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectTasksQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useProjectTasksQuery({
+ *   projectId: // value for 'projectId'
+ *   status: // value for 'status'
+ *   assigneeId: // value for 'assigneeId'
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useProjectTasksQuery(variables: ProjectTasksQueryVariables | VueCompositionApi.Ref<ProjectTasksQueryVariables> | ReactiveFunction<ProjectTasksQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ProjectTasksQuery, ProjectTasksQueryVariables>(ProjectTasksDocument, variables, options);
+}
+export function useProjectTasksLazyQuery(variables?: ProjectTasksQueryVariables | VueCompositionApi.Ref<ProjectTasksQueryVariables> | ReactiveFunction<ProjectTasksQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectTasksQuery, ProjectTasksQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ProjectTasksQuery, ProjectTasksQueryVariables>(ProjectTasksDocument, variables, options);
+}
+export type ProjectTasksQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectTasksQuery, ProjectTasksQueryVariables>;
+export const MyAssignedTasksDocument = gql`
+    query MyAssignedTasks($status: String, $limit: Int, $offset: Int) {
+  myAssignedTasks(status: $status, limit: $limit, offset: $offset) {
+    id
+    name
+    description
+    projectId
+    status
+    priority
+    dueDate
+    createdAt
+    updatedAt
+    project {
+      id
+      name
+    }
+    creator {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useMyAssignedTasksQuery__
+ *
+ * To run a query within a Vue component, call `useMyAssignedTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMyAssignedTasksQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useMyAssignedTasksQuery({
+ *   status: // value for 'status'
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useMyAssignedTasksQuery(variables: MyAssignedTasksQueryVariables | VueCompositionApi.Ref<MyAssignedTasksQueryVariables> | ReactiveFunction<MyAssignedTasksQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>(MyAssignedTasksDocument, variables, options);
+}
+export function useMyAssignedTasksLazyQuery(variables: MyAssignedTasksQueryVariables | VueCompositionApi.Ref<MyAssignedTasksQueryVariables> | ReactiveFunction<MyAssignedTasksQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>(MyAssignedTasksDocument, variables, options);
+}
+export type MyAssignedTasksQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<MyAssignedTasksQuery, MyAssignedTasksQueryVariables>;
+export const ProjectTaskStatsDocument = gql`
+    query ProjectTaskStats($projectId: UUID!) {
+  projectTaskStats(projectId: $projectId) {
+    total
+    todo
+    inProgress
+    completed
+    cancelled
+    overdue
+  }
+}
+    `;
+
+/**
+ * __useProjectTaskStatsQuery__
+ *
+ * To run a query within a Vue component, call `useProjectTaskStatsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectTaskStatsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useProjectTaskStatsQuery({
+ *   projectId: // value for 'projectId'
+ * });
+ */
+export function useProjectTaskStatsQuery(variables: ProjectTaskStatsQueryVariables | VueCompositionApi.Ref<ProjectTaskStatsQueryVariables> | ReactiveFunction<ProjectTaskStatsQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>(ProjectTaskStatsDocument, variables, options);
+}
+export function useProjectTaskStatsLazyQuery(variables?: ProjectTaskStatsQueryVariables | VueCompositionApi.Ref<ProjectTaskStatsQueryVariables> | ReactiveFunction<ProjectTaskStatsQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>(ProjectTaskStatsDocument, variables, options);
+}
+export type ProjectTaskStatsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectTaskStatsQuery, ProjectTaskStatsQueryVariables>;
+export const CreateTaskDocument = gql`
+    mutation CreateTask($input: CreateTaskInput!) {
+  createTask(input: $input) {
+    id
+    name
+    description
+    projectId
+    assigneeId
+    creatorId
+    status
+    priority
+    dueDate
+    createdAt
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useCreateTaskMutation__
+ *
+ * To run a mutation, you first call `useCreateTaskMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTaskMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateTaskMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateTaskMutation(options: VueApolloComposable.UseMutationOptions<CreateTaskMutation, CreateTaskMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateTaskMutation, CreateTaskMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateTaskMutation, CreateTaskMutationVariables>(CreateTaskDocument, options);
+}
+export type CreateTaskMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateTaskMutation, CreateTaskMutationVariables>;
+export const UpdateTaskDocument = gql`
+    mutation UpdateTask($input: UpdateTaskInput!) {
+  updateTask(input: $input) {
+    id
+    name
+    description
+    status
+    priority
+    dueDate
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateTaskMutation__
+ *
+ * To run a mutation, you first call `useUpdateTaskMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateTaskMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateTaskMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateTaskMutation(options: VueApolloComposable.UseMutationOptions<UpdateTaskMutation, UpdateTaskMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateTaskMutation, UpdateTaskMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateTaskMutation, UpdateTaskMutationVariables>(UpdateTaskDocument, options);
+}
+export type UpdateTaskMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateTaskMutation, UpdateTaskMutationVariables>;
+export const AssignTaskDocument = gql`
+    mutation AssignTask($input: AssignTaskInput!) {
+  assignTask(input: $input) {
+    id
+    assigneeId
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAssignTaskMutation__
+ *
+ * To run a mutation, you first call `useAssignTaskMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAssignTaskMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAssignTaskMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignTaskMutation(options: VueApolloComposable.UseMutationOptions<AssignTaskMutation, AssignTaskMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AssignTaskMutation, AssignTaskMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AssignTaskMutation, AssignTaskMutationVariables>(AssignTaskDocument, options);
+}
+export type AssignTaskMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AssignTaskMutation, AssignTaskMutationVariables>;
+export const DeleteTaskDocument = gql`
+    mutation DeleteTask($taskId: UUID!) {
+  deleteTask(taskId: $taskId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeleteTaskMutation__
+ *
+ * To run a mutation, you first call `useDeleteTaskMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteTaskMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeleteTaskMutation({
+ *   variables: {
+ *     taskId: // value for 'taskId'
+ *   },
+ * });
+ */
+export function useDeleteTaskMutation(options: VueApolloComposable.UseMutationOptions<DeleteTaskMutation, DeleteTaskMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeleteTaskMutation, DeleteTaskMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeleteTaskMutation, DeleteTaskMutationVariables>(DeleteTaskDocument, options);
+}
+export type DeleteTaskMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteTaskMutation, DeleteTaskMutationVariables>;
+export const AddProjectMemberDocument = gql`
+    mutation AddProjectMember($input: AddProjectMemberInput!) {
+  addProjectMember(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useAddProjectMemberMutation__
+ *
+ * To run a mutation, you first call `useAddProjectMemberMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAddProjectMemberMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAddProjectMemberMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddProjectMemberMutation(options: VueApolloComposable.UseMutationOptions<AddProjectMemberMutation, AddProjectMemberMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AddProjectMemberMutation, AddProjectMemberMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AddProjectMemberMutation, AddProjectMemberMutationVariables>(AddProjectMemberDocument, options);
+}
+export type AddProjectMemberMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AddProjectMemberMutation, AddProjectMemberMutationVariables>;
+export const UpdateMemberRoleDocument = gql`
+    mutation UpdateMemberRole($input: UpdateMemberRoleInput!) {
+  updateMemberRole(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useUpdateMemberRoleMutation__
+ *
+ * To run a mutation, you first call `useUpdateMemberRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateMemberRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateMemberRoleMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateMemberRoleMutation(options: VueApolloComposable.UseMutationOptions<UpdateMemberRoleMutation, UpdateMemberRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateMemberRoleMutation, UpdateMemberRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateMemberRoleMutation, UpdateMemberRoleMutationVariables>(UpdateMemberRoleDocument, options);
+}
+export type UpdateMemberRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateMemberRoleMutation, UpdateMemberRoleMutationVariables>;
+export const RemoveProjectMemberDocument = gql`
+    mutation RemoveProjectMember($input: RemoveProjectMemberInput!) {
+  removeProjectMember(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useRemoveProjectMemberMutation__
+ *
+ * To run a mutation, you first call `useRemoveProjectMemberMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveProjectMemberMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRemoveProjectMemberMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemoveProjectMemberMutation(options: VueApolloComposable.UseMutationOptions<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables>(RemoveProjectMemberDocument, options);
+}
+export type RemoveProjectMemberMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables>;
 export const HealthDocument = gql`
     query Health {
   health

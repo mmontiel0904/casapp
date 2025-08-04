@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 import { permissionService } from '../services/permissions'
+import { useFeedback } from '../composables/useFeedback'
 
 // Route components
 const LoginPage = () => import('../views/LoginPage.vue')
@@ -11,6 +12,7 @@ const ResetPasswordPage = () => import('../views/ResetPasswordPage.vue')
 const UserManagementPage = () => import('../views/UserManagementPage.vue')
 const ProfilePage = () => import('../views/ProfilePage.vue')
 const ProjectsPage = () => import('../views/ProjectsPage.vue')
+const MyTasksPage = () => import('../views/MyTasksPage.vue')
 
 const routes = [
   {
@@ -59,7 +61,19 @@ const routes = [
     path: '/projects',
     name: 'Projects',
     component: ProjectsPage,
-    meta: { requiresAuth: true }
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'project_system:read'
+    }
+  },
+  {
+    path: '/my-tasks',
+    name: 'MyTasks',
+    component: MyTasksPage,
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'task_system:read'
+    }
   },
   {
     path: '/admin/users',
@@ -122,20 +136,41 @@ router.beforeEach(async (to, _from, next) => {
       const hasPermission = await permissionService.hasPermission(requiredPermission)
       
       if (!hasPermission) {
-        // Redirect to dashboard with permission error
-        next({ 
-          path: '/', 
-          query: { error: 'insufficient_permissions', required: requiredPermission }
-        })
+        // Use global feedback system to show permission error
+        const { error } = useFeedback()
+        
+        // Get friendly names for permissions
+        const permissionNames: Record<string, string> = {
+          'task_system:read': 'Task Management',
+          'project_system:read': 'Project Management',
+          'user_management': 'User Management'
+        }
+        
+        const permissionName = permissionNames[requiredPermission] || requiredPermission
+        
+        error(
+          'Access Denied',
+          `You don't have permission to access ${permissionName}. Please contact your administrator.`,
+          7000
+        )
+        
+        // Redirect to dashboard without query params
+        next('/')
         return
       }
     } catch (error) {
       console.error('Permission check failed:', error)
-      // On permission check failure, redirect to dashboard
-      next({ 
-        path: '/', 
-        query: { error: 'permission_check_failed' }
-      })
+      
+      // Use global feedback system for permission check failures
+      const { error: showError } = useFeedback()
+      showError(
+        'Permission Check Failed',
+        'Unable to verify your permissions. Please try again or contact support.',
+        7000
+      )
+      
+      // Redirect to dashboard without query params
+      next('/')
       return
     }
   }

@@ -53,6 +53,14 @@
               Dashboard
             </router-link>
           </li>
+          <li v-if="canAccessTasks">
+            <router-link to="/my-tasks" class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              My Tasks
+            </router-link>
+          </li>
           <li v-if="canAccessProjects">
             <router-link to="/projects" class="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -150,6 +158,14 @@
                 </div>
               </div>
             </li>
+            <li v-if="canAccessTasks">
+              <router-link to="/my-tasks" class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+                My Tasks
+              </router-link>
+            </li>
             <li v-if="canAccessProjects">
               <router-link to="/projects" class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -206,15 +222,11 @@ import { usePermissions } from '../composables/usePermissions'
 
 const router = useRouter()
 const { currentUser, logout } = useAuth()
-const { canManageUsers, isSuperAdmin, isAdmin, currentUserRole } = usePermissions()
+const { canManageUsers, isSuperAdmin, isAdmin, currentUserRole, canAccessTasks, canAccessProjects } = usePermissions()
 const searchQuery = ref('')
 
-// Task system permissions
-const canAccessProjects = computed(() => {
-  // For now, all authenticated users can access projects
-  // This can be refined later with specific task_system:read permission
-  return !!currentUser.value
-})
+// Note: Task system permissions are now properly handled by usePermissions composable
+// No need for local computed properties - using canAccessTasks and canAccessProjects from composable
 
 // Helper functions
 const getRoleBadgeClass = (role: any): string => {

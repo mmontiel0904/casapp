@@ -151,6 +151,26 @@ export class PermissionService {
   }
 
   // ========================================
+  // TASK SYSTEM PERMISSIONS (Async)
+  // ========================================
+
+  async canAccessTasks(): Promise<boolean> {
+    return this.hasPermission('task_system:read') || this.isAdmin()
+  }
+
+  async canCreateTasks(): Promise<boolean> {
+    return this.hasPermission('task_system:write') || this.isAdmin()
+  }
+
+  async canManageTasks(): Promise<boolean> {
+    return this.hasPermission('task_system:admin') || this.isAdmin()
+  }
+
+  async canAccessProjects(): Promise<boolean> {
+    return this.hasPermission('project_system:read') || this.isAdmin()
+  }
+
+  // ========================================
   // PERMISSION-BASED CHECKS (Sync - after preload)
   // ========================================
 
@@ -176,6 +196,26 @@ export class PermissionService {
 
   canEditUserRolesSync(): boolean {
     return this.hasPermissionSync('edit_user_roles') || this.isSuperAdmin()
+  }
+
+  // ========================================
+  // TASK SYSTEM PERMISSIONS (Sync)
+  // ========================================
+
+  canAccessTasksSync(): boolean {
+    return this.hasPermissionSync('task_system:read') || this.isAdmin()
+  }
+
+  canCreateTasksSync(): boolean {
+    return this.hasPermissionSync('task_system:write') || this.isAdmin()
+  }
+
+  canManageTasksSync(): boolean {
+    return this.hasPermissionSync('task_system:admin') || this.isAdmin()
+  }
+
+  canAccessProjectsSync(): boolean {
+    return this.hasPermissionSync('project_system:read') || this.isAdmin()
   }
 
   // ========================================

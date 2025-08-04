@@ -52,20 +52,43 @@ export function useApolloFeedback() {
     options?: {
       errorTitle?: string
       showNetworkErrors?: boolean
+      showPermissionErrors?: boolean
     }
   ) => {
     const {
       errorTitle = 'Failed to Load Data',
-      showNetworkErrors = true
+      showNetworkErrors = true,
+      showPermissionErrors = true
     } = options || {}
 
     watch(error, (newError) => {
       if (newError) {
-        // Don't show feedback for every query error by default
-        // Only show for network errors or critical failures
+        // Check for permission errors first
+        if (showPermissionErrors && newError.graphQLErrors?.some((err: any) => 
+          err.message?.toLowerCase().includes('insufficient permissions') ||
+          err.message?.toLowerCase().includes('permission denied') ||
+          err.extensions?.code === 'FORBIDDEN'
+        )) {
+          const permissionError = newError.graphQLErrors.find((err: any) => 
+            err.message?.toLowerCase().includes('insufficient permissions') ||
+            err.message?.toLowerCase().includes('permission denied') ||
+            err.extensions?.code === 'FORBIDDEN'
+          )
+          
+          feedback.error(
+            'Access Denied',
+            permissionError.message || 'You don\'t have permission to access this resource.',
+            7000
+          )
+          return
+        }
+        
+        // Show network errors
         if (showNetworkErrors && newError.networkError) {
           feedback.fromApolloError(newError, errorTitle)
-        } else if (newError.graphQLErrors?.some((err: any) => err.extensions?.code === 'INTERNAL_ERROR')) {
+        } 
+        // Show internal server errors
+        else if (newError.graphQLErrors?.some((err: any) => err.extensions?.code === 'INTERNAL_ERROR')) {
           feedback.fromApolloError(newError, errorTitle)
         }
       }
