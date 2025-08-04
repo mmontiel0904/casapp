@@ -134,8 +134,24 @@
                     </svg>
                   </label>
                   <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-                    <li><a @click="openRoleAssignmentModal(user)">Assign Role</a></li>
-                    <li v-if="user.role"><a @click="removeUserRole(user)" class="text-error">Remove Role</a></li>
+                    <li><a @click="openRoleAssignmentModal(user)">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.25-4.5a2.25 2.25 0 000 4.5m0-4.5a2.25 2.25 0 000 4.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Assign Role
+                    </a></li>
+                    <li><a @click="openPasswordResetModal(user)" class="text-warning">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      Reset Password
+                    </a></li>
+                    <li v-if="user.role"><a @click="removeUserRole(user)" class="text-error">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                      Remove Role
+                    </a></li>
                   </ul>
                 </div>
               </div>
@@ -244,6 +260,14 @@
       </div>
       <div class="modal-backdrop" @click="closeRoleModal"></div>
     </div>
+
+    <!-- Admin Reset Password Modal -->
+    <AdminResetPasswordModal 
+      v-if="showPasswordResetModal && selectedUserForReset"
+      :user="selectedUserForReset"
+      @close="closePasswordResetModal"
+      @success="handlePasswordResetSuccess"
+    />
   </div>
 </template>
 
@@ -260,6 +284,7 @@ import {
 } from '../generated/graphql'
 import { usePermissions } from '../composables/usePermissions'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
+import AdminResetPasswordModal from '../components/AdminResetPasswordModal.vue'
 import type { AuthUser } from '../services/permissions'
 
 // Type aliases for actual GraphQL query results
@@ -351,6 +376,10 @@ const showRoleModal = ref(false)
 const selectedUser = ref<QueryUser | null>(null)
 const selectedRoleId = ref('')
 
+// Password reset modal state
+const showPasswordResetModal = ref(false)
+const selectedUserForReset = ref<QueryUser | null>(null)
+
 // Form state
 const inviteForm = ref({
   email: '',
@@ -413,6 +442,22 @@ const removeUserRole = async (user: QueryUser) => {
   } catch (error) {
     feedback.error('Removal Failed', 'Could not remove user role')
   }
+}
+
+// Password reset functions
+const openPasswordResetModal = (user: QueryUser) => {
+  selectedUserForReset.value = user
+  showPasswordResetModal.value = true
+}
+
+const closePasswordResetModal = () => {
+  showPasswordResetModal.value = false
+  selectedUserForReset.value = null
+}
+
+const handlePasswordResetSuccess = () => {
+  // Password reset was successful, feedback is handled by the modal component
+  closePasswordResetModal()
 }
 
 const handleInviteUser = async () => {

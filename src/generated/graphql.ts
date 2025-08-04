@@ -42,6 +42,12 @@ export type AcceptInvitationInput = {
   password: Scalars['String']['input'];
 };
 
+export type AddProjectMemberInput = {
+  projectId: Scalars['UUID']['input'];
+  role: Scalars['String']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
 export type AdminResetUserPasswordInput = {
   userId: Scalars['UUID']['input'];
 };
@@ -49,6 +55,11 @@ export type AdminResetUserPasswordInput = {
 export type AssignRoleInput = {
   roleId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
+};
+
+export type AssignTaskInput = {
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  taskId: Scalars['UUID']['input'];
 };
 
 export type AuthPayload = {
@@ -60,6 +71,20 @@ export type AuthPayload = {
 export type ChangePasswordInput = {
   currentPassword: Scalars['String']['input'];
   newPassword: Scalars['String']['input'];
+};
+
+export type CreateProjectInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
+export type CreateTaskInput = {
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  priority?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['UUID']['input'];
 };
 
 export type Invitation = {
@@ -93,24 +118,39 @@ export type MessageResponse = {
 
 export type MutationRoot = {
   acceptInvitation: AuthPayload;
+  addProjectMember: MessageResponse;
   adminResetUserPassword: MessageResponse;
   assignRole: User;
+  assignTask: Task;
   changePassword: MessageResponse;
+  createProject: Project;
+  createTask: Task;
+  deleteProject: MessageResponse;
+  deleteTask: MessageResponse;
   inviteUser: Invitation;
   inviteUserWithRole: Invitation;
   login: AuthPayload;
   logout: MessageResponse;
   refreshToken: AuthPayload;
   register: User;
+  removeProjectMember: MessageResponse;
   removeUserRole: User;
   requestPasswordReset: MessageResponse;
   resetPassword: MessageResponse;
+  updateMemberRole: MessageResponse;
+  updateProject: Project;
+  updateTask: Task;
   verifyEmail: MessageResponse;
 };
 
 
 export type MutationRootAcceptInvitationArgs = {
   input: AcceptInvitationInput;
+};
+
+
+export type MutationRootAddProjectMemberArgs = {
+  input: AddProjectMemberInput;
 };
 
 
@@ -124,8 +164,33 @@ export type MutationRootAssignRoleArgs = {
 };
 
 
+export type MutationRootAssignTaskArgs = {
+  input: AssignTaskInput;
+};
+
+
 export type MutationRootChangePasswordArgs = {
   input: ChangePasswordInput;
+};
+
+
+export type MutationRootCreateProjectArgs = {
+  input: CreateProjectInput;
+};
+
+
+export type MutationRootCreateTaskArgs = {
+  input: CreateTaskInput;
+};
+
+
+export type MutationRootDeleteProjectArgs = {
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type MutationRootDeleteTaskArgs = {
+  taskId: Scalars['UUID']['input'];
 };
 
 
@@ -154,6 +219,11 @@ export type MutationRootRegisterArgs = {
 };
 
 
+export type MutationRootRemoveProjectMemberArgs = {
+  input: RemoveProjectMemberInput;
+};
+
+
 export type MutationRootRemoveUserRoleArgs = {
   userId: Scalars['UUID']['input'];
 };
@@ -169,8 +239,53 @@ export type MutationRootResetPasswordArgs = {
 };
 
 
+export type MutationRootUpdateMemberRoleArgs = {
+  input: UpdateMemberRoleInput;
+};
+
+
+export type MutationRootUpdateProjectArgs = {
+  input: UpdateProjectInput;
+};
+
+
+export type MutationRootUpdateTaskArgs = {
+  input: UpdateTaskInput;
+};
+
+
 export type MutationRootVerifyEmailArgs = {
   token: Scalars['String']['input'];
+};
+
+export type Project = {
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  members: Array<ProjectMember>;
+  name: Scalars['String']['output'];
+  owner?: Maybe<User>;
+  ownerId: Scalars['UUID']['output'];
+  tasks: Array<Task>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+
+export type ProjectTasksArgs = {
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProjectMember = {
+  id: Scalars['UUID']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  projectId: Scalars['UUID']['output'];
+  role: Scalars['String']['output'];
+  user: User;
+  userId: Scalars['UUID']['output'];
 };
 
 export type QueryRoot = {
@@ -178,10 +293,53 @@ export type QueryRoot = {
   allUsers: Array<UserWithRole>;
   health: Scalars['String']['output'];
   me: User;
+  myAssignedTasks: Array<Task>;
   myInvitations: Array<Invitation>;
+  myProjects: Array<Project>;
+  project?: Maybe<Project>;
+  projectTaskStats: TaskStats;
+  projectTasks: Array<Task>;
+  task?: Maybe<Task>;
   userById: UserWithRole;
   userPermissions: Array<Scalars['String']['output']>;
   usersByRole: Array<UserWithRole>;
+};
+
+
+export type QueryRootMyAssignedTasksArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootMyProjectsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryRootProjectArgs = {
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootProjectTaskStatsArgs = {
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootProjectTasksArgs = {
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  projectId: Scalars['UUID']['input'];
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryRootTaskArgs = {
+  taskId: Scalars['UUID']['input'];
 };
 
 
@@ -210,6 +368,11 @@ export type RegisterInput = {
   password: Scalars['String']['input'];
 };
 
+export type RemoveProjectMemberInput = {
+  projectId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
 export type RequestPasswordResetInput = {
   email: Scalars['String']['input'];
 };
@@ -227,6 +390,53 @@ export type Role = {
   level: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type Task = {
+  assignee?: Maybe<User>;
+  assigneeId?: Maybe<Scalars['UUID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  creator?: Maybe<User>;
+  creatorId: Scalars['UUID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  dueDate?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['UUID']['output'];
+  name: Scalars['String']['output'];
+  priority: Scalars['String']['output'];
+  project?: Maybe<Project>;
+  projectId: Scalars['UUID']['output'];
+  status: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type TaskStats = {
+  cancelled: Scalars['Int']['output'];
+  completed: Scalars['Int']['output'];
+  inProgress: Scalars['Int']['output'];
+  overdue: Scalars['Int']['output'];
+  todo: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+};
+
+export type UpdateMemberRoleInput = {
+  projectId: Scalars['UUID']['input'];
+  role: Scalars['String']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
+export type UpdateProjectInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['UUID']['input'];
+};
+
+export type UpdateTaskInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  taskId: Scalars['UUID']['input'];
 };
 
 export type User = {
@@ -318,6 +528,21 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
 
 export type LogoutMutation = { logout: { message: string } };
+
+export type ChangePasswordMutationVariables = Exact<{
+  currentPassword: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type ChangePasswordMutation = { changePassword: { message: string } };
+
+export type AdminResetUserPasswordMutationVariables = Exact<{
+  userId: Scalars['UUID']['input'];
+}>;
+
+
+export type AdminResetUserPasswordMutation = { adminResetUserPassword: { message: string } };
 
 export type AssignRoleMutationVariables = Exact<{
   userId: Scalars['UUID']['input'];
@@ -721,6 +946,67 @@ export function useLogoutMutation(options: VueApolloComposable.UseMutationOption
   return VueApolloComposable.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
 }
 export type LogoutMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<LogoutMutation, LogoutMutationVariables>;
+export const ChangePasswordDocument = gql`
+    mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
+  changePassword(
+    input: {currentPassword: $currentPassword, newPassword: $newPassword}
+  ) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useChangePasswordMutation__
+ *
+ * To run a mutation, you first call `useChangePasswordMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useChangePasswordMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useChangePasswordMutation({
+ *   variables: {
+ *     currentPassword: // value for 'currentPassword'
+ *     newPassword: // value for 'newPassword'
+ *   },
+ * });
+ */
+export function useChangePasswordMutation(options: VueApolloComposable.UseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, options);
+}
+export type ChangePasswordMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const AdminResetUserPasswordDocument = gql`
+    mutation AdminResetUserPassword($userId: UUID!) {
+  adminResetUserPassword(input: {userId: $userId}) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useAdminResetUserPasswordMutation__
+ *
+ * To run a mutation, you first call `useAdminResetUserPasswordMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAdminResetUserPasswordMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAdminResetUserPasswordMutation({
+ *   variables: {
+ *     userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useAdminResetUserPasswordMutation(options: VueApolloComposable.UseMutationOptions<AdminResetUserPasswordMutation, AdminResetUserPasswordMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AdminResetUserPasswordMutation, AdminResetUserPasswordMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AdminResetUserPasswordMutation, AdminResetUserPasswordMutationVariables>(AdminResetUserPasswordDocument, options);
+}
+export type AdminResetUserPasswordMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AdminResetUserPasswordMutation, AdminResetUserPasswordMutationVariables>;
 export const AssignRoleDocument = gql`
     mutation AssignRole($userId: UUID!, $roleId: UUID!) {
   assignRole(input: {userId: $userId, roleId: $roleId}) {

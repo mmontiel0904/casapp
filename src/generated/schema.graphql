@@ -10,6 +10,12 @@ input AcceptInvitationInput {
   password: String!
 }
 
+input AddProjectMemberInput {
+  projectId: UUID!
+  role: String!
+  userId: UUID!
+}
+
 input AdminResetUserPasswordInput {
   userId: UUID!
 }
@@ -17,6 +23,11 @@ input AdminResetUserPasswordInput {
 input AssignRoleInput {
   roleId: UUID!
   userId: UUID!
+}
+
+input AssignTaskInput {
+  assigneeId: UUID
+  taskId: UUID!
 }
 
 type AuthPayload {
@@ -28,6 +39,20 @@ type AuthPayload {
 input ChangePasswordInput {
   currentPassword: String!
   newPassword: String!
+}
+
+input CreateProjectInput {
+  description: String
+  name: String!
+}
+
+input CreateTaskInput {
+  assigneeId: UUID
+  description: String
+  dueDate: DateTime
+  name: String!
+  priority: String
+  projectId: UUID!
 }
 
 """
@@ -68,19 +93,51 @@ type MessageResponse {
 
 type MutationRoot {
   acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
+  addProjectMember(input: AddProjectMemberInput!): MessageResponse!
   adminResetUserPassword(input: AdminResetUserPasswordInput!): MessageResponse!
   assignRole(input: AssignRoleInput!): User!
+  assignTask(input: AssignTaskInput!): Task!
   changePassword(input: ChangePasswordInput!): MessageResponse!
+  createProject(input: CreateProjectInput!): Project!
+  createTask(input: CreateTaskInput!): Task!
+  deleteProject(projectId: UUID!): MessageResponse!
+  deleteTask(taskId: UUID!): MessageResponse!
   inviteUser(input: InviteUserInput!): Invitation!
   inviteUserWithRole(input: InviteUserWithRoleInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
   logout: MessageResponse!
   refreshToken(input: RefreshTokenInput!): AuthPayload!
   register(input: RegisterInput!): User!
+  removeProjectMember(input: RemoveProjectMemberInput!): MessageResponse!
   removeUserRole(userId: UUID!): User!
   requestPasswordReset(input: RequestPasswordResetInput!): MessageResponse!
   resetPassword(input: ResetPasswordInput!): MessageResponse!
+  updateMemberRole(input: UpdateMemberRoleInput!): MessageResponse!
+  updateProject(input: UpdateProjectInput!): Project!
+  updateTask(input: UpdateTaskInput!): Task!
   verifyEmail(token: String!): MessageResponse!
+}
+
+type Project {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  members: [ProjectMember!]!
+  name: String!
+  owner: User
+  ownerId: UUID!
+  tasks(assigneeId: UUID, limit: Int, offset: Int, status: String): [Task!]!
+  updatedAt: DateTime!
+}
+
+type ProjectMember {
+  id: UUID!
+  joinedAt: DateTime!
+  projectId: UUID!
+  role: String!
+  user: User!
+  userId: UUID!
 }
 
 type QueryRoot {
@@ -88,7 +145,13 @@ type QueryRoot {
   allUsers: [UserWithRole!]!
   health: String!
   me: User!
+  myAssignedTasks(limit: Int, offset: Int, status: String): [Task!]!
   myInvitations: [Invitation!]!
+  myProjects(limit: Int, offset: Int): [Project!]!
+  project(projectId: UUID!): Project
+  projectTaskStats(projectId: UUID!): TaskStats!
+  projectTasks(assigneeId: UUID, limit: Int, offset: Int, projectId: UUID!, status: String): [Task!]!
+  task(taskId: UUID!): Task
   userById(userId: UUID!): UserWithRole!
   userPermissions(userId: UUID!): [String!]!
   usersByRole(roleName: String!): [UserWithRole!]!
@@ -103,6 +166,11 @@ input RegisterInput {
   firstName: String
   lastName: String
   password: String!
+}
+
+input RemoveProjectMemberInput {
+  projectId: UUID!
+  userId: UUID!
 }
 
 input RequestPasswordResetInput {
@@ -124,6 +192,32 @@ type Role {
   updatedAt: DateTime!
 }
 
+type Task {
+  assignee: User
+  assigneeId: UUID
+  createdAt: DateTime!
+  creator: User
+  creatorId: UUID!
+  description: String
+  dueDate: DateTime
+  id: UUID!
+  name: String!
+  priority: String!
+  project: Project
+  projectId: UUID!
+  status: String!
+  updatedAt: DateTime!
+}
+
+type TaskStats {
+  cancelled: Int!
+  completed: Int!
+  inProgress: Int!
+  overdue: Int!
+  todo: Int!
+  total: Int!
+}
+
 """
 A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
 Strings within GraphQL. UUIDs are used to assign unique identifiers to
@@ -135,6 +229,27 @@ entities without requiring a central allocating authority.
 * [RFC4122: A Universally Unique Identifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
 """
 scalar UUID
+
+input UpdateMemberRoleInput {
+  projectId: UUID!
+  role: String!
+  userId: UUID!
+}
+
+input UpdateProjectInput {
+  description: String
+  name: String
+  projectId: UUID!
+}
+
+input UpdateTaskInput {
+  description: String
+  dueDate: DateTime
+  name: String
+  priority: String
+  status: String
+  taskId: UUID!
+}
 
 type User {
   createdAt: DateTime!
