@@ -62,7 +62,7 @@
             </li>
             
             <!-- Admin Section -->
-            <div v-if="canManageUsers" class="divider my-2 text-xs text-base-content/50">Administration</div>
+            <div v-if="canManageUsers || canAdminSystem" class="divider my-2 text-xs text-base-content/50">Administration</div>
             
             <!-- User Management -->
             <li v-if="canManageUsers">
@@ -75,6 +75,21 @@
                 <div>
                   <div class="font-semibold">User Management</div>
                   <div class="text-xs text-base-content/60">Manage users & permissions</div>
+                </div>
+              </router-link>
+            </li>
+            
+            <!-- Role & Permission Administration -->
+            <li v-if="canAdminSystem">
+              <router-link to="/admin/roles" class="flex items-center gap-3 p-3 rounded-lg">
+                <div class="p-2 rounded-lg bg-error/10">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.25-4.5a2.25 2.25 0 000 4.5m0-4.5a2.25 2.25 0 000 4.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="font-semibold">Role Administration</div>
+                  <div class="text-xs text-base-content/60">Manage roles & permissions</div>
                 </div>
               </router-link>
             </li>
@@ -221,7 +236,7 @@ import { usePermissions } from '../composables/usePermissions'
 
 const router = useRouter()
 const { currentUser, logout } = useAuth()
-const { canManageUsers, isSuperAdmin, isAdmin, currentUserRole, canAccessTasks, canAccessProjects } = usePermissions()
+const { canManageUsers, canAdminSystem, isSuperAdmin, isAdmin, currentUserRole, canAccessTasks, canAccessProjects } = usePermissions()
 const searchQuery = ref('')
 
 

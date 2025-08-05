@@ -20,6 +20,11 @@ input AdminResetUserPasswordInput {
   userId: UUID!
 }
 
+input AssignPermissionToRoleInput {
+  permissionId: UUID!
+  roleId: UUID!
+}
+
 input AssignRoleInput {
   roleId: UUID!
   userId: UUID!
@@ -41,8 +46,25 @@ input ChangePasswordInput {
   newPassword: String!
 }
 
+input CreatePermissionInput {
+  action: String!
+  description: String
+  resourceId: UUID!
+}
+
 input CreateProjectInput {
   description: String
+  name: String!
+}
+
+input CreateResourceInput {
+  description: String
+  name: String!
+}
+
+input CreateRoleInput {
+  description: String
+  level: Int!
   name: String!
 }
 
@@ -61,6 +83,11 @@ Implement the DateTime<Utc> scalar
 The input/output is a string in RFC3339 format.
 """
 scalar DateTime
+
+input GrantUserPermissionInput {
+  permissionId: UUID!
+  userId: UUID!
+}
 
 type Invitation {
   createdAt: DateTime!
@@ -95,27 +122,52 @@ type MutationRoot {
   acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
   addProjectMember(input: AddProjectMemberInput!): MessageResponse!
   adminResetUserPassword(input: AdminResetUserPasswordInput!): MessageResponse!
+  assignPermissionToRole(input: AssignPermissionToRoleInput!): MessageResponse!
   assignRole(input: AssignRoleInput!): User!
   assignTask(input: AssignTaskInput!): Task!
   changePassword(input: ChangePasswordInput!): MessageResponse!
+  createPermission(input: CreatePermissionInput!): Permission!
   createProject(input: CreateProjectInput!): Project!
+  createResource(input: CreateResourceInput!): Resource!
+  createRole(input: CreateRoleInput!): Role!
   createTask(input: CreateTaskInput!): Task!
+  deletePermission(permissionId: UUID!): MessageResponse!
   deleteProject(projectId: UUID!): MessageResponse!
+  deleteResource(resourceId: UUID!): MessageResponse!
+  deleteRole(roleId: UUID!): MessageResponse!
   deleteTask(taskId: UUID!): MessageResponse!
+  grantUserPermission(input: GrantUserPermissionInput!): MessageResponse!
   inviteUser(input: InviteUserInput!): Invitation!
   inviteUserWithRole(input: InviteUserWithRoleInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
   logout: MessageResponse!
   refreshToken(input: RefreshTokenInput!): AuthPayload!
   register(input: RegisterInput!): User!
+  removePermissionFromRole(input: RemovePermissionFromRoleInput!): MessageResponse!
   removeProjectMember(input: RemoveProjectMemberInput!): MessageResponse!
   removeUserRole(userId: UUID!): User!
   requestPasswordReset(input: RequestPasswordResetInput!): MessageResponse!
   resetPassword(input: ResetPasswordInput!): MessageResponse!
+  revokeUserPermission(input: RevokeUserPermissionInput!): MessageResponse!
   updateMemberRole(input: UpdateMemberRoleInput!): MessageResponse!
+  updatePermission(input: UpdatePermissionInput!): Permission!
   updateProject(input: UpdateProjectInput!): Project!
+  updateResource(input: UpdateResourceInput!): Resource!
+  updateRole(input: UpdateRoleInput!): Role!
   updateTask(input: UpdateTaskInput!): Task!
   verifyEmail(token: String!): MessageResponse!
+}
+
+type Permission {
+  action: String!
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  resource: Resource
+  resourceId: UUID!
+  resourceName: String!
+  updatedAt: DateTime!
 }
 
 type Project {
@@ -141,18 +193,26 @@ type ProjectMember {
 }
 
 type QueryRoot {
+  allPermissions(resourceId: UUID): [Permission!]!
+  allResources: [Resource!]!
   allRoles: [Role!]!
+  allRolesWithPermissions: [RoleWithPermissions!]!
   allUsers: [UserWithRole!]!
   health: String!
   me: User!
   myAssignedTasks(limit: Int, offset: Int, status: String): [Task!]!
   myInvitations: [Invitation!]!
   myProjects(limit: Int, offset: Int): [Project!]!
+  permissionById(permissionId: UUID!): Permission
   project(projectId: UUID!): Project
   projectTaskStats(projectId: UUID!): TaskStats!
   projectTasks(assigneeId: UUID, limit: Int, offset: Int, projectId: UUID!, status: String): [Task!]!
+  resourceById(resourceId: UUID!): Resource
+  roleById(roleId: UUID!): RoleWithPermissions
+  rolePermissions(roleId: UUID!): [Permission!]!
   task(taskId: UUID!): Task
   userById(userId: UUID!): UserWithRole!
+  userDirectPermissions(userId: UUID!): [Permission!]!
   userPermissions(userId: UUID!): [String!]!
   usersByRole(roleName: String!): [UserWithRole!]!
 }
@@ -166,6 +226,11 @@ input RegisterInput {
   firstName: String
   lastName: String
   password: String!
+}
+
+input RemovePermissionFromRoleInput {
+  permissionId: UUID!
+  roleId: UUID!
 }
 
 input RemoveProjectMemberInput {
@@ -182,6 +247,20 @@ input ResetPasswordInput {
   token: String!
 }
 
+type Resource {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  name: String!
+  updatedAt: DateTime!
+}
+
+input RevokeUserPermissionInput {
+  permissionId: UUID!
+  userId: UUID!
+}
+
 type Role {
   createdAt: DateTime!
   description: String
@@ -190,6 +269,18 @@ type Role {
   level: Int!
   name: String!
   updatedAt: DateTime!
+}
+
+type RoleWithPermissions {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  level: Int!
+  name: String!
+  permissions: [Permission!]!
+  updatedAt: DateTime!
+  userCount: Int!
 }
 
 type Task {
@@ -236,10 +327,33 @@ input UpdateMemberRoleInput {
   userId: UUID!
 }
 
+input UpdatePermissionInput {
+  action: String
+  description: String
+  isActive: Boolean
+  permissionId: UUID!
+  resourceId: UUID
+}
+
 input UpdateProjectInput {
   description: String
   name: String
   projectId: UUID!
+}
+
+input UpdateResourceInput {
+  description: String
+  isActive: Boolean
+  name: String
+  resourceId: UUID!
+}
+
+input UpdateRoleInput {
+  description: String
+  isActive: Boolean
+  level: Int
+  name: String
+  roleId: UUID!
 }
 
 input UpdateTaskInput {

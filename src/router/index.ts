@@ -10,9 +10,11 @@ const RegisterPage = () => import('../views/RegisterPage.vue')
 const ForgotPasswordPage = () => import('../views/ForgotPasswordPage.vue')
 const ResetPasswordPage = () => import('../views/ResetPasswordPage.vue')
 const UserManagementPage = () => import('../views/UserManagementPage.vue')
+const RolePermissionAdminPage = () => import('../views/RolePermissionAdminPage.vue')
 const ProfilePage = () => import('../views/ProfilePage.vue')
 const ProjectsPage = () => import('../views/ProjectsPage.vue')
 const MyTasksPage = () => import('../views/MyTasksPage.vue')
+const UserDebugPage = () => import('../views/UserDebugPage.vue')
 
 const routes = [
   {
@@ -82,6 +84,23 @@ const routes = [
     meta: { 
       requiresAuth: true,
       requiresPermission: 'user_management'
+    }
+  },
+  {
+    path: '/admin/roles',
+    name: 'RolePermissionAdmin',
+    component: RolePermissionAdminPage,
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'system_admin'
+    }
+  },
+  {
+    path: '/debug/user',
+    name: 'UserDebug',
+    component: UserDebugPage,
+    meta: { 
+      requiresAuth: true
     }
   },
   {

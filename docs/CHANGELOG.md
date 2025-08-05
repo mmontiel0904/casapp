@@ -19,39 +19,15 @@
 ## [2025-08-04] - My Tasks Page & Task Views
 
 ### ✨ **New Features & Enhancements**
-- **My Tasks Page**: Added `MyTasksPage.vue` for users to view and manage their assigned tasks across all projects.
-- **Task Kanban View**: Introduced `TaskKanbanView.vue` for visualizing tasks in Kanban columns (To Do, In Progress, Completed, Cancelled).
-- **Task Table View**: Added `TaskTableView.vue` for tabular task management with sorting and actions.
-- **Task Filters**: Implemented `TaskFilters.vue` for searching, filtering by status, priority, assignee, and quick filters (overdue, my tasks).
-- **Task View Toggle**: Added `TaskViewToggle.vue` to switch between table and Kanban views.
-- **Task Card Component**: Created `TaskCard.vue` for consistent task display in Kanban and table views.
-- **Task Composable**: Added `useTasks.ts` composable for unified task state, filtering, and actions.
-- **Permissions & Routing**: Updated permissions and router to support `/my-tasks` route and permission checks for task views.
-- **GraphQL Types**: Extended `graphql.ts` with queries/mutations for tasks and projects.
-- **Permission Service**: Enhanced `permissions.ts` and `usePermissions.ts` for task/project permission checks.
 
 ### 🛠 **Refactoring & Cleanup**
-- Removed legacy `auth.ts` store (now handled by composables/services).
 
 A chronological record of major development milestones and architectural decisions for CasApp.
 
-## [2025-08-04] - Task System Integration & Project Management Foundation
-
-### 🚀 **Major Feature: Task System & Project Management Integration**
-
-**Objective**: Introduce the foundation for project and task management, including navigation, permissions, and UI, following the new TASK_SYSTEM_INTEGRATION.md guide.
-
-### ✨ **New Features & Enhancements**
 - **Task System Integration**: Added `docs/TASK_SYSTEM_INTEGRATION.md` with detailed frontend integration guide for projects, tasks, and permissions.
 - **Project Management UI**: New `ProjectsPage.vue` with roadmap, navigation, and modal placeholders for project creation.
-- **Navigation**: Added `/projects` route and navigation links in `NavBar.vue` for authenticated users.
-- **Permissions**: Implemented `taskPermissions.ts` service for task system RBAC checks (create, view, edit, admin, member management).
-- **GraphQL Schema & Types**: Extended backend schema and generated types for projects, tasks, project members, and related mutations/queries.
-- **Composables & Queries**: Added `src/graphql/projects.ts` for project/task GraphQL operations; ready for use in new composables.
-- **Store**: Updated `auth.ts` store for robust user/permission state management.
 - **Admin/Password Management**: Added `AdminResetPasswordModal.vue` and `ChangePasswordForm.vue` for user/admin password flows.
 - **User Management**: Enhanced `UserManagementPage.vue` with password reset modal and improved role management actions.
-
 ## [2025-08-03] - Authentication Performance Optimization & RBAC Enhancement
 
 ### 🚀 **Major Feature: Optimized Two-Phase Authentication System**

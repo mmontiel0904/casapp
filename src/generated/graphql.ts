@@ -52,6 +52,11 @@ export type AdminResetUserPasswordInput = {
   userId: Scalars['UUID']['input'];
 };
 
+export type AssignPermissionToRoleInput = {
+  permissionId: Scalars['UUID']['input'];
+  roleId: Scalars['UUID']['input'];
+};
+
 export type AssignRoleInput = {
   roleId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
@@ -73,8 +78,25 @@ export type ChangePasswordInput = {
   newPassword: Scalars['String']['input'];
 };
 
+export type CreatePermissionInput = {
+  action: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  resourceId: Scalars['UUID']['input'];
+};
+
 export type CreateProjectInput = {
   description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
+export type CreateResourceInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
+export type CreateRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  level: Scalars['Int']['input'];
   name: Scalars['String']['input'];
 };
 
@@ -85,6 +107,11 @@ export type CreateTaskInput = {
   name: Scalars['String']['input'];
   priority?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['UUID']['input'];
+};
+
+export type GrantUserPermissionInput = {
+  permissionId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
 };
 
 export type Invitation = {
@@ -120,25 +147,38 @@ export type MutationRoot = {
   acceptInvitation: AuthPayload;
   addProjectMember: MessageResponse;
   adminResetUserPassword: MessageResponse;
+  assignPermissionToRole: MessageResponse;
   assignRole: User;
   assignTask: Task;
   changePassword: MessageResponse;
+  createPermission: Permission;
   createProject: Project;
+  createResource: Resource;
+  createRole: Role;
   createTask: Task;
+  deletePermission: MessageResponse;
   deleteProject: MessageResponse;
+  deleteResource: MessageResponse;
+  deleteRole: MessageResponse;
   deleteTask: MessageResponse;
+  grantUserPermission: MessageResponse;
   inviteUser: Invitation;
   inviteUserWithRole: Invitation;
   login: AuthPayload;
   logout: MessageResponse;
   refreshToken: AuthPayload;
   register: User;
+  removePermissionFromRole: MessageResponse;
   removeProjectMember: MessageResponse;
   removeUserRole: User;
   requestPasswordReset: MessageResponse;
   resetPassword: MessageResponse;
+  revokeUserPermission: MessageResponse;
   updateMemberRole: MessageResponse;
+  updatePermission: Permission;
   updateProject: Project;
+  updateResource: Resource;
+  updateRole: Role;
   updateTask: Task;
   verifyEmail: MessageResponse;
 };
@@ -159,6 +199,11 @@ export type MutationRootAdminResetUserPasswordArgs = {
 };
 
 
+export type MutationRootAssignPermissionToRoleArgs = {
+  input: AssignPermissionToRoleInput;
+};
+
+
 export type MutationRootAssignRoleArgs = {
   input: AssignRoleInput;
 };
@@ -174,8 +219,23 @@ export type MutationRootChangePasswordArgs = {
 };
 
 
+export type MutationRootCreatePermissionArgs = {
+  input: CreatePermissionInput;
+};
+
+
 export type MutationRootCreateProjectArgs = {
   input: CreateProjectInput;
+};
+
+
+export type MutationRootCreateResourceArgs = {
+  input: CreateResourceInput;
+};
+
+
+export type MutationRootCreateRoleArgs = {
+  input: CreateRoleInput;
 };
 
 
@@ -184,13 +244,33 @@ export type MutationRootCreateTaskArgs = {
 };
 
 
+export type MutationRootDeletePermissionArgs = {
+  permissionId: Scalars['UUID']['input'];
+};
+
+
 export type MutationRootDeleteProjectArgs = {
   projectId: Scalars['UUID']['input'];
 };
 
 
+export type MutationRootDeleteResourceArgs = {
+  resourceId: Scalars['UUID']['input'];
+};
+
+
+export type MutationRootDeleteRoleArgs = {
+  roleId: Scalars['UUID']['input'];
+};
+
+
 export type MutationRootDeleteTaskArgs = {
   taskId: Scalars['UUID']['input'];
+};
+
+
+export type MutationRootGrantUserPermissionArgs = {
+  input: GrantUserPermissionInput;
 };
 
 
@@ -219,6 +299,11 @@ export type MutationRootRegisterArgs = {
 };
 
 
+export type MutationRootRemovePermissionFromRoleArgs = {
+  input: RemovePermissionFromRoleInput;
+};
+
+
 export type MutationRootRemoveProjectMemberArgs = {
   input: RemoveProjectMemberInput;
 };
@@ -239,13 +324,33 @@ export type MutationRootResetPasswordArgs = {
 };
 
 
+export type MutationRootRevokeUserPermissionArgs = {
+  input: RevokeUserPermissionInput;
+};
+
+
 export type MutationRootUpdateMemberRoleArgs = {
   input: UpdateMemberRoleInput;
 };
 
 
+export type MutationRootUpdatePermissionArgs = {
+  input: UpdatePermissionInput;
+};
+
+
 export type MutationRootUpdateProjectArgs = {
   input: UpdateProjectInput;
+};
+
+
+export type MutationRootUpdateResourceArgs = {
+  input: UpdateResourceInput;
+};
+
+
+export type MutationRootUpdateRoleArgs = {
+  input: UpdateRoleInput;
 };
 
 
@@ -256,6 +361,18 @@ export type MutationRootUpdateTaskArgs = {
 
 export type MutationRootVerifyEmailArgs = {
   token: Scalars['String']['input'];
+};
+
+export type Permission = {
+  action: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  resource?: Maybe<Resource>;
+  resourceId: Scalars['UUID']['output'];
+  resourceName: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type Project = {
@@ -289,20 +406,33 @@ export type ProjectMember = {
 };
 
 export type QueryRoot = {
+  allPermissions: Array<Permission>;
+  allResources: Array<Resource>;
   allRoles: Array<Role>;
+  allRolesWithPermissions: Array<RoleWithPermissions>;
   allUsers: Array<UserWithRole>;
   health: Scalars['String']['output'];
   me: User;
   myAssignedTasks: Array<Task>;
   myInvitations: Array<Invitation>;
   myProjects: Array<Project>;
+  permissionById?: Maybe<Permission>;
   project?: Maybe<Project>;
   projectTaskStats: TaskStats;
   projectTasks: Array<Task>;
+  resourceById?: Maybe<Resource>;
+  roleById?: Maybe<RoleWithPermissions>;
+  rolePermissions: Array<Permission>;
   task?: Maybe<Task>;
   userById: UserWithRole;
+  userDirectPermissions: Array<Permission>;
   userPermissions: Array<Scalars['String']['output']>;
   usersByRole: Array<UserWithRole>;
+};
+
+
+export type QueryRootAllPermissionsArgs = {
+  resourceId?: InputMaybe<Scalars['UUID']['input']>;
 };
 
 
@@ -316,6 +446,11 @@ export type QueryRootMyAssignedTasksArgs = {
 export type QueryRootMyProjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryRootPermissionByIdArgs = {
+  permissionId: Scalars['UUID']['input'];
 };
 
 
@@ -338,12 +473,32 @@ export type QueryRootProjectTasksArgs = {
 };
 
 
+export type QueryRootResourceByIdArgs = {
+  resourceId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootRoleByIdArgs = {
+  roleId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootRolePermissionsArgs = {
+  roleId: Scalars['UUID']['input'];
+};
+
+
 export type QueryRootTaskArgs = {
   taskId: Scalars['UUID']['input'];
 };
 
 
 export type QueryRootUserByIdArgs = {
+  userId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootUserDirectPermissionsArgs = {
   userId: Scalars['UUID']['input'];
 };
 
@@ -368,6 +523,11 @@ export type RegisterInput = {
   password: Scalars['String']['input'];
 };
 
+export type RemovePermissionFromRoleInput = {
+  permissionId: Scalars['UUID']['input'];
+  roleId: Scalars['UUID']['input'];
+};
+
 export type RemoveProjectMemberInput = {
   projectId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
@@ -382,6 +542,20 @@ export type ResetPasswordInput = {
   token: Scalars['String']['input'];
 };
 
+export type Resource = {
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type RevokeUserPermissionInput = {
+  permissionId: Scalars['UUID']['input'];
+  userId: Scalars['UUID']['input'];
+};
+
 export type Role = {
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
@@ -390,6 +564,18 @@ export type Role = {
   level: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type RoleWithPermissions = {
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  level: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  permissions: Array<Permission>;
+  updatedAt: Scalars['DateTime']['output'];
+  userCount: Scalars['Int']['output'];
 };
 
 export type Task = {
@@ -424,10 +610,33 @@ export type UpdateMemberRoleInput = {
   userId: Scalars['UUID']['input'];
 };
 
+export type UpdatePermissionInput = {
+  action?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  permissionId: Scalars['UUID']['input'];
+  resourceId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
 export type UpdateProjectInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['UUID']['input'];
+};
+
+export type UpdateResourceInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  resourceId: Scalars['UUID']['input'];
+};
+
+export type UpdateRoleInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  level?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  roleId: Scalars['UUID']['input'];
 };
 
 export type UpdateTaskInput = {
@@ -733,6 +942,114 @@ export type UsersByRoleQueryVariables = Exact<{
 
 
 export type UsersByRoleQuery = { usersByRole: Array<{ id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null }> };
+
+export type AllRolesWithPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllRolesWithPermissionsQuery = { allRolesWithPermissions: Array<{ id: any, name: string, level: number, description?: string | null, isActive: boolean, userCount: number, createdAt: any, updatedAt: any, permissions: Array<{ id: any, action: string, description?: string | null, resourceName: string, resourceId: any, isActive: boolean }> }> };
+
+export type AllPermissionsQueryVariables = Exact<{
+  resourceId?: InputMaybe<Scalars['UUID']['input']>;
+}>;
+
+
+export type AllPermissionsQuery = { allPermissions: Array<{ id: any, action: string, description?: string | null, resourceName: string, resourceId: any, isActive: boolean, createdAt: any, updatedAt: any, resource?: { id: any, name: string, description?: string | null } | null }> };
+
+export type AllResourcesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AllResourcesQuery = { allResources: Array<{ id: any, name: string, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any }> };
+
+export type CreateRoleMutationVariables = Exact<{
+  input: CreateRoleInput;
+}>;
+
+
+export type CreateRoleMutation = { createRole: { id: any, name: string, level: number, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any } };
+
+export type UpdateRoleMutationVariables = Exact<{
+  input: UpdateRoleInput;
+}>;
+
+
+export type UpdateRoleMutation = { updateRole: { id: any, name: string, level: number, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any } };
+
+export type DeleteRoleMutationVariables = Exact<{
+  roleId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteRoleMutation = { deleteRole: { message: string } };
+
+export type CreatePermissionMutationVariables = Exact<{
+  input: CreatePermissionInput;
+}>;
+
+
+export type CreatePermissionMutation = { createPermission: { id: any, action: string, description?: string | null, resourceName: string, resourceId: any, isActive: boolean, createdAt: any, updatedAt: any, resource?: { id: any, name: string, description?: string | null } | null } };
+
+export type UpdatePermissionMutationVariables = Exact<{
+  input: UpdatePermissionInput;
+}>;
+
+
+export type UpdatePermissionMutation = { updatePermission: { id: any, action: string, description?: string | null, resourceName: string, resourceId: any, isActive: boolean, createdAt: any, updatedAt: any, resource?: { id: any, name: string, description?: string | null } | null } };
+
+export type DeletePermissionMutationVariables = Exact<{
+  permissionId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeletePermissionMutation = { deletePermission: { message: string } };
+
+export type CreateResourceMutationVariables = Exact<{
+  input: CreateResourceInput;
+}>;
+
+
+export type CreateResourceMutation = { createResource: { id: any, name: string, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any } };
+
+export type UpdateResourceMutationVariables = Exact<{
+  input: UpdateResourceInput;
+}>;
+
+
+export type UpdateResourceMutation = { updateResource: { id: any, name: string, description?: string | null, isActive: boolean, createdAt: any, updatedAt: any } };
+
+export type DeleteResourceMutationVariables = Exact<{
+  resourceId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteResourceMutation = { deleteResource: { message: string } };
+
+export type AssignPermissionToRoleMutationVariables = Exact<{
+  input: AssignPermissionToRoleInput;
+}>;
+
+
+export type AssignPermissionToRoleMutation = { assignPermissionToRole: { message: string } };
+
+export type RemovePermissionFromRoleMutationVariables = Exact<{
+  input: RemovePermissionFromRoleInput;
+}>;
+
+
+export type RemovePermissionFromRoleMutation = { removePermissionFromRole: { message: string } };
+
+export type GrantUserPermissionMutationVariables = Exact<{
+  input: GrantUserPermissionInput;
+}>;
+
+
+export type GrantUserPermissionMutation = { grantUserPermission: { message: string } };
+
+export type RevokeUserPermissionMutationVariables = Exact<{
+  input: RevokeUserPermissionInput;
+}>;
+
+
+export type RevokeUserPermissionMutation = { revokeUserPermission: { message: string } };
 
 export type FastLoginMutationVariables = Exact<{
   input: LoginInput;
@@ -2151,6 +2468,545 @@ export function useUsersByRoleLazyQuery(variables?: UsersByRoleQueryVariables | 
   return VueApolloComposable.useLazyQuery<UsersByRoleQuery, UsersByRoleQueryVariables>(UsersByRoleDocument, variables, options);
 }
 export type UsersByRoleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UsersByRoleQuery, UsersByRoleQueryVariables>;
+export const AllRolesWithPermissionsDocument = gql`
+    query AllRolesWithPermissions {
+  allRolesWithPermissions {
+    id
+    name
+    level
+    description
+    isActive
+    userCount
+    permissions {
+      id
+      action
+      description
+      resourceName
+      resourceId
+      isActive
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAllRolesWithPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useAllRolesWithPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllRolesWithPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAllRolesWithPermissionsQuery();
+ */
+export function useAllRolesWithPermissionsQuery(options: VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>(AllRolesWithPermissionsDocument, {}, options);
+}
+export function useAllRolesWithPermissionsLazyQuery(options: VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>(AllRolesWithPermissionsDocument, {}, options);
+}
+export type AllRolesWithPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AllRolesWithPermissionsQuery, AllRolesWithPermissionsQueryVariables>;
+export const AllPermissionsDocument = gql`
+    query AllPermissions($resourceId: UUID) {
+  allPermissions(resourceId: $resourceId) {
+    id
+    action
+    description
+    resourceName
+    resourceId
+    isActive
+    resource {
+      id
+      name
+      description
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAllPermissionsQuery__
+ *
+ * To run a query within a Vue component, call `useAllPermissionsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllPermissionsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAllPermissionsQuery({
+ *   resourceId: // value for 'resourceId'
+ * });
+ */
+export function useAllPermissionsQuery(variables: AllPermissionsQueryVariables | VueCompositionApi.Ref<AllPermissionsQueryVariables> | ReactiveFunction<AllPermissionsQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AllPermissionsQuery, AllPermissionsQueryVariables>(AllPermissionsDocument, variables, options);
+}
+export function useAllPermissionsLazyQuery(variables: AllPermissionsQueryVariables | VueCompositionApi.Ref<AllPermissionsQueryVariables> | ReactiveFunction<AllPermissionsQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllPermissionsQuery, AllPermissionsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AllPermissionsQuery, AllPermissionsQueryVariables>(AllPermissionsDocument, variables, options);
+}
+export type AllPermissionsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AllPermissionsQuery, AllPermissionsQueryVariables>;
+export const AllResourcesDocument = gql`
+    query AllResources {
+  allResources {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useAllResourcesQuery__
+ *
+ * To run a query within a Vue component, call `useAllResourcesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAllResourcesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useAllResourcesQuery();
+ */
+export function useAllResourcesQuery(options: VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<AllResourcesQuery, AllResourcesQueryVariables>(AllResourcesDocument, {}, options);
+}
+export function useAllResourcesLazyQuery(options: VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<AllResourcesQuery, AllResourcesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<AllResourcesQuery, AllResourcesQueryVariables>(AllResourcesDocument, {}, options);
+}
+export type AllResourcesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<AllResourcesQuery, AllResourcesQueryVariables>;
+export const CreateRoleDocument = gql`
+    mutation CreateRole($input: CreateRoleInput!) {
+  createRole(input: $input) {
+    id
+    name
+    level
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useCreateRoleMutation__
+ *
+ * To run a mutation, you first call `useCreateRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateRoleMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateRoleMutation(options: VueApolloComposable.UseMutationOptions<CreateRoleMutation, CreateRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateRoleMutation, CreateRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateRoleMutation, CreateRoleMutationVariables>(CreateRoleDocument, options);
+}
+export type CreateRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateRoleMutation, CreateRoleMutationVariables>;
+export const UpdateRoleDocument = gql`
+    mutation UpdateRole($input: UpdateRoleInput!) {
+  updateRole(input: $input) {
+    id
+    name
+    level
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateRoleMutation__
+ *
+ * To run a mutation, you first call `useUpdateRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateRoleMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateRoleMutation(options: VueApolloComposable.UseMutationOptions<UpdateRoleMutation, UpdateRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateRoleMutation, UpdateRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateRoleMutation, UpdateRoleMutationVariables>(UpdateRoleDocument, options);
+}
+export type UpdateRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateRoleMutation, UpdateRoleMutationVariables>;
+export const DeleteRoleDocument = gql`
+    mutation DeleteRole($roleId: UUID!) {
+  deleteRole(roleId: $roleId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeleteRoleMutation__
+ *
+ * To run a mutation, you first call `useDeleteRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeleteRoleMutation({
+ *   variables: {
+ *     roleId: // value for 'roleId'
+ *   },
+ * });
+ */
+export function useDeleteRoleMutation(options: VueApolloComposable.UseMutationOptions<DeleteRoleMutation, DeleteRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeleteRoleMutation, DeleteRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeleteRoleMutation, DeleteRoleMutationVariables>(DeleteRoleDocument, options);
+}
+export type DeleteRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteRoleMutation, DeleteRoleMutationVariables>;
+export const CreatePermissionDocument = gql`
+    mutation CreatePermission($input: CreatePermissionInput!) {
+  createPermission(input: $input) {
+    id
+    action
+    description
+    resourceName
+    resourceId
+    isActive
+    resource {
+      id
+      name
+      description
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useCreatePermissionMutation__
+ *
+ * To run a mutation, you first call `useCreatePermissionMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePermissionMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreatePermissionMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreatePermissionMutation(options: VueApolloComposable.UseMutationOptions<CreatePermissionMutation, CreatePermissionMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreatePermissionMutation, CreatePermissionMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreatePermissionMutation, CreatePermissionMutationVariables>(CreatePermissionDocument, options);
+}
+export type CreatePermissionMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreatePermissionMutation, CreatePermissionMutationVariables>;
+export const UpdatePermissionDocument = gql`
+    mutation UpdatePermission($input: UpdatePermissionInput!) {
+  updatePermission(input: $input) {
+    id
+    action
+    description
+    resourceName
+    resourceId
+    isActive
+    resource {
+      id
+      name
+      description
+    }
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdatePermissionMutation__
+ *
+ * To run a mutation, you first call `useUpdatePermissionMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdatePermissionMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdatePermissionMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdatePermissionMutation(options: VueApolloComposable.UseMutationOptions<UpdatePermissionMutation, UpdatePermissionMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdatePermissionMutation, UpdatePermissionMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdatePermissionMutation, UpdatePermissionMutationVariables>(UpdatePermissionDocument, options);
+}
+export type UpdatePermissionMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdatePermissionMutation, UpdatePermissionMutationVariables>;
+export const DeletePermissionDocument = gql`
+    mutation DeletePermission($permissionId: UUID!) {
+  deletePermission(permissionId: $permissionId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeletePermissionMutation__
+ *
+ * To run a mutation, you first call `useDeletePermissionMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePermissionMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeletePermissionMutation({
+ *   variables: {
+ *     permissionId: // value for 'permissionId'
+ *   },
+ * });
+ */
+export function useDeletePermissionMutation(options: VueApolloComposable.UseMutationOptions<DeletePermissionMutation, DeletePermissionMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeletePermissionMutation, DeletePermissionMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeletePermissionMutation, DeletePermissionMutationVariables>(DeletePermissionDocument, options);
+}
+export type DeletePermissionMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeletePermissionMutation, DeletePermissionMutationVariables>;
+export const CreateResourceDocument = gql`
+    mutation CreateResource($input: CreateResourceInput!) {
+  createResource(input: $input) {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useCreateResourceMutation__
+ *
+ * To run a mutation, you first call `useCreateResourceMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateResourceMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateResourceMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateResourceMutation(options: VueApolloComposable.UseMutationOptions<CreateResourceMutation, CreateResourceMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateResourceMutation, CreateResourceMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateResourceMutation, CreateResourceMutationVariables>(CreateResourceDocument, options);
+}
+export type CreateResourceMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateResourceMutation, CreateResourceMutationVariables>;
+export const UpdateResourceDocument = gql`
+    mutation UpdateResource($input: UpdateResourceInput!) {
+  updateResource(input: $input) {
+    id
+    name
+    description
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateResourceMutation__
+ *
+ * To run a mutation, you first call `useUpdateResourceMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateResourceMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateResourceMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateResourceMutation(options: VueApolloComposable.UseMutationOptions<UpdateResourceMutation, UpdateResourceMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateResourceMutation, UpdateResourceMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateResourceMutation, UpdateResourceMutationVariables>(UpdateResourceDocument, options);
+}
+export type UpdateResourceMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateResourceMutation, UpdateResourceMutationVariables>;
+export const DeleteResourceDocument = gql`
+    mutation DeleteResource($resourceId: UUID!) {
+  deleteResource(resourceId: $resourceId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeleteResourceMutation__
+ *
+ * To run a mutation, you first call `useDeleteResourceMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteResourceMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeleteResourceMutation({
+ *   variables: {
+ *     resourceId: // value for 'resourceId'
+ *   },
+ * });
+ */
+export function useDeleteResourceMutation(options: VueApolloComposable.UseMutationOptions<DeleteResourceMutation, DeleteResourceMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeleteResourceMutation, DeleteResourceMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeleteResourceMutation, DeleteResourceMutationVariables>(DeleteResourceDocument, options);
+}
+export type DeleteResourceMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteResourceMutation, DeleteResourceMutationVariables>;
+export const AssignPermissionToRoleDocument = gql`
+    mutation AssignPermissionToRole($input: AssignPermissionToRoleInput!) {
+  assignPermissionToRole(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useAssignPermissionToRoleMutation__
+ *
+ * To run a mutation, you first call `useAssignPermissionToRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAssignPermissionToRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAssignPermissionToRoleMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAssignPermissionToRoleMutation(options: VueApolloComposable.UseMutationOptions<AssignPermissionToRoleMutation, AssignPermissionToRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AssignPermissionToRoleMutation, AssignPermissionToRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AssignPermissionToRoleMutation, AssignPermissionToRoleMutationVariables>(AssignPermissionToRoleDocument, options);
+}
+export type AssignPermissionToRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AssignPermissionToRoleMutation, AssignPermissionToRoleMutationVariables>;
+export const RemovePermissionFromRoleDocument = gql`
+    mutation RemovePermissionFromRole($input: RemovePermissionFromRoleInput!) {
+  removePermissionFromRole(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useRemovePermissionFromRoleMutation__
+ *
+ * To run a mutation, you first call `useRemovePermissionFromRoleMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRemovePermissionFromRoleMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRemovePermissionFromRoleMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRemovePermissionFromRoleMutation(options: VueApolloComposable.UseMutationOptions<RemovePermissionFromRoleMutation, RemovePermissionFromRoleMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RemovePermissionFromRoleMutation, RemovePermissionFromRoleMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RemovePermissionFromRoleMutation, RemovePermissionFromRoleMutationVariables>(RemovePermissionFromRoleDocument, options);
+}
+export type RemovePermissionFromRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RemovePermissionFromRoleMutation, RemovePermissionFromRoleMutationVariables>;
+export const GrantUserPermissionDocument = gql`
+    mutation GrantUserPermission($input: GrantUserPermissionInput!) {
+  grantUserPermission(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useGrantUserPermissionMutation__
+ *
+ * To run a mutation, you first call `useGrantUserPermissionMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useGrantUserPermissionMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useGrantUserPermissionMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useGrantUserPermissionMutation(options: VueApolloComposable.UseMutationOptions<GrantUserPermissionMutation, GrantUserPermissionMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<GrantUserPermissionMutation, GrantUserPermissionMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<GrantUserPermissionMutation, GrantUserPermissionMutationVariables>(GrantUserPermissionDocument, options);
+}
+export type GrantUserPermissionMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<GrantUserPermissionMutation, GrantUserPermissionMutationVariables>;
+export const RevokeUserPermissionDocument = gql`
+    mutation RevokeUserPermission($input: RevokeUserPermissionInput!) {
+  revokeUserPermission(input: $input) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useRevokeUserPermissionMutation__
+ *
+ * To run a mutation, you first call `useRevokeUserPermissionMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRevokeUserPermissionMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRevokeUserPermissionMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useRevokeUserPermissionMutation(options: VueApolloComposable.UseMutationOptions<RevokeUserPermissionMutation, RevokeUserPermissionMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RevokeUserPermissionMutation, RevokeUserPermissionMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RevokeUserPermissionMutation, RevokeUserPermissionMutationVariables>(RevokeUserPermissionDocument, options);
+}
+export type RevokeUserPermissionMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RevokeUserPermissionMutation, RevokeUserPermissionMutationVariables>;
 export const FastLoginDocument = gql`
     mutation FastLogin($input: LoginInput!) {
   login(input: $input) {
