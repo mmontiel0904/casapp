@@ -8,6 +8,32 @@
             <p class="text-base-content/70 font-sans">Track and manage your assigned tasks across all projects</p>
           </div>
           
+          <!-- Action Buttons -->
+          <div class="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-0">
+            <button 
+              @click="showCreateModal = true"
+              class="btn btn-primary rounded-lg shadow-sm"
+              :disabled="!canCreateTasks"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              New Task
+            </button>
+            
+            <button 
+              @click="refetchTasks"
+              class="btn btn-ghost rounded-lg shadow-sm"
+              :disabled="loading"
+            >
+              <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh
+            </button>
+          </div>
+
           <!-- Quick Stats -->
           <div class="stats stats-horizontal bg-base-100 shadow-sm">
             <div class="stat">
@@ -107,16 +133,25 @@
           Retry
         </button>
       </div>
+
+      <!-- Task Creation Modal -->
+      <TaskCreateModal 
+        :is-open="showCreateModal"
+        @close="showCreateModal = false"
+        @task-created="handleTaskCreated"
+      />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTasks, type TaskWithPartialUser } from '../composables/useTasks'
+import { usePermissions } from '../composables/usePermissions'
 import TaskFilters from '../components/TaskFilters.vue'
 import TaskViewToggle from '../components/TaskViewToggle.vue'
 import TaskTableView from '../components/TaskTableView.vue'
 import TaskKanbanView from '../components/TaskKanbanView.vue'
+import TaskCreateModal from '../components/TaskCreateModal.vue'
 
 // Initialize task management for "My Tasks" (no projectId)
 const {
@@ -136,8 +171,12 @@ const {
   removeTask
 } = useTasks() // No projectId = standalone "My Tasks" view
 
+// Permissions
+const { canCreateTasks } = usePermissions()
+
 // Local state
 const selectedTask = ref<TaskWithPartialUser | null>(null)
+const showCreateModal = ref(false)
 
 // Event handlers
 const handleTaskSelect = (task: TaskWithPartialUser) => {
@@ -161,8 +200,16 @@ const handleTaskDelete = async (task: TaskWithPartialUser) => {
 }
 
 const handleCreateTask = (status: string) => {
-  // TODO: Open create task modal with pre-selected status
-  console.log('Create task with status:', status)
+  // Open create task modal with pre-selected status from Kanban column
+  console.log('Opening task creation modal with status:', status)
+  showCreateModal.value = true
+}
+
+const handleTaskCreated = async (task: any) => {
+  // Task creation success is handled by the useTasks composable
+  // The modal will close automatically and show success feedback
+  console.log('Task created successfully:', task.name)
+  await refetchTasks()
 }
 
 const handleQuickFilter = (filterType: string, active: boolean) => {
