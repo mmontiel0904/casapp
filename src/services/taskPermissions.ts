@@ -2,49 +2,49 @@ import { permissionService } from '../services/permissions'
 
 /**
  * Task System Permission Service
- * Handles task system specific permission checks following RBAC patterns
+ * Handles task system specific permission checks using exact API permissions
  */
 export class TaskPermissionService {
-  // Task system permissions (resource: "task_system")
+  // Task system permissions using actual API format
   async canCreateProjects(): Promise<boolean> {
-    return permissionService.hasPermission('task_system:create')
+    return permissionService.hasPermission('project_create')
   }
 
   async canViewProjects(): Promise<boolean> {
-    return permissionService.hasPermission('task_system:read')
+    return permissionService.hasPermission('project_read')
   }
 
   async canEditProjects(): Promise<boolean> {
-    return permissionService.hasPermission('task_system:write')
+    return permissionService.hasPermission('task_write') // For editing project tasks
   }
 
   async canDeleteProjects(): Promise<boolean> {
-    return permissionService.hasPermission('task_system:admin')
+    return permissionService.hasPermission('project_admin')
   }
 
   async canManageProjectMembers(): Promise<boolean> {
-    return permissionService.hasPermission('task_system:user_management')
+    return permissionService.hasPermission('project_invite')
   }
 
   // Sync versions (require permissions to be loaded)
   canCreateProjectsSync(): boolean {
-    return permissionService.hasPermissionSync('task_system:create')
+    return permissionService.hasPermissionSync('project_create')
   }
 
   canViewProjectsSync(): boolean {
-    return permissionService.hasPermissionSync('task_system:read')
+    return permissionService.hasPermissionSync('project_read')
   }
 
   canEditProjectsSync(): boolean {
-    return permissionService.hasPermissionSync('task_system:write')
+    return permissionService.hasPermissionSync('task_write')
   }
 
   canDeleteProjectsSync(): boolean {
-    return permissionService.hasPermissionSync('task_system:admin')
+    return permissionService.hasPermissionSync('project_admin')
   }
 
   canManageProjectMembersSync(): boolean {
-    return permissionService.hasPermissionSync('task_system:user_management')
+    return permissionService.hasPermissionSync('project_invite')
   }
 
   // Fallback permissions for when task_system permissions aren't set up yet

@@ -65,7 +65,7 @@ const routes = [
     component: ProjectsPage,
     meta: { 
       requiresAuth: true,
-      requiresPermission: 'project_system:read'
+      requiresPermission: 'project_read'
     }
   },
   {
@@ -74,7 +74,7 @@ const routes = [
     component: MyTasksPage,
     meta: { 
       requiresAuth: true,
-      requiresPermission: 'task_system:read'
+      requiresPermission: 'task_read'
     }
   },
   {
@@ -160,9 +160,10 @@ router.beforeEach(async (to, _from, next) => {
         
         // Get friendly names for permissions
         const permissionNames: Record<string, string> = {
-          'task_system:read': 'Task Management',
-          'project_system:read': 'Project Management',
-          'user_management': 'User Management'
+          'task_read': 'Task Management',
+          'project_read': 'Project Management',
+          'user_management': 'User Management',
+          'system_admin': 'System Administration'
         }
         
         const permissionName = permissionNames[requiredPermission] || requiredPermission

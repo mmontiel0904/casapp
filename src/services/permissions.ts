@@ -75,15 +75,21 @@ export class PermissionService {
 
   /**
    * Check if user has specific permission (async for first load)
-   * Supports both exact matches and action-based permissions
+   * API returns exact action strings like: "task_read", "project_admin", "user_management"
+   * Admin users get automatic access via role level
    */
   async hasPermission(action: string): Promise<boolean> {
     if (!this.user) return false
     
+    // Admin users get automatic access to basic operations
+    if (this.isAdmin()) {
+      return true
+    }
+    
     const permissions = await this.getPermissions()
-    return permissions.some(perm => 
-      perm === action || perm.endsWith(`:${action}`)
-    )
+    
+    // Exact match - API returns action strings like "task_read", "project_admin"
+    return permissions.includes(action)
   }
 
   /**
@@ -91,10 +97,17 @@ export class PermissionService {
    * Use this for instant checks after permissions are preloaded
    */
   hasPermissionSync(action: string): boolean {
-    if (!this.user || !this.permissionsCache) return false
-    return this.permissionsCache.some(perm => 
-      perm === action || perm.endsWith(`:${action}`)
-    )
+    if (!this.user) return false
+    
+    // Admin users get automatic access
+    if (this.isAdmin()) {
+      return true
+    }
+    
+    if (!this.permissionsCache) return false
+    
+    // Exact match - API returns action strings like "task_read", "project_admin"
+    return this.permissionsCache.includes(action)
   }
 
   /**
@@ -172,19 +185,19 @@ export class PermissionService {
   // ========================================
 
   async canAccessTasks(): Promise<boolean> {
-    return this.hasPermission('task_system:read') || this.isAdmin()
+    return this.hasPermission('task_read') || this.isAdmin()
   }
 
   async canCreateTasks(): Promise<boolean> {
-    return this.hasPermission('task_system:write') || this.isAdmin()
+    return this.hasPermission('task_create') || this.isAdmin()
   }
 
   async canManageTasks(): Promise<boolean> {
-    return this.hasPermission('task_system:admin') || this.isAdmin()
+    return this.hasPermission('task_write') || this.hasPermission('task_delete') || this.hasPermission('task_assign') || this.isAdmin()
   }
 
   async canAccessProjects(): Promise<boolean> {
-    return this.hasPermission('project_system:read') || this.isAdmin()
+    return this.hasPermission('project_read') || this.isAdmin()
   }
 
   // ========================================
@@ -220,19 +233,19 @@ export class PermissionService {
   // ========================================
 
   canAccessTasksSync(): boolean {
-    return this.hasPermissionSync('task_system:read') || this.isAdmin()
+    return this.hasPermissionSync('task_read') || this.isAdmin()
   }
 
   canCreateTasksSync(): boolean {
-    return this.hasPermissionSync('task_system:write') || this.isAdmin()
+    return this.hasPermissionSync('task_create') || this.isAdmin()
   }
 
   canManageTasksSync(): boolean {
-    return this.hasPermissionSync('task_system:admin') || this.isAdmin()
+    return this.hasPermissionSync('task_write') || this.hasPermissionSync('task_delete') || this.hasPermissionSync('task_assign') || this.isAdmin()
   }
 
   canAccessProjectsSync(): boolean {
-    return this.hasPermissionSync('project_system:read') || this.isAdmin()
+    return this.hasPermissionSync('project_read') || this.isAdmin()
   }
 
   // ========================================
