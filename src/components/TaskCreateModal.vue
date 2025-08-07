@@ -43,26 +43,42 @@
           ></textarea>
         </div>
 
-        <!-- Project Selection -->
+        <!-- Project Selection with Quick Create -->
         <div class="form-control mb-4">
           <label class="label">
             <span class="label-text font-sans font-medium">Project</span>
             <span class="label-text-alt text-error">*</span>
           </label>
-          <select 
-            v-model="form.projectId"
-            class="select select-bordered select-primary focus:ring-2"
-            required
-          >
-            <option value="">Select a project</option>
-            <option 
-              v-for="project in availableProjects" 
-              :key="project.id" 
-              :value="project.id"
+          
+          <div class="flex gap-2">
+            <select 
+              v-model="form.projectId"
+              class="select select-bordered select-primary focus:ring-2 flex-1"
+              required
             >
-              {{ project.name }}
-            </option>
-          </select>
+              <option value="">Select a project</option>
+              <option 
+                v-for="project in availableProjects" 
+                :key="project.id" 
+                :value="project.id"
+              >
+                {{ project.name }}
+              </option>
+            </select>
+            
+            <!-- Quick Create Project Button -->
+            <button 
+              type="button"
+              @click="showProjectCreateModal = true"
+              class="btn btn-outline btn-primary"
+              title="Create new project"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+          </div>
+          
           <div v-if="projectsLoading" class="label">
             <span class="label-text-alt">
               <span class="loading loading-spinner loading-xs"></span>
@@ -184,14 +200,21 @@
       <button @click="closeModal">close</button>
     </form>
   </dialog>
+
+  <!-- Nested Project Creation Modal -->
+  <ProjectCreateModal 
+    :is-open="showProjectCreateModal"
+    @close="showProjectCreateModal = false"
+    @project-created="handleProjectCreated"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery } from '../generated/graphql'
-import { useTasks, TASK_PRIORITY, TASK_STATUS, type TaskPriority, type TaskStatus } from '../composables/useTasks'
-import { useFeedback } from '../composables/useFeedback'
-import type { CreateTaskInput, MyProjectsQuery, AllUsersQuery } from '../generated/graphql'
+import { ref, computed, watch, nextTick } from 'vue'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { TASK_PRIORITY, TASK_STATUS, type TaskPriority, type TaskStatus } from '../composables/useTasks'
+import { useApolloFeedback } from '../composables/useApolloFeedback'
+import ProjectCreateModal from './ProjectCreateModal.vue'
 
 // Props & Emits
 interface Props {
@@ -214,11 +237,11 @@ const emit = defineEmits<{
 // Component refs
 const modal = ref<HTMLDialogElement>()
 
-// Task management
-const { createNewTask, createLoading } = useTasks()
+// Task management - use Apollo directly for better control
+const { mutate: createTask, loading: createLoading, error: createError } = useCreateTaskMutation()
 
-// Feedback system (for potential manual feedback)
-const { error: showError } = useFeedback()
+// Automatic Apollo feedback
+const feedback = useApolloFeedback()
 
 // Form state
 const form = ref<{
@@ -241,8 +264,11 @@ const form = ref<{
 
 const isSubmitting = ref(false)
 
+// Project creation modal state
+const showProjectCreateModal = ref(false)
+
 // Data fetching
-const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery({
+const { result: projectsResult, loading: projectsLoading, refetch: refetchProjects } = useMyProjectsQuery({
   limit: 50,
   offset: 0
 })
@@ -328,7 +354,7 @@ const closeModal = () => {
   }
 }
 
-// Form submission
+// Form submission with Apollo automatic feedback
 const handleSubmit = async () => {
   if (!form.value.name || !form.value.projectId || isSubmitting.value) {
     return
@@ -336,29 +362,56 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true
 
+  // Prepare task input following GraphQL schema
+  const taskInput: CreateTaskInput = {
+    name: form.value.name,
+    description: form.value.description || undefined,
+    projectId: form.value.projectId,
+    priority: form.value.priority,
+    assigneeId: form.value.assigneeId || undefined,
+    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+  }
+
+  // Use Apollo feedback system for automatic success/error handling
+  feedback.handleMutation(createLoading, createError, async () => {
+    // Success callback - task was created successfully
+    emit('taskCreated', taskInput)
+    isSubmitting.value = false
+    closeModal()
+  }, {
+    successTitle: 'Task Created',
+    successMessage: `"${form.value.name}" has been created successfully`,
+    errorTitle: 'Task Creation Failed'
+  })
+
   try {
-    // Prepare task input following GraphQL schema
-    const taskInput: CreateTaskInput = {
-      name: form.value.name,
-      description: form.value.description || undefined,
-      projectId: form.value.projectId,
-      priority: form.value.priority,
-      assigneeId: form.value.assigneeId || undefined,
-      dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
-    }
-
-    const success = await createNewTask(taskInput)
-
-    if (success) {
-      emit('taskCreated', taskInput)
-      closeModal()
-    } else {
-      showError('Task Creation Failed', 'Unable to create task. Please try again.')
-    }
+    await createTask({ input: taskInput })
   } catch (error) {
     console.error('Task creation failed:', error)
-  } finally {
     isSubmitting.value = false
+  }
+}
+
+// Project creation handler
+const handleProjectCreated = async (project: any) => {
+  try {
+    // Refresh the projects list to include the new project
+    await refetchProjects({
+      limit: 50,
+      offset: 0
+    })
+    
+    // Wait for reactive updates
+    await nextTick()
+    
+    // Auto-select the newly created project in the task form
+    form.value.projectId = project.id
+    
+    // Close the project creation modal
+    showProjectCreateModal.value = false
+  } catch (error) {
+    console.error('Error handling project creation:', error)
+    // Project was still created successfully, just log the integration error
   }
 }
 

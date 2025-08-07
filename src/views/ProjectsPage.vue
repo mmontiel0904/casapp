@@ -107,7 +107,7 @@
           <span>Permission service for task system</span>
         </div>
         <div class="flex items-center gap-4">
-          <div class="badge badge-warning">⏳</div>
+          <div class="badge badge-success">✓</div>
           <span>Project listing and creation</span>
         </div>
         <div class="flex items-center gap-4">
@@ -129,30 +129,19 @@
       </div>
     </div>
 
-    <!-- Create Project Modal Placeholder -->
-    <div v-if="showCreateModal" class="modal modal-open">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg mb-4">Create New Project</h3>
-        
-        <div class="alert alert-info">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <span>Project creation functionality will be implemented in the next phase following the task system integration guide.</span>
-        </div>
-
-        <div class="modal-action">
-          <button @click="showCreateModal = false" class="btn">Close</button>
-        </div>
-      </div>
-      <div class="modal-backdrop" @click="showCreateModal = false"></div>
-    </div>
+    <!-- Project Creation Modal -->
+    <ProjectCreateModal 
+      :is-open="showCreateModal"
+      @close="showCreateModal = false"
+      @project-created="handleProjectCreated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { taskPermissionService } from '../services/taskPermissions'
+import ProjectCreateModal from '../components/ProjectCreateModal.vue'
 
 const showCreateModal = ref(false)
 
@@ -160,4 +149,11 @@ const showCreateModal = ref(false)
 const canCreateProjects = computed(() => {
   return taskPermissionService.canCreateProjectsBasic()
 })
+
+// Event handlers
+const handleProjectCreated = (project: any) => {
+  console.log('Project created successfully:', project.name)
+  // TODO: Refresh projects list when we implement project listing
+  // TODO: Optionally redirect to the new project page
+}
 </script>

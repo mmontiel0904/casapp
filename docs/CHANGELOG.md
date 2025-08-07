@@ -18,6 +18,24 @@
   - Due Date (optional datetime-local input)
   - Assignee Selection (optional dropdown from all users)
 
+#### **ProjectCreateModal Component** (`src/components/ProjectCreateModal.vue`)
+- **Professional Design**: Modal for project creation, matching DaisyUI/Material Design 3
+- **Form Fields**:
+  - Project Name (required, max 255 characters)
+  - Description (optional, max 1000 characters)
+  - Project Type/Template (future enhancement, UI present)
+- **Quick-Create Integration**: Can be opened directly from TaskCreateModal for seamless project creation during task entry
+- **Smart Validation**: Client-side validation, loading state, and feedback
+- **Success Feedback**: Global feedback system integration
+- **Accessibility**: ARIA labels, keyboard navigation, focus management
+- **Responsive Design**: Mobile-friendly, adaptive layout
+
+#### **Project Quick-Create Integration**
+- **TaskCreateModal** now includes a quick-create button to open ProjectCreateModal
+- After creating a project, the new project is auto-selected in the task form
+- Projects list is auto-refreshed after creation
+- Ensures a smooth workflow for users creating tasks in new projects
+
 #### **Form Features & UX**
 - **Smart Validation**: Client-side HTML5 validation with visual feedback
 - **Loading States**: Submit button shows spinner, form disabled during creation

@@ -144,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useTasks, type TaskWithPartialUser } from '../composables/useTasks'
 import { usePermissions } from '../composables/usePermissions'
 import TaskFilters from '../components/TaskFilters.vue'
