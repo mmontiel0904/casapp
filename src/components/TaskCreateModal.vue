@@ -87,86 +87,84 @@
           </div>
         </div>
 
-        <!-- Priority Selection -->
-        <div class="form-control mb-4">
-          <label class="label">
-            <span class="label-text font-sans font-medium">Priority</span>
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <label 
-              v-for="priority in priorityOptions" 
-              :key="priority.value"
-              class="label cursor-pointer border rounded-lg p-3 hover:bg-base-200 transition-colors"
-              :class="{ 'border-primary bg-primary/10': form.priority === priority.value }"
+        <!-- Form Grid Layout - Two Columns for Compact Design -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <!-- Priority Selection -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-sans font-medium">Priority</span>
+            </label>
+            <select 
+              v-model="form.priority"
+              class="select select-bordered select-primary focus:ring-2"
             >
-              <input 
-                v-model="form.priority"
-                type="radio" 
+              <option 
+                v-for="priority in priorityOptions" 
+                :key="priority.value"
                 :value="priority.value"
-                class="radio radio-primary radio-sm"
-              />
-              <span class="label-text font-sans ml-2">
-                <span class="badge badge-sm mr-1" :class="priority.colorClass">{{ priority.label }}</span>
-              </span>
-            </label>
+              >
+                {{ priority.label }}
+              </option>
+            </select>
           </div>
-        </div>
 
-        <!-- Status Selection -->
-        <div class="form-control mb-4">
-          <label class="label">
-            <span class="label-text font-sans font-medium">Initial Status</span>
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <label 
-              v-for="status in statusOptions" 
-              :key="status.value"
-              class="label cursor-pointer border rounded-lg p-3 hover:bg-base-200 transition-colors"
-              :class="{ 'border-primary bg-primary/10': form.status === status.value }"
+          <!-- Status Selection -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-sans font-medium">Initial Status</span>
+            </label>
+            <select 
+              v-model="form.status"
+              class="select select-bordered select-primary focus:ring-2"
             >
-              <input 
-                v-model="form.status"
-                type="radio" 
+              <option 
+                v-for="status in statusOptions" 
+                :key="status.value"
                 :value="status.value"
-                class="radio radio-primary radio-sm"
-              />
-              <span class="label-text font-sans ml-2">
-                <span class="badge badge-sm mr-1" :class="status.colorClass">{{ status.label }}</span>
-              </span>
-            </label>
+              >
+                {{ status.label }}
+              </option>
+            </select>
           </div>
         </div>
 
-        <!-- Due Date -->
-        <div class="form-control mb-4">
-          <label class="label">
-            <span class="label-text font-sans font-medium">Due Date</span>
-          </label>
-          <input 
-            v-model="form.dueDate"
-            type="datetime-local" 
-            class="input input-bordered input-primary focus:ring-2"
-          />
-        </div>
+        <!-- Due Date and Assignee Grid Layout -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- Due Date -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-sans font-medium">Due Date</span>
+            </label>
+            <input 
+              v-model="form.dueDate"
+              type="date" 
+              class="input input-bordered input-primary focus:ring-2"
+              :min="todayDate"
+            />
+            <div class="label">
+              <span class="label-text-alt">Defaults to tomorrow if empty</span>
+            </div>
+          </div>
 
-        <!-- Assignee Selection -->
-        <div class="form-control mb-6">
-          <label class="label">
-            <span class="label-text font-sans font-medium">Assignee</span>
-          </label>
-          <select 
-            v-model="form.assigneeId"
-            class="select select-bordered select-primary focus:ring-2"
-          >
-            <option value="">Leave unassigned</option>
-            <option 
-              v-for="user in availableUsers" 
-              :key="user.id" 
-              :value="user.id"
+          <!-- Assignee Selection -->
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text font-sans font-medium">Assignee</span>
+            </label>
+            <select 
+              v-model="form.assigneeId"
+              class="select select-bordered select-primary focus:ring-2"
             >
-              {{ getUserDisplayName(user) }}
-            </option>
-          </select>
+              <option value="">Leave unassigned</option>
+              <option 
+                v-for="user in availableUsers" 
+                :key="user.id" 
+                :value="user.id"
+              >
+                {{ getUserDisplayName(user) }}
+              </option>
+            </select>
+          </div>
         </div>
 
         <!-- Form Actions -->
@@ -258,7 +256,11 @@ const form = ref<{
   projectId: props.preselectedProjectId,
   status: (props.preselectedStatus as TaskStatus) || TASK_STATUS.TODO,
   priority: TASK_PRIORITY.MEDIUM,
-  dueDate: '',
+  dueDate: (() => {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    return tomorrow.toISOString().split('T')[0]
+  })(), // Default to tomorrow
   assigneeId: ''
 })
 
@@ -323,6 +325,17 @@ const statusOptions = computed(() => [
   // Note: Completed and Cancelled are typically not initial states for new tasks
 ])
 
+// Date helpers
+const todayDate = computed(() => {
+  return new Date().toISOString().split('T')[0]
+})
+
+const tomorrowDate = computed(() => {
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  return tomorrow.toISOString().split('T')[0]
+})
+
 // Helper functions
 const getUserDisplayName = (user: AllUsersQuery['allUsers'][0]): string => {
   const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim()
@@ -336,7 +349,7 @@ const resetForm = () => {
     projectId: props.preselectedProjectId,
     status: (props.preselectedStatus as TaskStatus) || TASK_STATUS.TODO,
     priority: TASK_PRIORITY.MEDIUM,
-    dueDate: '',
+    dueDate: tomorrowDate.value, // Default to tomorrow
     assigneeId: ''
   }
 }

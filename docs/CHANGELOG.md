@@ -3,6 +3,21 @@
 
 ## [2025-08-06] - Task Creation System Implementation & Permission System Fixes
 
+### 🆕 Integrated Task Toolbar, Inline Task Creation, and Table/Board Toggle
+
+- **Added `TaskToolbar.vue`**: Unified toolbar for task management, providing live stats (total, overdue, urgent), search, smart filters, and view toggle (table/kanban) in a single, professional UI. Used in `MyTasksPage.vue`.
+- **MyTasksPage.vue**: Refactored to use the new toolbar, replacing legacy header, stats, and filter components. Now supports toggling inline task creation directly from the toolbar, and switching between table and kanban views with a single control. All task actions and filters are integrated into the toolbar.
+- **TaskTableView.vue**: Enhanced to support an inline creator row, context-aware columns (shows "Assignee" or "Created By" as appropriate), and emits events for inline creation and cancellation. Now receives context and inline creator props for flexible usage.
+- **InlineTaskCreator.vue**: New component for fast, in-table task creation with keyboard navigation, validation, and feedback. Used as a row in the table view for seamless quick entry.
+- **UX Improvements**: Streamlined task management workflow—users can add tasks inline or via modal, filter/search tasks, and switch views without leaving the page. All controls are accessible, keyboard-friendly, and match the app's design system.
+
+### ✨ Inline Task Creation in Table View
+
+- **Added `InlineTaskCreator.vue`**: Enables fast, in-table task creation with full DaisyUI/Material Design 3 styling, validation, and feedback.
+- **TaskTableView.vue**: Now supports an inline creator row, context-aware columns (shows "Assignee" or "Created By" as appropriate), and emits events for inline creation and cancellation.
+- **MyTasksPage.vue**: Users can toggle the inline creator, add tasks directly from the table, and see immediate updates. The page handles all new events and state for inline creation.
+- **UX Improvements**: Streamlined quick entry for tasks, with keyboard navigation, default values, and error handling. Matches the design and accessibility standards of the rest of the app.
+
 ### 🚀 **New Feature: Complete Task Creation System**
 
 **Objective**: Implement comprehensive task creation functionality following DaisyUI/Material Design 3 patterns and FRONTEND_INTEGRATION guidelines.

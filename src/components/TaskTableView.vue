@@ -7,7 +7,8 @@
           <th class="font-semibold text-sm">Task</th>
           <th class="font-semibold text-sm">Status</th>
           <th class="font-semibold text-sm">Priority</th>
-          <th class="font-semibold text-sm">Assignee</th>
+          <th v-if="context === 'projectTasks'" class="font-semibold text-sm">Assignee</th>
+          <th v-if="context === 'myTasks'" class="font-semibold text-sm">Created By</th>
           <th v-if="showProject" class="font-semibold text-sm">Project</th>
           <th class="font-semibold text-sm">Due Date</th>
           <th class="font-semibold text-sm text-right">Actions</th>
@@ -16,6 +17,15 @@
       
       <!-- Table Body -->
       <tbody>
+        <!-- Inline Task Creator -->
+        <InlineTaskCreator
+          v-if="showInlineCreator"
+          :show-project="showProject"
+          :preselected-project-id="preselectedProjectId"
+          @task-created="handleTaskCreated"
+          @cancel="emit('cancelInlineCreator')"
+        />
+        
         <tr v-if="loading" class="hover">
           <td :colspan="showProject ? 7 : 6" class="text-center py-8">
             <div class="flex items-center justify-center gap-2">
@@ -70,8 +80,8 @@
             </div>
           </td>
           
-          <!-- Assignee -->
-          <td>
+          <!-- Assignee (for project tasks) -->
+          <td v-if="context === 'projectTasks'">
             <div v-if="task.assignee" class="flex items-center gap-2">
               <div class="avatar placeholder">
                 <div class="bg-neutral text-neutral-content rounded-full w-6">
@@ -81,6 +91,19 @@
               <span class="text-sm truncate max-w-24">{{ getAssigneeName(task.assignee) }}</span>
             </div>
             <div v-else class="text-sm text-base-content/50">Unassigned</div>
+          </td>
+
+          <!-- Created By (for my tasks) -->
+          <td v-if="context === 'myTasks'">
+            <div v-if="task.creator" class="flex items-center gap-2">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-primary-content rounded-full w-6">
+                  <span class="text-xs font-mono">{{ getCreatorInitials(task.creator) }}</span>
+                </div>
+              </div>
+              <span class="text-sm truncate max-w-24">{{ getCreatorName(task.creator) }}</span>
+            </div>
+            <div v-else class="text-sm text-base-content/50">System</div>
           </td>
           
           <!-- Project (conditional) -->
@@ -146,12 +169,16 @@
 
 <script setup lang="ts">
 import type { TaskWithPartialUser } from '../composables/useTasks'
+import InlineTaskCreator from './InlineTaskCreator.vue'
 
 interface Props {
   tasks: TaskWithPartialUser[]
   loading?: boolean
   selectedTask?: TaskWithPartialUser | null
   showProject?: boolean
+  showInlineCreator?: boolean
+  preselectedProjectId?: string
+  context?: 'myTasks' | 'projectTasks' // New prop to determine table context
 }
 
 interface Emits {
@@ -159,14 +186,24 @@ interface Emits {
   (e: 'edit', task: TaskWithPartialUser): void
   (e: 'assign', task: TaskWithPartialUser): void
   (e: 'delete', task: TaskWithPartialUser): void
+  (e: 'taskCreated', task: any): void
+  (e: 'cancelInlineCreator'): void
 }
 
 withDefaults(defineProps<Props>(), {
   loading: false,
-  showProject: false
+  showProject: false,
+  showInlineCreator: false,
+  preselectedProjectId: '',
+  context: 'projectTasks'
 })
 
-defineEmits<Emits>()
+const emit = defineEmits<Emits>()
+
+// Event handlers
+const handleTaskCreated = (task: any) => {
+  emit('taskCreated', task)
+}
 
 // Helper functions following FRONTEND_INTEGRATION.md patterns
 const getStatusDisplayName = (status: string): string => {
@@ -238,6 +275,38 @@ const getAssigneeName = (assignee: any): string => {
     return lastName
   } else {
     return assignee.email.split('@')[0]
+  }
+}
+
+const getCreatorInitials = (creator: any): string => {
+  if (!creator) return '?'
+  const firstName = creator.firstName || ''
+  const lastName = creator.lastName || ''
+  
+  if (firstName && lastName) {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase()
+  } else if (firstName) {
+    return firstName[0].toUpperCase()
+  } else if (lastName) {
+    return lastName[0].toUpperCase()
+  } else {
+    return creator.email[0].toUpperCase()
+  }
+}
+
+const getCreatorName = (creator: any): string => {
+  if (!creator) return 'System'
+  const firstName = creator.firstName || ''
+  const lastName = creator.lastName || ''
+  
+  if (firstName && lastName) {
+    return `${firstName} ${lastName}`
+  } else if (firstName) {
+    return firstName
+  } else if (lastName) {
+    return lastName
+  } else {
+    return creator.email.split('@')[0]
   }
 }
 
