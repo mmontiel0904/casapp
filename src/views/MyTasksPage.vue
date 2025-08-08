@@ -75,6 +75,16 @@
         @close="showCreateModal = false"
         @task-created="handleTaskCreated"
       />
+
+      <!-- Task Edit Panel -->
+      <TaskEditPanel
+        :is-open="showTaskEditPanel"
+        :task="selectedTaskForEdit"
+        :show-project="true"
+        @close="handleTaskEditClose"
+        @saved="handleTaskEditSaved"
+        @deleted="handleTaskEditDeleted"
+      />
   </div>
 </template>
 
@@ -86,6 +96,7 @@ import TaskTableView from '../components/TaskTableView.vue'
 import TaskKanbanView from '../components/TaskKanbanView.vue'
 import TaskCreateModal from '../components/TaskCreateModal.vue'
 import TaskToolbar from '../components/TaskToolbar.vue'
+import TaskEditPanel from '../components/TaskEditPanel.vue'
 
 // Initialize task management for "My Tasks" (no projectId)
 const {
@@ -109,8 +120,10 @@ const { canCreateTasks } = usePermissions()
 
 // Local state
 const selectedTask = ref<TaskWithPartialUser | null>(null)
+const selectedTaskForEdit = ref<TaskWithPartialUser | null>(null)
 const showCreateModal = ref(false)
 const showInlineCreator = ref(false)
+const showTaskEditPanel = ref(false)
 
 // Event handlers
 const handleTaskSelect = (task: TaskWithPartialUser) => {
@@ -118,8 +131,8 @@ const handleTaskSelect = (task: TaskWithPartialUser) => {
 }
 
 const handleTaskEdit = (task: TaskWithPartialUser) => {
-  // TODO: Open task edit modal
-  console.log('Edit task:', task.id)
+  selectedTaskForEdit.value = task
+  showTaskEditPanel.value = true
 }
 
 const handleTaskAssign = (task: TaskWithPartialUser) => {
@@ -166,6 +179,25 @@ const handleQuickFilter = (filterType: string, active: boolean) => {
     // This is already "My Tasks" view, so this filter is always active
     console.log('My tasks filter:', active)
   }
+}
+
+const handleTaskEditClose = () => {
+  showTaskEditPanel.value = false
+  selectedTaskForEdit.value = null
+}
+
+const handleTaskEditSaved = async (updatedTask: any) => {
+  console.log('Task saved successfully:', updatedTask)
+  await refetchTasks()
+  showTaskEditPanel.value = false
+  selectedTaskForEdit.value = null
+}
+
+const handleTaskEditDeleted = async (taskId: string) => {
+  console.log('Task deleted successfully:', taskId)
+  await refetchTasks()
+  showTaskEditPanel.value = false
+  selectedTaskForEdit.value = null
 }
 
 // Initialize

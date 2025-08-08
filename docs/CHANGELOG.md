@@ -3,6 +3,11 @@
 
 ## [2025-08-06] - Task Creation System Implementation & Permission System Fixes
 
+### 🛠 TaskTableView Actions Dropdown Improvements
+
+- **TaskTableView.vue**: Improved the actions dropdown for each task row. Enhanced event handling for edit, assign, and delete actions, ensuring more reliable click behavior and better accessibility. UI/UX of the dropdown and action items refined for consistency with the design system.
+
+
 ### 🆕 Integrated Task Toolbar, Inline Task Creation, and Table/Board Toggle
 
 - **Added `TaskToolbar.vue`**: Unified toolbar for task management, providing live stats (total, overdue, urgent), search, smart filters, and view toggle (table/kanban) in a single, professional UI. Used in `MyTasksPage.vue`.
