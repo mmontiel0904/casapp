@@ -106,3 +106,53 @@ export const TASK_WITH_ACTIVITIES_QUERY = gql`
     }
   }
 `
+
+// ========================================
+// ACTIVITY LOG MUTATIONS
+// ========================================
+
+export const ADD_COMMENT_MUTATION = gql`
+  mutation AddComment($input: AddCommentInput!) {
+    addComment(input: $input) {
+      id
+      actionType
+      description
+      entityId
+      entityType
+      actorId
+      createdAt
+      actor {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+`
+
+// ========================================
+// GENERAL ACTIVITY QUERIES (for future use)
+// ========================================
+
+export const GET_ACTIVITIES_QUERY = gql`
+  query GetActivities($entityType: EntityType!, $entityId: UUID!, $limit: Int, $offset: Int) {
+    activities(entityType: $entityType, entityId: $entityId, limit: $limit, offset: $offset) {
+      id
+      actionType
+      description
+      entityId
+      entityType
+      actorId
+      changesJson
+      metadataJson
+      createdAt
+      actor {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+`

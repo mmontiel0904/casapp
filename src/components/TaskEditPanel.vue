@@ -40,82 +40,89 @@
           <!-- Task Information -->
           <div class="card bg-base-50 border border-base-300">
             <div class="card-body p-4">
-              <h3 class="card-title text-base mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Basic Information
-              </h3>
-              
-              <!-- Task Name -->
-              <div class="form-control mb-4">
-                <label class="label">
-                  <span class="label-text font-medium">Task Name</span>
-                  <span class="label-text-alt text-error">*</span>
-                </label>
-                <input 
-                  v-model="form.name"
-                  type="text" 
-                  class="input input-bordered focus:ring-2 focus:ring-primary/20"
-                  placeholder="Enter task name"
-                  maxlength="255"
-                  required
-                />
-              </div>
-              
-              <!-- Description -->
-              <div class="form-control mb-4">
-                <label class="label">
-                  <span class="label-text font-medium">Description</span>
-                </label>
-                <textarea 
-                  v-model="form.description"
-                  class="textarea textarea-bordered focus:ring-2 focus:ring-primary/20 resize-none"
-                  placeholder="Describe the task..."
-                  rows="4"
-                  maxlength="1000"
-                ></textarea>
-                <div class="label">
-                  <span class="label-text-alt">{{ form.description?.length || 0 }}/1000 characters</span>
+              <!-- Collapsible Header -->
+              <div 
+                class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
+                @click="taskInfoExpanded = !taskInfoExpanded"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="font-semibold text-base">Basic Information</span>
                 </div>
+                <svg 
+                  class="w-5 h-5 text-base-content/60 transition-transform duration-200"
+                  :class="{ 'rotate-180': taskInfoExpanded }"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
               </div>
-              
-              <!-- Status and Priority Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">Status</span>
-                  </label>
-                  <select 
-                    v-model="form.status"
-                    class="select select-bordered focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option 
-                      v-for="status in statusOptions" 
-                      :key="status.value"
-                      :value="status.value"
-                    >
-                      {{ status.label }}
-                    </option>
-                  </select>
+
+              <!-- Collapsible Content -->
+              <div 
+                v-show="taskInfoExpanded"
+                class="space-y-4 mt-4 transition-all duration-200"
+              >
+                <div class="flex flex-col gap-4 md:flex-row md:gap-6">
+                  <!-- Task Name -->
+                  <div class="w-full">
+                    <div class="form-control w-full">
+                      <input 
+                        v-model="form.name"
+                        type="text"
+                        class="input input-bordered input-lg w-full placeholder:text-base-content/60 focus:ring-2 focus:ring-primary/20"
+                        placeholder="Task name*"
+                        maxlength="255"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <!-- Status -->
+                  <div class="w-full md:w-auto md:min-w-48">
+                    <div class="form-control w-full">
+                      <select 
+                        v-model="form.status"
+                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                      >
+                        <option v-for="status in statusOptions" :key="status.value" :value="status.value">
+                          {{ status.label }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
                 
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">Priority</span>
-                  </label>
-                  <select 
-                    v-model="form.priority"
-                    class="select select-bordered focus:ring-2 focus:ring-primary/20"
-                  >
-                    <option 
-                      v-for="priority in priorityOptions" 
-                      :key="priority.value"
-                      :value="priority.value"
-                    >
-                      {{ priority.label }}
-                    </option>
-                  </select>
+                <div class="flex flex-col gap-4 md:flex-row md:gap-6">
+                  <!-- Description -->
+                  <div class="w-full">
+                    <div class="form-control w-full">
+                      <textarea 
+                        v-model="form.description"
+                        class="textarea textarea-bordered textarea-lg w-full placeholder:text-base-content/60 focus:ring-2 focus:ring-primary/20 resize-none"
+                        placeholder="Description"
+                        rows="3"
+                        maxlength="1000"
+                      ></textarea>
+                      <span class="text-xs text-base-content/60 mt-1">{{ form.description?.length || 0 }}/1000</span>
+                    </div>
+                  </div>
+                  <!-- Priority -->
+                  <div class="w-full md:w-auto md:min-w-48">
+                    <div class="form-control w-full">
+                      <select 
+                        v-model="form.priority"
+                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                      >
+                        <option v-for="priority in priorityOptions" :key="priority.value" :value="priority.value">
+                          {{ priority.label }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -124,102 +131,159 @@
           <!-- Assignment & Scheduling -->
           <div class="card bg-base-50 border border-base-300">
             <div class="card-body p-4">
-              <h3 class="card-title text-base mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+              <!-- Collapsible Header -->
+              <div 
+                class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
+                @click="assignmentExpanded = !assignmentExpanded"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2-2v16a2 2 0 002 2z"></path>
+                  </svg>
+                  <span class="font-semibold text-base">Assignment & Timeline</span>
+                </div>
+                <svg 
+                  class="w-5 h-5 text-base-content/60 transition-transform duration-200"
+                  :class="{ 'rotate-180': assignmentExpanded }"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
-                Assignment & Timeline
-              </h3>
-              
-              <!-- Assignee and Due Date Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">Assignee</span>
-                  </label>
+              </div>
+
+              <!-- Collapsible Content -->
+              <div 
+                v-show="assignmentExpanded"
+                class="space-y-4 mt-4 transition-all duration-200"
+              >
+                <div class="flex flex-col gap-4 md:flex-row md:gap-6">
+                  <!-- Assignee -->
+                  <div class="w-full">
+                    <div class="form-control w-full">
+                      <select 
+                        v-model="form.assigneeId"
+                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                        :disabled="usersLoading"
+                      >
+                        <option value="">Unassigned</option>
+                        <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+                          {{ getUserDisplayName(user) }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- Due Date -->
+                  <div class="w-full md:w-auto md:min-w-48">
+                    <div class="form-control w-full">
+                      <input 
+                        v-model="form.dueDate"
+                        type="date"
+                        class="input input-bordered input-lg w-full focus:ring-2 focus:ring-primary/20"
+                        :min="todayDate"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <!-- Project -->
+                <div v-if="showProject" class="form-control w-full">
                   <select 
-                    v-model="form.assigneeId"
-                    class="select select-bordered focus:ring-2 focus:ring-primary/20"
-                    :disabled="usersLoading"
+                    v-model="form.projectId"
+                    class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                    :disabled="projectsLoading"
+                    required
                   >
-                    <option value="">Leave unassigned</option>
-                    <option 
-                      v-for="user in availableUsers" 
-                      :key="user.id" 
-                      :value="user.id"
-                    >
-                      {{ getUserDisplayName(user) }}
+                    <option value="">Select project</option>
+                    <option v-for="project in availableProjects" :key="project.id" :value="project.id">
+                      {{ project.name }}
                     </option>
                   </select>
                 </div>
-                
-                <div class="form-control">
-                  <label class="label">
-                    <span class="label-text font-medium">Due Date</span>
-                  </label>
-                  <input 
-                    v-model="form.dueDate"
-                    type="date" 
-                    class="input input-bordered focus:ring-2 focus:ring-primary/20"
-                    :min="todayDate"
-                  />
-                </div>
-              </div>
-              
-              <!-- Project (if context allows) -->
-              <div class="form-control mt-4" v-if="showProject">
-                <label class="label">
-                  <span class="label-text font-medium">Project</span>
-                </label>
-                <select 
-                  v-model="form.projectId"
-                  class="select select-bordered focus:ring-2 focus:ring-primary/20"
-                  :disabled="projectsLoading"
-                  required
-                >
-                  <option value="">Select project</option>
-                  <option 
-                    v-for="project in availableProjects" 
-                    :key="project.id" 
-                    :value="project.id"
-                  >
-                    {{ project.name }}
-                  </option>
-                </select>
               </div>
             </div>
           </div>
           
-          <!-- Task Activity/History Section -->
+          <!-- Activity Log -->
           <div class="card bg-base-50 border border-base-300">
             <div class="card-body p-4">
-              <h3 class="card-title text-base mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              <!-- Collapsible Header -->
+              <div 
+                class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
+                @click="activityExpanded = !activityExpanded"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span class="font-semibold text-base">Activity Log</span>
+                  <span class="badge badge-sm">{{ taskActivityCount }}</span>
+                  <div v-if="isLoadingActivities" class="loading loading-spinner loading-sm"></div>
+                </div>
+                <svg 
+                  class="w-5 h-5 text-base-content/60 transition-transform duration-200"
+                  :class="{ 'rotate-180': activityExpanded }"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                 </svg>
-                Task Details
-              </h3>
-              
-              <div class="grid grid-cols-2 gap-4 text-sm">
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-base-content/60">Created:</span>
-                    <span class="font-mono">{{ formatDate(task?.createdAt) }}</span>
+              </div>
+
+              <!-- Collapsible Content -->
+              <div 
+                v-show="activityExpanded"
+                class="space-y-4 mt-4 transition-all duration-200"
+              >
+                <!-- Activity Log -->
+                <div class="max-h-64 overflow-y-auto space-y-3">
+                  <div v-if="isLoadingActivities" class="flex justify-center py-4">
+                    <div class="loading loading-spinner loading-md"></div>
                   </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-base-content/60">Updated:</span>
-                    <span class="font-mono">{{ formatDate(task?.updatedAt) }}</span>
+                  <div v-else-if="taskActivities.length === 0" class="text-center py-4 text-base-content/60">
+                    No activity yet
+                  </div>
+                  <div v-else v-for="activity in taskActivities" :key="activity.id" class="chat chat-start">
+                    <div class="chat-image avatar">
+                      <div class="w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span class="text-xs font-bold text-primary">{{ getUserInitials(activity.actor) }}</span>
+                      </div>
+                    </div>
+                    <div class="chat-header text-xs text-base-content/60 mb-1">
+                      {{ getUserName(activity.actor) }}
+                      <time class="text-xs opacity-50 ml-2">{{ formatDate(activity.createdAt) }}</time>
+                    </div>
+                    <div class="chat-bubble chat-bubble-primary text-sm">
+                      {{ activity.description || activity.actionType || 'Activity performed' }}
+                    </div>
+                    <div v-if="activity.changesJson" class="chat-footer text-xs text-base-content/60 mt-1">
+                      <span class="badge badge-xs badge-outline">{{ activity.changesJson }}</span>
+                    </div>
                   </div>
                 </div>
-                <div class="space-y-2">
-                  <div class="flex items-center justify-between">
-                    <span class="text-base-content/60">Creator:</span>
-                    <span>{{ getCreatorName(task?.creator) }}</span>
-                  </div>
-                  <div class="flex items-center justify-between">
-                    <span class="text-base-content/60">ID:</span>
-                    <span class="font-mono text-xs">{{ task?.id?.slice(0, 8) }}...</span>
-                  </div>
+                
+                <!-- Add Comment Input -->
+                <div class="divider text-sm">Add Comment</div>
+                <div class="flex gap-2">
+                  <input 
+                    v-model="newComment"
+                    type="text"
+                    class="input input-bordered input-sm flex-1 placeholder:text-base-content/60"
+                    placeholder="Add a comment..."
+                    @keyup.enter="handleAddComment"
+                    :disabled="isSubmittingComment"
+                  />
+                  <button 
+                    class="btn btn-primary btn-sm"
+                    @click="handleAddComment"
+                    :disabled="!newComment.trim() || isSubmittingComment"
+                  >
+                    <div v-if="isSubmittingComment" class="loading loading-spinner loading-xs"></div>
+                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                  </button>
                 </div>
               </div>
             </div>
@@ -268,7 +332,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, TaskPriority, TaskStatus, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useTaskWithActivitiesQuery, TaskPriority, TaskStatus, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { type TaskWithPartialUser } from '../composables/useTasks'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 
@@ -304,6 +368,18 @@ const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery(
 
 const { result: usersResult, loading: usersLoading } = useAllUsersQuery()
 
+// Task activities data
+const { result: taskActivitiesResult, loading: activitiesLoading /*, refetch: refetchActivities*/ } = useTaskWithActivitiesQuery(
+  computed(() => ({ 
+    taskId: props.task?.id || '', 
+    activityLimit: 20 
+  })),
+  {
+    enabled: computed(() => !!props.task?.id && props.isOpen),
+    fetchPolicy: 'cache-and-network'
+  }
+)
+
 // Computed properties
 const availableProjects = computed((): MyProjectsQuery['myProjects'] => {
   return projectsResult.value?.myProjects || []
@@ -312,6 +388,17 @@ const availableProjects = computed((): MyProjectsQuery['myProjects'] => {
 const availableUsers = computed((): AllUsersQuery['allUsers'] => {
   return usersResult.value?.allUsers || []
 })
+
+// Real activities from API
+const taskActivities = computed(() => {
+  return taskActivitiesResult.value?.task?.activities || []
+})
+
+const taskActivityCount = computed(() => {
+  return taskActivitiesResult.value?.task?.activityCount || 0
+})
+
+const isLoadingActivities = computed(() => activitiesLoading.value)
 
 const todayDate = computed(() => {
   return new Date().toISOString().split('T')[0]
@@ -338,6 +425,11 @@ const form = ref<{
   dueDate: ''
 })
 
+// Expandable sections state
+const taskInfoExpanded = ref(true)
+const assignmentExpanded = ref(true)
+const activityExpanded = ref(true)
+
 // Options
 const statusOptions = computed(() => [
   { value: TaskStatus.Todo, label: 'To Do' },
@@ -358,12 +450,6 @@ const getUserDisplayName = (user: AllUsersQuery['allUsers'][0]): string => {
   return fullName || user.email
 }
 
-const getCreatorName = (creator: any): string => {
-  if (!creator) return 'System'
-  const fullName = `${creator.firstName || ''} ${creator.lastName || ''}`.trim()
-  return fullName || creator.email
-}
-
 const formatDate = (dateString: string): string => {
   if (!dateString) return 'N/A'
   return new Date(dateString).toLocaleDateString('en-US', {
@@ -373,6 +459,52 @@ const formatDate = (dateString: string): string => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+// Helper to get user initials
+const getUserInitials = (user: any): string => {
+  if (!user) return 'U'
+  const firstName = user.firstName || ''
+  const lastName = user.lastName || ''
+  if (firstName && lastName) {
+    return `${firstName[0]}${lastName[0]}`.toUpperCase()
+  }
+  if (firstName) return firstName[0].toUpperCase()
+  if (lastName) return lastName[0].toUpperCase()
+  return user.email?.[0]?.toUpperCase() || 'U'
+}
+
+// Helper to get user display name
+const getUserName = (user: any): string => {
+  if (!user) return 'Unknown User'
+  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim()
+  return fullName || user.email || 'Unknown User'
+}
+
+// Comment input state
+const newComment = ref('')
+const isSubmittingComment = ref(false)
+
+// Handle adding a comment
+const handleAddComment = async () => {
+  if (!newComment.value.trim() || isSubmittingComment.value || !props.task?.id) return
+  
+  try {
+    isSubmittingComment.value = true
+    // TODO: Implement ADD_COMMENT_MUTATION when it's ready
+    console.log('Adding comment:', newComment.value, 'to task:', props.task.id)
+    
+    // Clear the input after successful submission
+    newComment.value = ''
+    
+    // Refetch activities to show the new comment
+    // Uncomment when implementing: await refetchActivities()
+  } catch (error) {
+    console.error('Error adding comment:', error)
+    // You could show an error message here
+  } finally {
+    isSubmittingComment.value = false
+  }
 }
 
 // Form management
