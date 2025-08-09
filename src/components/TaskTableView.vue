@@ -127,36 +127,78 @@
           <!-- Actions -->
           <td class="text-right">
             <div class="dropdown dropdown-end" @click.stop>
-              <label tabindex="0" class="btn btn-ghost btn-xs btn-circle">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <label tabindex="0" class="btn btn-ghost btn-sm btn-square hover:bg-base-200">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                 </svg>
               </label>
-              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-lg bg-base-100 rounded-lg w-40">
-                <li>
-                  <a @click="$emit('edit', task)" class="text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit
-                  </a>
+              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow-xl bg-base-100 border border-base-300 rounded-xl w-48">
+                <!-- Primary Actions -->
+                <li class="menu-title">
+                  <span class="text-xs font-medium text-base-content/70">Actions</span>
                 </li>
                 <li>
-                  <a @click="$emit('assign', task)" class="text-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    Assign
-                  </a>
+                  <button @click="handleEdit(task)" class="flex items-center gap-3 p-3 text-sm hover:bg-primary/10">
+                    <div class="p-1.5 rounded-md bg-primary/10">
+                      <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-medium">Edit Task</div>
+                      <div class="text-xs text-base-content/60">Modify task details</div>
+                    </div>
+                  </button>
                 </li>
-                <li><hr class="my-1"></li>
+                
+                <!-- Disabled Actions -->
                 <li>
-                  <a @click="$emit('delete', task)" class="text-sm text-error">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
-                  </a>
+                  <button @click="closeDropdown" disabled class="flex items-center gap-3 p-3 text-sm opacity-50 cursor-not-allowed">
+                    <div class="p-1.5 rounded-md bg-base-300/50">
+                      <svg class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-medium">Reassign Task</div>
+                      <div class="text-xs text-base-content/40">Coming soon</div>
+                    </div>
+                  </button>
+                </li>
+                
+                <li>
+                  <button @click="closeDropdown" disabled class="flex items-center gap-3 p-3 text-sm opacity-50 cursor-not-allowed">
+                    <div class="p-1.5 rounded-md bg-base-300/50">
+                      <svg class="h-4 w-4 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2v0M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-medium">Duplicate Task</div>
+                      <div class="text-xs text-base-content/40">Coming soon</div>
+                    </div>
+                  </button>
+                </li>
+                
+                <!-- Separator -->
+                <div class="divider my-2"></div>
+                
+                <!-- Destructive Action -->
+                <li class="menu-title">
+                  <span class="text-xs font-medium text-error/70">Danger Zone</span>
+                </li>
+                <li>
+                  <button @click="handleDelete(task)" class="flex items-center gap-3 p-3 text-sm hover:bg-error/10">
+                    <div class="p-1.5 rounded-md bg-error/10">
+                      <svg class="h-4 w-4 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <div class="font-medium text-error">Delete Task</div>
+                      <div class="text-xs text-error/60">Cannot be undone</div>
+                    </div>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -200,10 +242,54 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+// Note: Letting DaisyUI handle dropdown state natively for better compatibility
+
 // Event handlers
 const handleTaskCreated = (task: any) => {
   emit('taskCreated', task)
 }
+
+const handleEdit = (task: TaskWithPartialUser) => {
+  // Use a timeout to allow the click to register, then close dropdown
+  setTimeout(() => {
+    // Force blur on any active dropdown element
+    const activeElement = document.activeElement as HTMLElement
+    if (activeElement && activeElement.closest('.dropdown')) {
+      activeElement.blur()
+    }
+    
+    // Also blur any open dropdown labels
+    document.querySelectorAll('.dropdown label[tabindex="0"]').forEach(label => {
+      (label as HTMLElement).blur()
+    })
+  }, 0)
+  
+  emit('edit', task)
+}
+
+// Simple close function for disabled items
+const closeDropdown = () => {
+  // Force blur on any active dropdown element
+  const activeElement = document.activeElement as HTMLElement
+  if (activeElement && activeElement.closest('.dropdown')) {
+    activeElement.blur()
+  }
+}
+
+const handleDelete = (task: TaskWithPartialUser) => {
+  // Use a timeout to allow the click to register, then close dropdown
+  setTimeout(() => {
+    // Force blur on any active dropdown element
+    const activeElement = document.activeElement as HTMLElement
+    if (activeElement && activeElement.closest('.dropdown')) {
+      activeElement.blur()
+    }
+  }, 0)
+  
+  emit('delete', task)
+}
+
+// DaisyUI handles click outside automatically
 
 // Helper functions following FRONTEND_INTEGRATION.md patterns
 const getStatusDisplayName = (status: string): string => {

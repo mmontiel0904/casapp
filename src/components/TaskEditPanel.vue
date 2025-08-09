@@ -9,7 +9,7 @@
     <div class="absolute inset-0 bg-base-content/20 backdrop-blur-sm transition-opacity"></div>
     
     <!-- Side Panel -->
-    <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-base-100 shadow-2xl transform transition-transform ease-in-out duration-300">
+    <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-base-100 shadow-2xl transform transition-transform ease-in-out duration-300 flex flex-col">
       <!-- Panel Header -->
       <div class="flex items-center justify-between p-6 border-b border-base-300 bg-gradient-to-r from-base-100 to-base-50">
         <div class="flex items-center gap-4">
@@ -34,10 +34,8 @@
         </button>
       </div>
       
-      <!-- Panel Content -->
-      <div class="flex flex-col h-full">
-        <!-- Form Content -->
-        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+      <!-- Form Content -->
+      <div class="flex-1 overflow-y-auto p-6 space-y-6">
           
           <!-- Task Information -->
           <div class="card bg-base-50 border border-base-300">
@@ -264,7 +262,6 @@
             </button>
           </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
