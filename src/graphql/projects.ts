@@ -112,7 +112,7 @@ export const DELETE_PROJECT_MUTATION = gql`
 export const PROJECT_TASKS_QUERY = gql`
   query ProjectTasks(
     $projectId: UUID!, 
-    $status: String, 
+    $status: TaskStatus, 
     $assigneeId: UUID, 
     $limit: Int, 
     $offset: Int
@@ -163,7 +163,7 @@ export const PROJECT_TASKS_QUERY = gql`
 `
 
 export const MY_ASSIGNED_TASKS_QUERY = gql`
-  query MyAssignedTasks($status: String, $limit: Int, $offset: Int) {
+  query MyAssignedTasks($status: TaskStatus, $limit: Int, $offset: Int) {
     myAssignedTasks(status: $status, limit: $limit, offset: $offset) {
       id
       name

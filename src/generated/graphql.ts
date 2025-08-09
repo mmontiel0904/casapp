@@ -408,7 +408,7 @@ export type ProjectTasksArgs = {
   assigneeId?: InputMaybe<Scalars['UUID']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
 };
 
 export type ProjectMember = {
@@ -454,7 +454,7 @@ export type QueryRootAllPermissionsArgs = {
 export type QueryRootMyAssignedTasksArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
 };
 
 
@@ -484,7 +484,7 @@ export type QueryRootProjectTasksArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   projectId: Scalars['UUID']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
 };
 
 
@@ -897,7 +897,7 @@ export type DeleteProjectMutation = { deleteProject: { message: string } };
 
 export type ProjectTasksQueryVariables = Exact<{
   projectId: Scalars['UUID']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
   assigneeId?: InputMaybe<Scalars['UUID']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -907,7 +907,7 @@ export type ProjectTasksQueryVariables = Exact<{
 export type ProjectTasksQuery = { projectTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, activityCount: number, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null }> };
 
 export type MyAssignedTasksQueryVariables = Exact<{
-  status?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<TaskStatus>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 }>;
@@ -2037,7 +2037,7 @@ export function useDeleteProjectMutation(options: VueApolloComposable.UseMutatio
 }
 export type DeleteProjectMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteProjectMutation, DeleteProjectMutationVariables>;
 export const ProjectTasksDocument = gql`
-    query ProjectTasks($projectId: UUID!, $status: String, $assigneeId: UUID, $limit: Int, $offset: Int) {
+    query ProjectTasks($projectId: UUID!, $status: TaskStatus, $assigneeId: UUID, $limit: Int, $offset: Int) {
   projectTasks(
     projectId: $projectId
     status: $status
@@ -2110,7 +2110,7 @@ export function useProjectTasksLazyQuery(variables?: ProjectTasksQueryVariables 
 }
 export type ProjectTasksQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectTasksQuery, ProjectTasksQueryVariables>;
 export const MyAssignedTasksDocument = gql`
-    query MyAssignedTasks($status: String, $limit: Int, $offset: Int) {
+    query MyAssignedTasks($status: TaskStatus, $limit: Int, $offset: Int) {
   myAssignedTasks(status: $status, limit: $limit, offset: $offset) {
     id
     name

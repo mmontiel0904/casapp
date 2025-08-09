@@ -1,5 +1,23 @@
-
 # Development Changelog
+
+## [2025-08-09] - GraphQL Enum Migration for Task System
+
+### 🛠 Task System GraphQL Enum Migration
+
+- **projects.ts**: Migrated all task-related queries and mutations to use proper GraphQL enum types (`TaskStatus`, `TaskPriority`, `RecurrenceType`) for parameters and return values. This replaces previous usage of raw strings, ensuring full type safety and IDE autocomplete for all task operations.
+- **Schema Alignment**: All queries and mutations now match the backend schema, leveraging introspected enums for compile-time validation and improved developer experience.
+- **Benefits**:
+  - Full type safety from database to frontend
+  - Compile-time validation of enum values
+  - IDE autocomplete for all enum fields
+  - No string parsing overhead
+  - Database integrity enforced by PostgreSQL
+- **References**: See `FRONTEND_INTEGRATION.md` and `TASK_SYSTEM_INTEGRATION.md` for details on enum usage and migration patterns.
+
+### 🚀 Developer Experience Improvements
+
+- **TypeScript Types**: All generated types now use enums for task status, priority, and recurrence, improving reliability and reducing runtime errors.
+- **Codegen**: Run `npm run codegen` after schema changes to update types automatically.
 
 ## [2025-08-06] - Task Creation System Implementation & Permission System Fixes
 
@@ -1148,45 +1166,3 @@ This architecture prepares the application for:
 - **Advanced Error Handling**: Retry logic, offline support, error recovery
 - **Service Extensions**: Easy addition of new API services following established patterns
 - **State Management**: Centralized state patterns ready for complex application flows
-
----
-
-## [Previous] - Initial Project Setup
-
-### 🚀 **Project Foundation**
-
-**Commit**: feat: Vue 3 SPA with automated GraphQL client and type generation
-
-### Initial Setup
-- Vue 3 + TypeScript + Vite foundation
-- Apollo GraphQL Client integration  
-- GraphQL Code Generator setup
-- Railway deployment configuration
-- Environment variable management
-- Yarn workspace configuration (node-modules instead of PnP)
-
-### Core Features Implemented
-- Automated GraphQL type generation from remote schema
-- Schema synchronization with `yarn update-schema`
-- Basic authentication components (LoginForm)
-- Apollo Client with error policies
-- Production build optimization
-
----
-
-## Development Philosophy
-
-### Architecture Principles
-1. **Type Safety First** - Everything typed from API to UI
-2. **Reactive by Design** - Vue 3 composition API throughout
-3. **Scalable Patterns** - Easy to extend and maintain
-4. **Error Resilience** - Comprehensive error handling at every layer  
-5. **Developer Experience** - Clear patterns, good documentation, debugging tools
-
-### Code Quality Standards
-- Full TypeScript coverage
-- Consistent error handling patterns
-- Reactive state management
-- Separation of concerns
-- Clear naming conventions
-- Comprehensive documentation

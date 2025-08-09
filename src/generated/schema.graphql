@@ -194,7 +194,7 @@ type Project {
   name: String!
   owner: User
   ownerId: UUID!
-  tasks(assigneeId: UUID, limit: Int, offset: Int, status: String): [Task!]!
+  tasks(assigneeId: UUID, limit: Int, offset: Int, status: TaskStatus): [Task!]!
   updatedAt: DateTime!
 }
 
@@ -215,13 +215,13 @@ type QueryRoot {
   allUsers: [UserWithRole!]!
   health: String!
   me: User!
-  myAssignedTasks(limit: Int, offset: Int, status: String): [Task!]!
+  myAssignedTasks(limit: Int, offset: Int, status: TaskStatus): [Task!]!
   myInvitations: [Invitation!]!
   myProjects(limit: Int, offset: Int): [Project!]!
   permissionById(permissionId: UUID!): Permission
   project(projectId: UUID!): Project
   projectTaskStats(projectId: UUID!): TaskStats!
-  projectTasks(assigneeId: UUID, limit: Int, offset: Int, projectId: UUID!, status: String): [Task!]!
+  projectTasks(assigneeId: UUID, limit: Int, offset: Int, projectId: UUID!, status: TaskStatus): [Task!]!
   resourceById(resourceId: UUID!): Resource
   roleById(roleId: UUID!): RoleWithPermissions
   rolePermissions(roleId: UUID!): [Permission!]!
