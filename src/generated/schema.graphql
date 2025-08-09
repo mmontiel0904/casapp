@@ -10,6 +10,19 @@ input AcceptInvitationInput {
   password: String!
 }
 
+type Activity {
+  actionType: String!
+  actor: User
+  actorId: UUID!
+  changesJson: String
+  createdAt: DateTime!
+  description: String
+  entityId: UUID!
+  entityType: String!
+  id: UUID!
+  metadataJson: String
+}
+
 input AddProjectMemberInput {
   projectId: UUID!
   role: String!
@@ -73,8 +86,10 @@ input CreateTaskInput {
   description: String
   dueDate: DateTime
   name: String!
-  priority: String
+  priority: TaskPriority
   projectId: UUID!
+  recurrenceDay: Int
+  recurrenceType: RecurrenceType
 }
 
 """
@@ -217,6 +232,14 @@ type QueryRoot {
   usersByRole(roleName: String!): [UserWithRole!]!
 }
 
+enum RecurrenceType {
+  DAILY
+  MONTHLY
+  NONE
+  WEEKDAYS
+  WEEKLY
+}
+
 input RefreshTokenInput {
   refreshToken: String!
 }
@@ -284,6 +307,8 @@ type RoleWithPermissions {
 }
 
 type Task {
+  activities(limit: Int, offset: Int): [Activity!]!
+  activityCount: Int!
   assignee: User
   assigneeId: UUID
   createdAt: DateTime!
@@ -292,12 +317,26 @@ type Task {
   description: String
   dueDate: DateTime
   id: UUID!
+  isRecurring: Boolean!
   name: String!
-  priority: String!
+  nextDueDate: DateTime
+  parentTask: Task
+  parentTaskId: UUID
+  priority: TaskPriority!
   project: Project
   projectId: UUID!
-  status: String!
+  recurrenceDay: Int
+  recurrenceType: RecurrenceType!
+  recurringInstances(limit: Int): [Task!]!
+  status: TaskStatus!
   updatedAt: DateTime!
+}
+
+enum TaskPriority {
+  HIGH
+  LOW
+  MEDIUM
+  URGENT
 }
 
 type TaskStats {
@@ -307,6 +346,13 @@ type TaskStats {
   overdue: Int!
   todo: Int!
   total: Int!
+}
+
+enum TaskStatus {
+  CANCELLED
+  COMPLETED
+  IN_PROGRESS
+  TODO
 }
 
 """
@@ -360,8 +406,10 @@ input UpdateTaskInput {
   description: String
   dueDate: DateTime
   name: String
-  priority: String
-  status: String
+  priority: TaskPriority
+  recurrenceDay: Int
+  recurrenceType: RecurrenceType
+  status: TaskStatus
   taskId: UUID!
 }
 

@@ -42,6 +42,19 @@ export type AcceptInvitationInput = {
   password: Scalars['String']['input'];
 };
 
+export type Activity = {
+  actionType: Scalars['String']['output'];
+  actor?: Maybe<User>;
+  actorId: Scalars['UUID']['output'];
+  changesJson?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  entityId: Scalars['UUID']['output'];
+  entityType: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  metadataJson?: Maybe<Scalars['String']['output']>;
+};
+
 export type AddProjectMemberInput = {
   projectId: Scalars['UUID']['input'];
   role: Scalars['String']['input'];
@@ -105,8 +118,10 @@ export type CreateTaskInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   dueDate?: InputMaybe<Scalars['DateTime']['input']>;
   name: Scalars['String']['input'];
-  priority?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<TaskPriority>;
   projectId: Scalars['UUID']['input'];
+  recurrenceDay?: InputMaybe<Scalars['Int']['input']>;
+  recurrenceType?: InputMaybe<RecurrenceType>;
 };
 
 export type GrantUserPermissionInput = {
@@ -512,6 +527,14 @@ export type QueryRootUsersByRoleArgs = {
   roleName: Scalars['String']['input'];
 };
 
+export enum RecurrenceType {
+  Daily = 'DAILY',
+  Monthly = 'MONTHLY',
+  None = 'NONE',
+  Weekdays = 'WEEKDAYS',
+  Weekly = 'WEEKLY'
+}
+
 export type RefreshTokenInput = {
   refreshToken: Scalars['String']['input'];
 };
@@ -579,6 +602,8 @@ export type RoleWithPermissions = {
 };
 
 export type Task = {
+  activities: Array<Activity>;
+  activityCount: Scalars['Int']['output'];
   assignee?: Maybe<User>;
   assigneeId?: Maybe<Scalars['UUID']['output']>;
   createdAt: Scalars['DateTime']['output'];
@@ -587,13 +612,38 @@ export type Task = {
   description?: Maybe<Scalars['String']['output']>;
   dueDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['UUID']['output'];
+  isRecurring: Scalars['Boolean']['output'];
   name: Scalars['String']['output'];
-  priority: Scalars['String']['output'];
+  nextDueDate?: Maybe<Scalars['DateTime']['output']>;
+  parentTask?: Maybe<Task>;
+  parentTaskId?: Maybe<Scalars['UUID']['output']>;
+  priority: TaskPriority;
   project?: Maybe<Project>;
   projectId: Scalars['UUID']['output'];
-  status: Scalars['String']['output'];
+  recurrenceDay?: Maybe<Scalars['Int']['output']>;
+  recurrenceType: RecurrenceType;
+  recurringInstances: Array<Task>;
+  status: TaskStatus;
   updatedAt: Scalars['DateTime']['output'];
 };
+
+
+export type TaskActivitiesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type TaskRecurringInstancesArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export enum TaskPriority {
+  High = 'HIGH',
+  Low = 'LOW',
+  Medium = 'MEDIUM',
+  Urgent = 'URGENT'
+}
 
 export type TaskStats = {
   cancelled: Scalars['Int']['output'];
@@ -603,6 +653,13 @@ export type TaskStats = {
   todo: Scalars['Int']['output'];
   total: Scalars['Int']['output'];
 };
+
+export enum TaskStatus {
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  InProgress = 'IN_PROGRESS',
+  Todo = 'TODO'
+}
 
 export type UpdateMemberRoleInput = {
   projectId: Scalars['UUID']['input'];
@@ -643,8 +700,10 @@ export type UpdateTaskInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   dueDate?: InputMaybe<Scalars['DateTime']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
-  priority?: InputMaybe<Scalars['String']['input']>;
-  status?: InputMaybe<Scalars['String']['input']>;
+  priority?: InputMaybe<TaskPriority>;
+  recurrenceDay?: InputMaybe<Scalars['Int']['input']>;
+  recurrenceType?: InputMaybe<RecurrenceType>;
+  status?: InputMaybe<TaskStatus>;
   taskId: Scalars['UUID']['input'];
 };
 
@@ -671,6 +730,30 @@ export type UserWithRole = {
   role?: Maybe<Role>;
   updatedAt: Scalars['DateTime']['output'];
 };
+
+export type TaskActivitiesQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TaskActivitiesQuery = { task?: { id: any, name: string, activityCount: number, activities: Array<{ id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> } | null };
+
+export type TaskActivityCountQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+}>;
+
+
+export type TaskActivityCountQuery = { task?: { id: any, activityCount: number } | null };
+
+export type TaskWithActivitiesQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+  activityLimit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TaskWithActivitiesQuery = { task?: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, createdAt: any, updatedAt: any, activityCount: number, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, project?: { id: any, name: string, description?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null, activities: Array<{ id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }>, recurringInstances: Array<{ id: any, name: string, status: TaskStatus, dueDate?: any | null, nextDueDate?: any | null }> } | null };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -789,7 +872,7 @@ export type ProjectQueryVariables = Exact<{
 }>;
 
 
-export type ProjectQuery = { project?: { id: any, name: string, description?: string | null, ownerId: any, isActive: boolean, createdAt: any, updatedAt: any, owner?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, members: Array<{ id: any, role: string, joinedAt: any, user: { id: any, email: string, firstName?: string | null, lastName?: string | null } }>, tasks: Array<{ id: any, name: string, status: string, priority: string, dueDate?: any | null, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> } | null };
+export type ProjectQuery = { project?: { id: any, name: string, description?: string | null, ownerId: any, isActive: boolean, createdAt: any, updatedAt: any, owner?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, members: Array<{ id: any, role: string, joinedAt: any, user: { id: any, email: string, firstName?: string | null, lastName?: string | null } }>, tasks: Array<{ id: any, name: string, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> } | null };
 
 export type CreateProjectMutationVariables = Exact<{
   input: CreateProjectInput;
@@ -821,7 +904,7 @@ export type ProjectTasksQueryVariables = Exact<{
 }>;
 
 
-export type ProjectTasksQuery = { projectTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
+export type ProjectTasksQuery = { projectTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, activityCount: number, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null }> };
 
 export type MyAssignedTasksQueryVariables = Exact<{
   status?: InputMaybe<Scalars['String']['input']>;
@@ -830,7 +913,7 @@ export type MyAssignedTasksQueryVariables = Exact<{
 }>;
 
 
-export type MyAssignedTasksQuery = { myAssignedTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, updatedAt: any, project?: { id: any, name: string } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
+export type MyAssignedTasksQuery = { myAssignedTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, activityCount: number, createdAt: any, updatedAt: any, project?: { id: any, name: string } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null }> };
 
 export type ProjectTaskStatsQueryVariables = Exact<{
   projectId: Scalars['UUID']['input'];
@@ -844,14 +927,14 @@ export type CreateTaskMutationVariables = Exact<{
 }>;
 
 
-export type CreateTaskMutation = { createTask: { id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: string, priority: string, dueDate?: any | null, createdAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null } };
+export type CreateTaskMutation = { createTask: { id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, creatorId: any, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, createdAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null } };
 
 export type UpdateTaskMutationVariables = Exact<{
   input: UpdateTaskInput;
 }>;
 
 
-export type UpdateTaskMutation = { updateTask: { id: any, name: string, description?: string | null, status: string, priority: string, dueDate?: any | null, updatedAt: any } };
+export type UpdateTaskMutation = { updateTask: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, updatedAt: any } };
 
 export type AssignTaskMutationVariables = Exact<{
   input: AssignTaskInput;
@@ -887,6 +970,21 @@ export type RemoveProjectMemberMutationVariables = Exact<{
 
 
 export type RemoveProjectMemberMutation = { removeProjectMember: { message: string } };
+
+export type TaskRecurringInstancesQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type TaskRecurringInstancesQuery = { task?: { id: any, name: string, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, recurringInstances: Array<{ id: any, name: string, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, nextDueDate?: any | null, createdAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> } | null };
+
+export type TaskWithParentQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+}>;
+
+
+export type TaskWithParentQuery = { task?: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, project?: { id: any, name: string } | null, parentTask?: { id: any, name: string, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null } | null } | null };
 
 export type HealthQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1071,6 +1169,177 @@ export type GetUserPermissionsQueryVariables = Exact<{
 export type GetUserPermissionsQuery = { userPermissions: Array<string> };
 
 
+export const TaskActivitiesDocument = gql`
+    query TaskActivities($taskId: UUID!, $limit: Int, $offset: Int) {
+  task(taskId: $taskId) {
+    id
+    name
+    activityCount
+    activities(limit: $limit, offset: $offset) {
+      id
+      actionType
+      description
+      entityId
+      entityType
+      actorId
+      changesJson
+      metadataJson
+      createdAt
+      actor {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTaskActivitiesQuery__
+ *
+ * To run a query within a Vue component, call `useTaskActivitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskActivitiesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskActivitiesQuery({
+ *   taskId: // value for 'taskId'
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useTaskActivitiesQuery(variables: TaskActivitiesQueryVariables | VueCompositionApi.Ref<TaskActivitiesQueryVariables> | ReactiveFunction<TaskActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskActivitiesQuery, TaskActivitiesQueryVariables>(TaskActivitiesDocument, variables, options);
+}
+export function useTaskActivitiesLazyQuery(variables?: TaskActivitiesQueryVariables | VueCompositionApi.Ref<TaskActivitiesQueryVariables> | ReactiveFunction<TaskActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskActivitiesQuery, TaskActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskActivitiesQuery, TaskActivitiesQueryVariables>(TaskActivitiesDocument, variables, options);
+}
+export type TaskActivitiesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskActivitiesQuery, TaskActivitiesQueryVariables>;
+export const TaskActivityCountDocument = gql`
+    query TaskActivityCount($taskId: UUID!) {
+  task(taskId: $taskId) {
+    id
+    activityCount
+  }
+}
+    `;
+
+/**
+ * __useTaskActivityCountQuery__
+ *
+ * To run a query within a Vue component, call `useTaskActivityCountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskActivityCountQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskActivityCountQuery({
+ *   taskId: // value for 'taskId'
+ * });
+ */
+export function useTaskActivityCountQuery(variables: TaskActivityCountQueryVariables | VueCompositionApi.Ref<TaskActivityCountQueryVariables> | ReactiveFunction<TaskActivityCountQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskActivityCountQuery, TaskActivityCountQueryVariables>(TaskActivityCountDocument, variables, options);
+}
+export function useTaskActivityCountLazyQuery(variables?: TaskActivityCountQueryVariables | VueCompositionApi.Ref<TaskActivityCountQueryVariables> | ReactiveFunction<TaskActivityCountQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskActivityCountQuery, TaskActivityCountQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskActivityCountQuery, TaskActivityCountQueryVariables>(TaskActivityCountDocument, variables, options);
+}
+export type TaskActivityCountQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskActivityCountQuery, TaskActivityCountQueryVariables>;
+export const TaskWithActivitiesDocument = gql`
+    query TaskWithActivities($taskId: UUID!, $activityLimit: Int = 10) {
+  task(taskId: $taskId) {
+    id
+    name
+    description
+    status
+    priority
+    dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    createdAt
+    updatedAt
+    activityCount
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
+    creator {
+      id
+      email
+      firstName
+      lastName
+    }
+    project {
+      id
+      name
+      description
+    }
+    parentTask {
+      id
+      name
+      status
+    }
+    activities(limit: $activityLimit) {
+      id
+      actionType
+      description
+      entityId
+      entityType
+      actorId
+      changesJson
+      metadataJson
+      createdAt
+      actor {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+    recurringInstances(limit: 5) {
+      id
+      name
+      status
+      dueDate
+      nextDueDate
+    }
+  }
+}
+    `;
+
+/**
+ * __useTaskWithActivitiesQuery__
+ *
+ * To run a query within a Vue component, call `useTaskWithActivitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskWithActivitiesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskWithActivitiesQuery({
+ *   taskId: // value for 'taskId'
+ *   activityLimit: // value for 'activityLimit'
+ * });
+ */
+export function useTaskWithActivitiesQuery(variables: TaskWithActivitiesQueryVariables | VueCompositionApi.Ref<TaskWithActivitiesQueryVariables> | ReactiveFunction<TaskWithActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>(TaskWithActivitiesDocument, variables, options);
+}
+export function useTaskWithActivitiesLazyQuery(variables?: TaskWithActivitiesQueryVariables | VueCompositionApi.Ref<TaskWithActivitiesQueryVariables> | ReactiveFunction<TaskWithActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>(TaskWithActivitiesDocument, variables, options);
+}
+export type TaskWithActivitiesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(input: {email: $email, password: $password}) {
@@ -1785,6 +2054,12 @@ export const ProjectTasksDocument = gql`
     status
     priority
     dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    parentTaskId
+    activityCount
     createdAt
     updatedAt
     assignee {
@@ -1798,6 +2073,11 @@ export const ProjectTasksDocument = gql`
       email
       firstName
       lastName
+    }
+    parentTask {
+      id
+      name
+      status
     }
   }
 }
@@ -1839,6 +2119,12 @@ export const MyAssignedTasksDocument = gql`
     status
     priority
     dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    parentTaskId
+    activityCount
     createdAt
     updatedAt
     project {
@@ -1850,6 +2136,11 @@ export const MyAssignedTasksDocument = gql`
       email
       firstName
       lastName
+    }
+    parentTask {
+      id
+      name
+      status
     }
   }
 }
@@ -1926,12 +2217,22 @@ export const CreateTaskDocument = gql`
     status
     priority
     dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    parentTaskId
     createdAt
     assignee {
       id
       email
       firstName
       lastName
+    }
+    parentTask {
+      id
+      name
+      status
     }
   }
 }
@@ -1967,6 +2268,10 @@ export const UpdateTaskDocument = gql`
     status
     priority
     dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
     updatedAt
   }
 }
@@ -2146,6 +2451,125 @@ export function useRemoveProjectMemberMutation(options: VueApolloComposable.UseM
   return VueApolloComposable.useMutation<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables>(RemoveProjectMemberDocument, options);
 }
 export type RemoveProjectMemberMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RemoveProjectMemberMutation, RemoveProjectMemberMutationVariables>;
+export const TaskRecurringInstancesDocument = gql`
+    query TaskRecurringInstances($taskId: UUID!, $limit: Int = 10) {
+  task(taskId: $taskId) {
+    id
+    name
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    recurringInstances(limit: $limit) {
+      id
+      name
+      status
+      priority
+      dueDate
+      nextDueDate
+      createdAt
+      assignee {
+        id
+        email
+        firstName
+        lastName
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTaskRecurringInstancesQuery__
+ *
+ * To run a query within a Vue component, call `useTaskRecurringInstancesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskRecurringInstancesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskRecurringInstancesQuery({
+ *   taskId: // value for 'taskId'
+ *   limit: // value for 'limit'
+ * });
+ */
+export function useTaskRecurringInstancesQuery(variables: TaskRecurringInstancesQueryVariables | VueCompositionApi.Ref<TaskRecurringInstancesQueryVariables> | ReactiveFunction<TaskRecurringInstancesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>(TaskRecurringInstancesDocument, variables, options);
+}
+export function useTaskRecurringInstancesLazyQuery(variables?: TaskRecurringInstancesQueryVariables | VueCompositionApi.Ref<TaskRecurringInstancesQueryVariables> | ReactiveFunction<TaskRecurringInstancesQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>(TaskRecurringInstancesDocument, variables, options);
+}
+export type TaskRecurringInstancesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskRecurringInstancesQuery, TaskRecurringInstancesQueryVariables>;
+export const TaskWithParentDocument = gql`
+    query TaskWithParent($taskId: UUID!) {
+  task(taskId: $taskId) {
+    id
+    name
+    description
+    status
+    priority
+    dueDate
+    isRecurring
+    recurrenceType
+    recurrenceDay
+    nextDueDate
+    parentTaskId
+    createdAt
+    updatedAt
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
+    creator {
+      id
+      email
+      firstName
+      lastName
+    }
+    project {
+      id
+      name
+    }
+    parentTask {
+      id
+      name
+      status
+      priority
+      dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+    }
+  }
+}
+    `;
+
+/**
+ * __useTaskWithParentQuery__
+ *
+ * To run a query within a Vue component, call `useTaskWithParentQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskWithParentQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskWithParentQuery({
+ *   taskId: // value for 'taskId'
+ * });
+ */
+export function useTaskWithParentQuery(variables: TaskWithParentQueryVariables | VueCompositionApi.Ref<TaskWithParentQueryVariables> | ReactiveFunction<TaskWithParentQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskWithParentQuery, TaskWithParentQueryVariables>(TaskWithParentDocument, variables, options);
+}
+export function useTaskWithParentLazyQuery(variables?: TaskWithParentQueryVariables | VueCompositionApi.Ref<TaskWithParentQueryVariables> | ReactiveFunction<TaskWithParentQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskWithParentQuery, TaskWithParentQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskWithParentQuery, TaskWithParentQueryVariables>(TaskWithParentDocument, variables, options);
+}
+export type TaskWithParentQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskWithParentQuery, TaskWithParentQueryVariables>;
 export const HealthDocument = gql`
     query Health {
   health

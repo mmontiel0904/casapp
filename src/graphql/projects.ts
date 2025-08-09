@@ -133,6 +133,12 @@ export const PROJECT_TASKS_QUERY = gql`
       status
       priority
       dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+      parentTaskId
+      activityCount
       createdAt
       updatedAt
       assignee {
@@ -146,6 +152,11 @@ export const PROJECT_TASKS_QUERY = gql`
         email
         firstName
         lastName
+      }
+      parentTask {
+        id
+        name
+        status
       }
     }
   }
@@ -161,6 +172,12 @@ export const MY_ASSIGNED_TASKS_QUERY = gql`
       status
       priority
       dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+      parentTaskId
+      activityCount
       createdAt
       updatedAt
       project {
@@ -172,6 +189,11 @@ export const MY_ASSIGNED_TASKS_QUERY = gql`
         email
         firstName
         lastName
+      }
+      parentTask {
+        id
+        name
+        status
       }
     }
   }
@@ -203,12 +225,22 @@ export const CREATE_TASK_MUTATION = gql`
       status
       priority
       dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+      parentTaskId
       createdAt
       assignee {
         id
         email
         firstName
         lastName
+      }
+      parentTask {
+        id
+        name
+        status
       }
     }
   }
@@ -223,6 +255,10 @@ export const UPDATE_TASK_MUTATION = gql`
       status
       priority
       dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
       updatedAt
     }
   }
@@ -273,6 +309,84 @@ export const REMOVE_PROJECT_MEMBER_MUTATION = gql`
   mutation RemoveProjectMember($input: RemoveProjectMemberInput!) {
     removeProjectMember(input: $input) {
       message
+    }
+  }
+`
+
+// ========================================
+// RECURRING TASK QUERIES
+// ========================================
+
+export const TASK_RECURRING_INSTANCES_QUERY = gql`
+  query TaskRecurringInstances($taskId: UUID!, $limit: Int = 10) {
+    task(taskId: $taskId) {
+      id
+      name
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+      recurringInstances(limit: $limit) {
+        id
+        name
+        status
+        priority
+        dueDate
+        nextDueDate
+        createdAt
+        assignee {
+          id
+          email
+          firstName
+          lastName
+        }
+      }
+    }
+  }
+`
+
+export const TASK_WITH_PARENT_QUERY = gql`
+  query TaskWithParent($taskId: UUID!) {
+    task(taskId: $taskId) {
+      id
+      name
+      description
+      status
+      priority
+      dueDate
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+      parentTaskId
+      createdAt
+      updatedAt
+      assignee {
+        id
+        email
+        firstName
+        lastName
+      }
+      creator {
+        id
+        email
+        firstName
+        lastName
+      }
+      project {
+        id
+        name
+      }
+      parentTask {
+        id
+        name
+        status
+        priority
+        dueDate
+        isRecurring
+        recurrenceType
+        recurrenceDay
+      }
     }
   }
 `
