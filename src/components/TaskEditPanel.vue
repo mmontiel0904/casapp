@@ -268,8 +268,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
-import { TASK_PRIORITY, TASK_STATUS, type TaskPriority, type TaskStatus, type TaskWithPartialUser } from '../composables/useTasks'
+import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, TaskPriority, TaskStatus, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { type TaskWithPartialUser } from '../composables/useTasks'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 
 // Props & Emits
@@ -331,8 +331,8 @@ const form = ref<{
 }>({
   name: '',
   description: '',
-  status: TASK_STATUS.TODO,
-  priority: TASK_PRIORITY.MEDIUM,
+  status: TaskStatus.Todo,
+  priority: TaskPriority.Medium,
   assigneeId: '',
   projectId: '',
   dueDate: ''
@@ -340,16 +340,16 @@ const form = ref<{
 
 // Options
 const statusOptions = computed(() => [
-  { value: TASK_STATUS.TODO, label: 'To Do' },
-  { value: TASK_STATUS.IN_PROGRESS, label: 'In Progress' },
-  { value: TASK_STATUS.COMPLETED, label: 'Completed' }
+  { value: TaskStatus.Todo, label: 'To Do' },
+  { value: TaskStatus.InProgress, label: 'In Progress' },
+  { value: TaskStatus.Completed, label: 'Completed' }
 ])
 
 const priorityOptions = computed(() => [
-  { value: TASK_PRIORITY.LOW, label: 'Low' },
-  { value: TASK_PRIORITY.MEDIUM, label: 'Medium' },
-  { value: TASK_PRIORITY.HIGH, label: 'High' },
-  { value: TASK_PRIORITY.URGENT, label: 'Urgent' }
+  { value: TaskPriority.Low, label: 'Low' },
+  { value: TaskPriority.Medium, label: 'Medium' },
+  { value: TaskPriority.High, label: 'High' },
+  { value: TaskPriority.Urgent, label: 'Urgent' }
 ])
 
 // Helper functions
@@ -381,8 +381,8 @@ const resetForm = () => {
     form.value = {
       name: props.task.name || '',
       description: props.task.description || '',
-      status: (props.task.status as TaskStatus) || TASK_STATUS.TODO,
-      priority: (props.task.priority as TaskPriority) || TASK_PRIORITY.MEDIUM,
+      status: (props.task.status as TaskStatus) || TaskStatus.Todo,
+      priority: (props.task.priority as TaskPriority) || TaskPriority.Medium,
       assigneeId: props.task.assigneeId || '',
       projectId: props.task.projectId || '',
       dueDate: props.task.dueDate ? new Date(props.task.dueDate).toISOString().split('T')[0] : ''

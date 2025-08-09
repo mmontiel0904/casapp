@@ -33,9 +33,11 @@
           :show-inline-creator="showInlineCreator"
           context="myTasks"
           @select="handleTaskSelect"
+          @view-details="handleTaskViewDetails"
           @edit="handleTaskEdit"
           @assign="handleTaskAssign"
           @delete="handleTaskDelete"
+          @mark-complete="handleTaskMarkComplete"
           @task-created="handleInlineTaskCreated"
           @cancel-inline-creator="showInlineCreator = false"
         />
@@ -130,9 +132,27 @@ const handleTaskSelect = (task: TaskWithPartialUser) => {
   selectedTask.value = selectedTask.value?.id === task.id ? null : task
 }
 
+const handleTaskViewDetails = (task: TaskWithPartialUser) => {
+  // Primary action - open detail view (same as edit for now, but can be different)
+  selectedTaskForEdit.value = task
+  showTaskEditPanel.value = true
+  selectedTask.value = task // Also select the task for visual feedback
+}
+
 const handleTaskEdit = (task: TaskWithPartialUser) => {
   selectedTaskForEdit.value = task
   showTaskEditPanel.value = true
+}
+
+const handleTaskMarkComplete = async (task: TaskWithPartialUser) => {
+  try {
+    // TODO: Add updateTask composable from useTasks to handle status update
+    console.log('Marking task complete:', task.id)
+    // For now, just trigger a refresh
+    await refetchTasks()
+  } catch (error) {
+    console.error('Failed to mark task complete:', error)
+  }
 }
 
 const handleTaskAssign = (task: TaskWithPartialUser) => {

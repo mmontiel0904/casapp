@@ -134,8 +134,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
-import { TASK_PRIORITY, TASK_STATUS, type TaskPriority, type TaskStatus } from '../composables/useTasks'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 
 // Props & Emits
@@ -148,7 +147,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   showProject: true,
   preselectedProjectId: '',
-  preselectedStatus: TASK_STATUS.TODO
+  preselectedStatus: TaskStatus.Todo
 })
 
 const emit = defineEmits<{
@@ -204,8 +203,8 @@ const form = ref<{
   name: '',
   description: '',
   projectId: props.preselectedProjectId,
-  status: (props.preselectedStatus as TaskStatus) || TASK_STATUS.TODO,
-  priority: TASK_PRIORITY.MEDIUM,
+  status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
+  priority: TaskPriority.Medium,
   dueDate: tomorrowDate.value,
   assigneeId: ''
 })
@@ -214,15 +213,15 @@ const isSubmitting = ref(false)
 
 // Priority and status options
 const priorityOptions = computed(() => [
-  { value: TASK_PRIORITY.LOW, label: 'Low' },
-  { value: TASK_PRIORITY.MEDIUM, label: 'Medium' },
-  { value: TASK_PRIORITY.HIGH, label: 'High' },
-  { value: TASK_PRIORITY.URGENT, label: 'Urgent' }
+  { value: TaskPriority.Low, label: 'Low' },
+  { value: TaskPriority.Medium, label: 'Medium' },
+  { value: TaskPriority.High, label: 'High' },
+  { value: TaskPriority.Urgent, label: 'Urgent' }
 ])
 
 const statusOptions = computed(() => [
-  { value: TASK_STATUS.TODO, label: 'To Do' },
-  { value: TASK_STATUS.IN_PROGRESS, label: 'In Progress' }
+  { value: TaskStatus.Todo, label: 'To Do' },
+  { value: TaskStatus.InProgress, label: 'In Progress' }
 ])
 
 // Helper functions

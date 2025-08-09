@@ -19,7 +19,7 @@ const config: CodegenConfig = {
       config: {
         withCompositionFunctions: true,
         vueCompositionApiImportFrom: 'vue',
-        skipTypename: true
+        skipTypename: true,
       }
     },
     './src/generated/schema.graphql': {

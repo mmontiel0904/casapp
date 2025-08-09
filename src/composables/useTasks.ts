@@ -7,6 +7,8 @@ import {
   useUpdateTaskMutation,
   useAssignTaskMutation,
   useDeleteTaskMutation,
+  TaskStatus,
+  TaskPriority,
   type CreateTaskInput,
   type UpdateTaskInput,
   type AssignTaskInput,
@@ -43,23 +45,9 @@ export type TaskWithPartialUser = {
 
 export type TaskStats = ProjectTaskStatsQuery['projectTaskStats']
 
-// Task status and priority constants following API schema
-export const TASK_STATUS = {
-  TODO: 'todo',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled'
-} as const
-
-export const TASK_PRIORITY = {
-  LOW: 'low',
-  MEDIUM: 'medium',
-  HIGH: 'high',
-  URGENT: 'urgent'
-} as const
-
-export type TaskStatus = typeof TASK_STATUS[keyof typeof TASK_STATUS]
-export type TaskPriority = typeof TASK_PRIORITY[keyof typeof TASK_PRIORITY]
+// Use GraphQL generated enums directly - this ensures perfect type alignment
+export const TASK_STATUS = TaskStatus
+export const TASK_PRIORITY = TaskPriority
 
 // Task view modes
 export const TASK_VIEW_MODE = {
@@ -79,8 +67,8 @@ export function useTasks(projectId?: string) {
   
   // Local state
   const viewMode = ref<TaskViewMode>(TASK_VIEW_MODE.TABLE)
-  const selectedStatus = ref<string>('')
-  const selectedPriority = ref<string>('')
+  const selectedStatus = ref<TaskStatus | ''>('')
+  const selectedPriority = ref<TaskPriority | ''>('')
   const selectedAssignee = ref<string>('')
   const searchQuery = ref('')
 
@@ -172,10 +160,10 @@ export function useTasks(projectId?: string) {
   // Tasks grouped by status for Kanban view
   const tasksByStatus = computed(() => {
     const grouped = {
-      [TASK_STATUS.TODO]: [] as TaskWithPartialUser[],
-      [TASK_STATUS.IN_PROGRESS]: [] as TaskWithPartialUser[],
-      [TASK_STATUS.COMPLETED]: [] as TaskWithPartialUser[],
-      [TASK_STATUS.CANCELLED]: [] as TaskWithPartialUser[]
+      [TaskStatus.Todo]: [] as TaskWithPartialUser[],
+      [TaskStatus.InProgress]: [] as TaskWithPartialUser[],
+      [TaskStatus.Completed]: [] as TaskWithPartialUser[],
+      [TaskStatus.Cancelled]: [] as TaskWithPartialUser[]
     }
 
     filteredTasks.value.forEach((task: TaskWithPartialUser) => {
@@ -191,10 +179,10 @@ export function useTasks(projectId?: string) {
   // Priority-based filtering
   const tasksByPriority = computed(() => {
     const grouped = {
-      [TASK_PRIORITY.URGENT]: [] as TaskWithPartialUser[],
-      [TASK_PRIORITY.HIGH]: [] as TaskWithPartialUser[],
-      [TASK_PRIORITY.MEDIUM]: [] as TaskWithPartialUser[],
-      [TASK_PRIORITY.LOW]: [] as TaskWithPartialUser[]
+      [TaskPriority.Urgent]: [] as TaskWithPartialUser[],
+      [TaskPriority.High]: [] as TaskWithPartialUser[],
+      [TaskPriority.Medium]: [] as TaskWithPartialUser[],
+      [TaskPriority.Low]: [] as TaskWithPartialUser[]
     }
 
     filteredTasks.value.forEach((task: TaskWithPartialUser) => {
@@ -213,55 +201,55 @@ export function useTasks(projectId?: string) {
     return filteredTasks.value.filter((task: TaskWithPartialUser) => 
       task.dueDate && 
       new Date(task.dueDate) < now && 
-      task.status !== TASK_STATUS.COMPLETED
+      task.status !== TaskStatus.Completed
     )
   })
 
   // High priority incomplete tasks
   const urgentTasks = computed(() => 
     filteredTasks.value.filter((task: TaskWithPartialUser) => 
-      task.priority === TASK_PRIORITY.URGENT && 
-      task.status !== TASK_STATUS.COMPLETED
+      task.priority === TaskPriority.Urgent && 
+      task.status !== TaskStatus.Completed
     )
   )
 
   // Helper functions
   const getStatusDisplayName = (status: string): string => {
     const names = {
-      [TASK_STATUS.TODO]: 'To Do',
-      [TASK_STATUS.IN_PROGRESS]: 'In Progress',
-      [TASK_STATUS.COMPLETED]: 'Completed',
-      [TASK_STATUS.CANCELLED]: 'Cancelled'
+      [TaskStatus.Todo]: 'To Do',
+      [TaskStatus.InProgress]: 'In Progress',
+      [TaskStatus.Completed]: 'Completed',
+      [TaskStatus.Cancelled]: 'Cancelled'
     }
     return names[status as TaskStatus] || status
   }
 
   const getPriorityDisplayName = (priority: string): string => {
     const names = {
-      [TASK_PRIORITY.LOW]: 'Low',
-      [TASK_PRIORITY.MEDIUM]: 'Medium', 
-      [TASK_PRIORITY.HIGH]: 'High',
-      [TASK_PRIORITY.URGENT]: 'Urgent'
+      [TaskPriority.Low]: 'Low',
+      [TaskPriority.Medium]: 'Medium', 
+      [TaskPriority.High]: 'High',
+      [TaskPriority.Urgent]: 'Urgent'
     }
     return names[priority as TaskPriority] || priority
   }
 
   const getPriorityColor = (priority: string): string => {
     const colors = {
-      [TASK_PRIORITY.LOW]: 'badge-ghost',
-      [TASK_PRIORITY.MEDIUM]: 'badge-info',
-      [TASK_PRIORITY.HIGH]: 'badge-warning',
-      [TASK_PRIORITY.URGENT]: 'badge-error'
+      [TaskPriority.Low]: 'badge-ghost',
+      [TaskPriority.Medium]: 'badge-info',
+      [TaskPriority.High]: 'badge-warning',
+      [TaskPriority.Urgent]: 'badge-error'
     }
     return colors[priority as TaskPriority] || 'badge-ghost'
   }
 
   const getStatusColor = (status: string): string => {
     const colors = {
-      [TASK_STATUS.TODO]: 'badge-ghost',
-      [TASK_STATUS.IN_PROGRESS]: 'badge-warning',
-      [TASK_STATUS.COMPLETED]: 'badge-success',
-      [TASK_STATUS.CANCELLED]: 'badge-error'
+      [TaskStatus.Todo]: 'badge-ghost',
+      [TaskStatus.InProgress]: 'badge-warning',
+      [TaskStatus.Completed]: 'badge-success',
+      [TaskStatus.Cancelled]: 'badge-error'
     }
     return colors[status as TaskStatus] || 'badge-ghost'
   }
@@ -357,11 +345,11 @@ export function useTasks(projectId?: string) {
 
   // Filter actions
   const setStatusFilter = (status: string) => {
-    selectedStatus.value = status
+    selectedStatus.value = status as TaskStatus | ''
   }
 
   const setPriorityFilter = (priority: string) => {
-    selectedPriority.value = priority
+    selectedPriority.value = priority as TaskPriority | ''
   }
 
   const setAssigneeFilter = (assigneeId: string) => {

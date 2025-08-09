@@ -209,8 +209,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
-import { TASK_PRIORITY, TASK_STATUS, type TaskPriority, type TaskStatus } from '../composables/useTasks'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 import ProjectCreateModal from './ProjectCreateModal.vue'
 
@@ -254,8 +253,8 @@ const form = ref<{
   name: '',
   description: '',
   projectId: props.preselectedProjectId,
-  status: (props.preselectedStatus as TaskStatus) || TASK_STATUS.TODO,
-  priority: TASK_PRIORITY.MEDIUM,
+  status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
+  priority: TaskPriority.Medium,
   dueDate: (() => {
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
@@ -289,22 +288,22 @@ const availableUsers = computed((): AllUsersQuery['allUsers'] => {
 // Priority options with Material Design 3 styling
 const priorityOptions = computed(() => [
   { 
-    value: TASK_PRIORITY.LOW, 
+    value: TaskPriority.Low, 
     label: 'Low', 
     colorClass: 'badge-ghost' 
   },
   { 
-    value: TASK_PRIORITY.MEDIUM, 
+    value: TaskPriority.Medium, 
     label: 'Medium', 
     colorClass: 'badge-info' 
   },
   { 
-    value: TASK_PRIORITY.HIGH, 
+    value: TaskPriority.High, 
     label: 'High', 
     colorClass: 'badge-warning' 
   },
   { 
-    value: TASK_PRIORITY.URGENT, 
+    value: TaskPriority.Urgent, 
     label: 'Urgent', 
     colorClass: 'badge-error' 
   }
@@ -313,12 +312,12 @@ const priorityOptions = computed(() => [
 // Status options with consistent styling
 const statusOptions = computed(() => [
   { 
-    value: TASK_STATUS.TODO, 
+    value: TaskStatus.Todo, 
     label: 'To Do', 
     colorClass: 'badge-ghost' 
   },
   { 
-    value: TASK_STATUS.IN_PROGRESS, 
+    value: TaskStatus.InProgress, 
     label: 'In Progress', 
     colorClass: 'badge-warning' 
   }
@@ -347,8 +346,8 @@ const resetForm = () => {
     name: '',
     description: '',
     projectId: props.preselectedProjectId,
-    status: (props.preselectedStatus as TaskStatus) || TASK_STATUS.TODO,
-    priority: TASK_PRIORITY.MEDIUM,
+    status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
+    priority: TaskPriority.Medium,
     dueDate: tomorrowDate.value, // Default to tomorrow
     assigneeId: ''
   }
