@@ -25,9 +25,10 @@ export function useApolloFeedback() {
       showSuccess = true
     } = options || {}
 
-    // Watch for errors
+    // Watch for errors with intelligent handling
     watch(error, (newError) => {
       if (newError) {
+        // Use the enhanced error categorization from the feedback system
         feedback.fromApolloError(newError, errorTitle)
       }
     }, { immediate: true })
@@ -63,33 +64,31 @@ export function useApolloFeedback() {
 
     watch(error, (newError) => {
       if (newError) {
-        // Check for permission errors first
-        if (showPermissionErrors && newError.graphQLErrors?.some((err: any) => 
-          err.message?.toLowerCase().includes('insufficient permissions') ||
-          err.message?.toLowerCase().includes('permission denied') ||
-          err.extensions?.code === 'FORBIDDEN'
-        )) {
-          const permissionError = newError.graphQLErrors.find((err: any) => 
-            err.message?.toLowerCase().includes('insufficient permissions') ||
-            err.message?.toLowerCase().includes('permission denied') ||
-            err.extensions?.code === 'FORBIDDEN'
-          )
+        // Use the enhanced error categorization system
+        // Let the feedback system handle intelligent error categorization
+        if (newError.networkError && showNetworkErrors) {
+          feedback.fromApolloError(newError, errorTitle)
+        } else if (newError.graphQLErrors?.length > 0) {
+          // Let the intelligent categorizer decide how to handle the error
+          const shouldShowError = newError.graphQLErrors.some((err: any) => {
+            const message = err.message?.toLowerCase() || ''
+            const code = err.extensions?.code || ''
+            
+            // Show permission errors if enabled
+            const isPermissionError = message.includes('permission') || 
+                                    message.includes('forbidden') || 
+                                    code === 'FORBIDDEN'
+            if (isPermissionError && !showPermissionErrors) {
+              return false
+            }
+            
+            // Show other errors (validation, server errors, etc.)
+            return true
+          })
           
-          feedback.error(
-            'Access Denied',
-            permissionError.message || 'You don\'t have permission to access this resource.',
-            7000
-          )
-          return
-        }
-        
-        // Show network errors
-        if (showNetworkErrors && newError.networkError) {
-          feedback.fromApolloError(newError, errorTitle)
-        } 
-        // Show internal server errors
-        else if (newError.graphQLErrors?.some((err: any) => err.extensions?.code === 'INTERNAL_ERROR')) {
-          feedback.fromApolloError(newError, errorTitle)
+          if (shouldShowError) {
+            feedback.fromApolloError(newError, errorTitle)
+          }
         }
       }
     }, { immediate: true })

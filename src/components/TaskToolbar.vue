@@ -1,13 +1,12 @@
 <template>
-  <!-- Integrated Task Management Toolbar -->
-  <div class="bg-gradient-to-r from-base-100 to-base-50 border border-base-300 rounded-lg shadow-sm overflow-hidden">
-    
-    <!-- Context Header - Primary Information Layer -->
-    <div class="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-primary/5 to-transparent border-b border-base-200">
+  <!-- Redesigned Task Management Toolbar -->
+  <div class="space-y-4">
+    <!-- Header Section - Page Title and Stats -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <!-- Page Context with Live Stats -->
       <div class="flex items-center gap-4">
         <div class="flex items-baseline gap-3">
-          <h1 class="text-2xl font-bold text-base-content font-serif">{{ title }}</h1>
+          <h1 class="text-3xl font-bold text-base-content">{{ title }}</h1>
           <div class="flex items-center gap-3 text-sm">
             <!-- Total Count Badge -->
             <div class="flex items-center gap-1.5 px-2.5 py-1 bg-primary/10 text-primary rounded-full">
@@ -36,27 +35,16 @@
         </div>
       </div>
       
-      <!-- Primary Actions -->
+      <!-- Secondary Actions -->
       <div class="flex items-center gap-3">
-        <button 
-          @click="$emit('addTask')"
-          class="btn btn-primary gap-2 shadow-sm hover:shadow-md transition-all"
-          :disabled="!canCreateTasks"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Add Task
-        </button>
-        
-        <!-- Secondary Actions Menu -->
+        <!-- Utility Actions Menu -->
         <div class="dropdown dropdown-end">
-          <button tabindex="0" class="btn btn-ghost btn-square btn-sm hover:bg-base-200">
+          <button tabindex="0" class="btn btn-ghost btn-square btn-sm hover:bg-base-200" title="More actions">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
             </svg>
           </button>
-          <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+          <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40 border border-base-300">
             <li>
               <a @click="$emit('refresh')" :disabled="loading">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,99 +66,118 @@
       </div>
     </div>
     
-    <!-- Smart Filter & View Bar - Secondary Controls Layer -->
-    <div class="flex items-center justify-between px-6 py-3 bg-base-50/50">
-      <!-- Left: Discovery Tools -->
-      <div class="flex items-center gap-4 flex-1">
-        <!-- Smart Search -->
-        <div class="relative flex-1 max-w-md">
-          <input 
-            v-model="searchQuery"
-            @input="$emit('search', searchQuery)"
-            type="text" 
-            placeholder="Search tasks, projects, or assignees..."
-            class="input input-sm input-bordered w-full pl-10 bg-base-100 focus:ring-2 focus:ring-primary/20 transition-all"
-          />
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
+    <!-- Controls Section - Filters, Search, View Toggle, and Add Task -->
+    <div class="bg-gradient-to-r from-base-100 to-base-50 border border-base-300 rounded-lg shadow-sm p-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <!-- Left: Search and Filters -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
+          <!-- Smart Search -->
+          <div class="relative flex-1 max-w-md">
+            <input 
+              v-model="searchQuery"
+              @input="$emit('search', searchQuery)"
+              type="text" 
+              placeholder="Search tasks, projects, or assignees..."
+              class="input input-sm input-bordered w-full pl-10 bg-base-100 focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          
+          <!-- Filters Row -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Status Filter -->
+            <select 
+              v-model="selectedStatus"
+              @change="$emit('statusFilter', selectedStatus)"
+              class="select select-sm select-bordered bg-base-100 text-sm min-w-28"
+            >
+              <option value="">All Status</option>
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+            
+            <!-- Priority Filter -->
+            <select 
+              v-model="selectedPriority"
+              @change="$emit('priorityFilter', selectedPriority)"
+              class="select select-sm select-bordered bg-base-100 text-sm min-w-28"
+            >
+              <option value="">All Priority</option>
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+              <option value="URGENT">Urgent</option>
+            </select>
+            
+            <!-- Quick Filters -->
+            <div class="flex items-center gap-1">
+              <button 
+                @click="$emit('quickFilter', 'myTasks', !activeFilters.myTasks)"
+                :class="['btn btn-xs', activeFilters.myTasks ? 'btn-primary' : 'btn-ghost']"
+              >
+                Mine
+              </button>
+              <button 
+                @click="$emit('quickFilter', 'overdue', !activeFilters.overdue)"
+                :class="['btn btn-xs', activeFilters.overdue ? 'btn-error' : 'btn-ghost']"
+              >
+                Overdue
+              </button>
+            </div>
+            
+            <!-- Clear Filters -->
+            <button 
+              v-if="hasActiveFilters"
+              @click="$emit('clearFilters')"
+              class="btn btn-ghost btn-xs text-base-content/60 hover:text-base-content"
+            >
+              Clear All
+            </button>
+          </div>
         </div>
         
-        <!-- Contextual Filters -->
-        <div class="flex items-center gap-2">
-          <!-- Status Filter -->
-          <select 
-            v-model="selectedStatus"
-            @change="$emit('statusFilter', selectedStatus)"
-            class="select select-sm select-bordered bg-base-100 text-sm min-w-24"
-          >
-            <option value="">All Status</option>
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
-          </select>
-          
-          <!-- Priority Filter -->
-          <select 
-            v-model="selectedPriority"
-            @change="$emit('priorityFilter', selectedPriority)"
-            class="select select-sm select-bordered bg-base-100 text-sm min-w-24"
-          >
-            <option value="">All Priority</option>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="urgent">Urgent</option>
-          </select>
-          
-          <!-- Quick Filters -->
-          <div class="flex items-center gap-1 ml-2">
+        <!-- Right: Actions and View Controls -->
+        <div class="flex items-center gap-3">
+          <!-- View Toggle -->
+          <div class="join bg-base-100 border border-base-300">
             <button 
-              @click="$emit('quickFilter', 'myTasks', !activeFilters.myTasks)"
-              :class="['btn btn-xs', activeFilters.myTasks ? 'btn-primary' : 'btn-ghost']"
+              @click="$emit('viewMode', 'table')"
+              :class="['btn btn-sm join-item gap-2', viewMode === 'table' ? 'btn-primary' : 'btn-ghost']"
+              title="Table view"
             >
-              Mine
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-7 8H8m8 4H8m8-8h6m-6 4h6"></path>
+              </svg>
+              <span class="hidden sm:inline">Table</span>
             </button>
             <button 
-              @click="$emit('quickFilter', 'overdue', !activeFilters.overdue)"
-              :class="['btn btn-xs', activeFilters.overdue ? 'btn-error' : 'btn-ghost']"
+              @click="$emit('viewMode', 'kanban')"
+              :class="['btn btn-sm join-item gap-2', viewMode === 'kanban' ? 'btn-primary' : 'btn-ghost']"
+              title="Kanban board view"
             >
-              Overdue
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              <span class="hidden sm:inline">Board</span>
             </button>
           </div>
           
-          <!-- Clear Filters -->
+          <!-- Primary Add Task Button - Now positioned near table -->
           <button 
-            v-if="hasActiveFilters"
-            @click="$emit('clearFilters')"
-            class="btn btn-ghost btn-xs text-base-content/60 hover:text-base-content"
-          >
-            Clear
-          </button>
-        </div>
-      </div>
-      
-      <!-- Right: View Controls -->
-      <div class="flex items-center gap-3">
-        <!-- View Toggle -->
-        <div class="join bg-base-100 border border-base-300">
-          <button 
-            @click="$emit('viewMode', 'table')"
-            :class="['btn btn-sm join-item gap-2', viewMode === 'table' ? 'btn-primary' : 'btn-ghost']"
+            @click="$emit('addTask')"
+            class="btn btn-primary gap-2 shadow-sm hover:shadow-md transition-all"
+            :disabled="!canCreateTasks"
+            title="Create a new task"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-7 8H8m8 4H8m8-8h6m-6 4h6"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
-            <span class="hidden sm:inline">Table</span>
-          </button>
-          <button 
-            @click="$emit('viewMode', 'kanban')"
-            :class="['btn btn-sm join-item gap-2', viewMode === 'kanban' ? 'btn-primary' : 'btn-ghost']"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-            <span class="hidden sm:inline">Board</span>
+            <span class="hidden sm:inline">Add Task</span>
+            <span class="sm:hidden">Add</span>
           </button>
         </div>
       </div>

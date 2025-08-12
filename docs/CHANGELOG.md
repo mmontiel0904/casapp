@@ -1,4 +1,16 @@
 # Development Changelog
+## [2025-08-11] - Enhanced Feedback System & UI/UX Improvements
+
+### 🧠 Enhanced Feedback System
+- **useFeedback.ts & useApolloFeedback.ts**: Implemented intelligent error categorization for GraphQL and network errors. Validation, permission, network, rate limit, and server errors now show user-friendly, context-aware messages. See `ENHANCED_FEEDBACK_SYSTEM.md` for details and usage examples.
+- **ProjectCreateModal.vue**: Migrated to use the new Apollo feedback system for project creation, providing smarter error handling and improved user experience.
+
+### 🛠️ Task Management UI/UX Updates
+- **TaskToolbar.vue**: Redesigned toolbar layout for clarity and responsiveness. Added new filter controls, improved view toggling, and repositioned the add task button for better accessibility.
+
+### 📝 Documentation
+- **ENHANCED_FEEDBACK_SYSTEM.md**: Added documentation describing the new feedback system, error categories, and integration patterns for developers.
+
 
 
 ## [2025-08-11] - UI/UX Enhancements, Activity Logging, and Enum Migration

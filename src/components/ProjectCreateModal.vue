@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useCreateProjectMutation } from '../generated/graphql'
-import { useFeedback } from '../composables/useFeedback'
+import { useApolloFeedback } from '../composables/useApolloFeedback'
 import type { CreateProjectInput } from '../generated/graphql'
 
 // Props & Emits
@@ -138,10 +138,10 @@ const modal = ref<HTMLDialogElement>()
 const nameInput = ref<HTMLInputElement>()
 
 // GraphQL Mutation
-const { mutate: createProject, error: createError } = useCreateProjectMutation()
+const { mutate: createProject, loading: createLoading, error: createError } = useCreateProjectMutation()
 
-// Feedback system
-const { success: showSuccess, error: showError } = useFeedback()
+// Enhanced feedback system with intelligent error handling
+const feedback = useApolloFeedback()
 
 // Form state
 const form = ref({
@@ -215,7 +215,7 @@ const closeModal = () => {
   }
 }
 
-// Form submission
+// Form submission with enhanced feedback
 const handleSubmit = async () => {
   if (!form.value.name.trim() || isSubmitting.value) {
     return
@@ -234,19 +234,19 @@ const handleSubmit = async () => {
     const newProject = result?.data?.createProject
 
     if (newProject) {
-      showSuccess('Project Created', `"${newProject.name}" has been created successfully`)
+      feedback.success('Project Created', `"${newProject.name}" has been created successfully`)
       emit('projectCreated', newProject)
       
       // Reset submitting state before closing modal
       isSubmitting.value = false
       closeModal()
     } else {
-      showError('Project Creation Failed', 'Unable to create project. Please try again.')
+      feedback.error('Creation Failed', 'Unable to create project. Please try again.')
       isSubmitting.value = false
     }
   } catch (error) {
     console.error('Project creation failed:', error)
-    showError('Project Creation Failed', 'An error occurred while creating the project.')
+    // The Apollo feedback system will handle the error categorization automatically
     isSubmitting.value = false
   }
 }
@@ -258,12 +258,11 @@ watch(() => props.isOpen, (isOpen) => {
   }
 })
 
-// Watch for GraphQL errors
-watch(createError, (error) => {
-  if (error) {
-    console.error('GraphQL error:', error)
-    showError('Project Creation Failed', 'Unable to create project. Please check your permissions.')
-  }
+// Set up automatic error handling with intelligent categorization
+feedback.handleMutation(createLoading, createError, undefined, {
+  successTitle: 'Project Created',
+  errorTitle: 'Project Creation Failed',
+  showSuccess: false // We handle success manually to get project data
 })
 
 // Public methods
