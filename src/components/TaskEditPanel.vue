@@ -332,7 +332,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useTaskWithActivitiesQuery, TaskPriority, TaskStatus, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, EntityType, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { type TaskWithPartialUser } from '../composables/useTasks'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 
@@ -358,6 +358,7 @@ const emit = defineEmits<{
 // Apollo mutations
 const { mutate: updateTask, loading: updateLoading, error: updateError } = useUpdateTaskMutation()
 const { mutate: deleteTask, loading: deleteLoading, error: deleteError } = useDeleteTaskMutation()
+const { mutate: addComment, loading: addCommentLoading } = useAddCommentMutation()
 const feedback = useApolloFeedback()
 
 // Data fetching
@@ -369,7 +370,7 @@ const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery(
 const { result: usersResult, loading: usersLoading } = useAllUsersQuery()
 
 // Task activities data
-const { result: taskActivitiesResult, loading: activitiesLoading /*, refetch: refetchActivities*/ } = useTaskWithActivitiesQuery(
+const { result: taskActivitiesResult, loading: activitiesLoading, refetch: refetchActivities } = useTaskWithActivitiesQuery(
   computed(() => ({ 
     taskId: props.task?.id || '', 
     activityLimit: 20 
@@ -483,27 +484,34 @@ const getUserName = (user: any): string => {
 
 // Comment input state
 const newComment = ref('')
-const isSubmittingComment = ref(false)
+const isSubmittingComment = computed(() => addCommentLoading.value)
 
 // Handle adding a comment
 const handleAddComment = async () => {
   if (!newComment.value.trim() || isSubmittingComment.value || !props.task?.id) return
   
   try {
-    isSubmittingComment.value = true
-    // TODO: Implement ADD_COMMENT_MUTATION when it's ready
-    console.log('Adding comment:', newComment.value, 'to task:', props.task.id)
+    const result = await addComment({
+      input: {
+        content: newComment.value.trim(),
+        entityId: props.task.id,
+        entityType: EntityType.Task,
+        mentions: [] // Add mentions functionality later if needed
+      }
+    })
     
-    // Clear the input after successful submission
-    newComment.value = ''
-    
-    // Refetch activities to show the new comment
-    // Uncomment when implementing: await refetchActivities()
+    if (result?.data?.addComment) {
+      // Clear the input after successful submission
+      newComment.value = ''
+      
+      // Refetch activities to show the new comment
+      await refetchActivities()
+      
+      feedback.success('Comment added successfully', 'Your comment has been posted')
+    }
   } catch (error) {
     console.error('Error adding comment:', error)
-    // You could show an error message here
-  } finally {
-    isSubmittingComment.value = false
+    feedback.error('Failed to add comment', 'Please try again')
   }
 }
 

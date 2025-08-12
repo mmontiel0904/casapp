@@ -23,6 +23,13 @@ type Activity {
   metadataJson: String
 }
 
+input AddCommentInput {
+  content: String!
+  entityId: UUID!
+  entityType: EntityType!
+  mentions: [UUID!]
+}
+
 input AddProjectMemberInput {
   projectId: UUID!
   role: String!
@@ -99,6 +106,13 @@ The input/output is a string in RFC3339 format.
 """
 scalar DateTime
 
+enum EntityType {
+  PROJECT
+  SETTINGS
+  TASK
+  USER
+}
+
 input GrantUserPermissionInput {
   permissionId: UUID!
   userId: UUID!
@@ -135,6 +149,7 @@ type MessageResponse {
 
 type MutationRoot {
   acceptInvitation(input: AcceptInvitationInput!): AuthPayload!
+  addComment(input: AddCommentInput!): Activity!
   addProjectMember(input: AddProjectMemberInput!): MessageResponse!
   adminResetUserPassword(input: AdminResetUserPasswordInput!): MessageResponse!
   assignPermissionToRole(input: AssignPermissionToRoleInput!): MessageResponse!
@@ -208,6 +223,7 @@ type ProjectMember {
 }
 
 type QueryRoot {
+  activities(entityId: UUID!, entityType: EntityType!, limit: Int, offset: Int): [Activity!]!
   allPermissions(resourceId: UUID): [Permission!]!
   allResources: [Resource!]!
   allRoles: [Role!]!

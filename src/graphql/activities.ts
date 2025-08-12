@@ -120,6 +120,8 @@ export const ADD_COMMENT_MUTATION = gql`
       entityId
       entityType
       actorId
+      changesJson
+      metadataJson
       createdAt
       actor {
         id
@@ -132,12 +134,12 @@ export const ADD_COMMENT_MUTATION = gql`
 `
 
 // ========================================
-// GENERAL ACTIVITY QUERIES (for future use)
+// GENERAL ACTIVITY QUERIES
 // ========================================
 
 export const GET_ACTIVITIES_QUERY = gql`
-  query GetActivities($entityType: EntityType!, $entityId: UUID!, $limit: Int, $offset: Int) {
-    activities(entityType: $entityType, entityId: $entityId, limit: $limit, offset: $offset) {
+  query GetActivities($entityId: UUID!, $entityType: EntityType!, $limit: Int, $offset: Int) {
+    activities(entityId: $entityId, entityType: $entityType, limit: $limit, offset: $offset) {
       id
       actionType
       description

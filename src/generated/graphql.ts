@@ -55,6 +55,13 @@ export type Activity = {
   metadataJson?: Maybe<Scalars['String']['output']>;
 };
 
+export type AddCommentInput = {
+  content: Scalars['String']['input'];
+  entityId: Scalars['UUID']['input'];
+  entityType: EntityType;
+  mentions?: InputMaybe<Array<Scalars['UUID']['input']>>;
+};
+
 export type AddProjectMemberInput = {
   projectId: Scalars['UUID']['input'];
   role: Scalars['String']['input'];
@@ -124,6 +131,13 @@ export type CreateTaskInput = {
   recurrenceType?: InputMaybe<RecurrenceType>;
 };
 
+export enum EntityType {
+  Project = 'PROJECT',
+  Settings = 'SETTINGS',
+  Task = 'TASK',
+  User = 'USER'
+}
+
 export type GrantUserPermissionInput = {
   permissionId: Scalars['UUID']['input'];
   userId: Scalars['UUID']['input'];
@@ -160,6 +174,7 @@ export type MessageResponse = {
 
 export type MutationRoot = {
   acceptInvitation: AuthPayload;
+  addComment: Activity;
   addProjectMember: MessageResponse;
   adminResetUserPassword: MessageResponse;
   assignPermissionToRole: MessageResponse;
@@ -201,6 +216,11 @@ export type MutationRoot = {
 
 export type MutationRootAcceptInvitationArgs = {
   input: AcceptInvitationInput;
+};
+
+
+export type MutationRootAddCommentArgs = {
+  input: AddCommentInput;
 };
 
 
@@ -421,6 +441,7 @@ export type ProjectMember = {
 };
 
 export type QueryRoot = {
+  activities: Array<Activity>;
   allPermissions: Array<Permission>;
   allResources: Array<Resource>;
   allRoles: Array<Role>;
@@ -443,6 +464,14 @@ export type QueryRoot = {
   userDirectPermissions: Array<Permission>;
   userPermissions: Array<Scalars['String']['output']>;
   usersByRole: Array<UserWithRole>;
+};
+
+
+export type QueryRootActivitiesArgs = {
+  entityId: Scalars['UUID']['input'];
+  entityType: EntityType;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -754,6 +783,23 @@ export type TaskWithActivitiesQueryVariables = Exact<{
 
 
 export type TaskWithActivitiesQuery = { task?: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, createdAt: any, updatedAt: any, activityCount: number, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, project?: { id: any, name: string, description?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null, activities: Array<{ id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }>, recurringInstances: Array<{ id: any, name: string, status: TaskStatus, dueDate?: any | null, nextDueDate?: any | null }> } | null };
+
+export type AddCommentMutationVariables = Exact<{
+  input: AddCommentInput;
+}>;
+
+
+export type AddCommentMutation = { addComment: { id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null } };
+
+export type GetActivitiesQueryVariables = Exact<{
+  entityId: Scalars['UUID']['input'];
+  entityType: EntityType;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetActivitiesQuery = { activities: Array<{ id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
 
 export type LoginMutationVariables = Exact<{
   email: Scalars['String']['input'];
@@ -1340,6 +1386,101 @@ export function useTaskWithActivitiesLazyQuery(variables?: TaskWithActivitiesQue
   return VueApolloComposable.useLazyQuery<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>(TaskWithActivitiesDocument, variables, options);
 }
 export type TaskWithActivitiesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskWithActivitiesQuery, TaskWithActivitiesQueryVariables>;
+export const AddCommentDocument = gql`
+    mutation AddComment($input: AddCommentInput!) {
+  addComment(input: $input) {
+    id
+    actionType
+    description
+    entityId
+    entityType
+    actorId
+    changesJson
+    metadataJson
+    createdAt
+    actor {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useAddCommentMutation__
+ *
+ * To run a mutation, you first call `useAddCommentMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useAddCommentMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useAddCommentMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddCommentMutation(options: VueApolloComposable.UseMutationOptions<AddCommentMutation, AddCommentMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<AddCommentMutation, AddCommentMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<AddCommentMutation, AddCommentMutationVariables>(AddCommentDocument, options);
+}
+export type AddCommentMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<AddCommentMutation, AddCommentMutationVariables>;
+export const GetActivitiesDocument = gql`
+    query GetActivities($entityId: UUID!, $entityType: EntityType!, $limit: Int, $offset: Int) {
+  activities(
+    entityId: $entityId
+    entityType: $entityType
+    limit: $limit
+    offset: $offset
+  ) {
+    id
+    actionType
+    description
+    entityId
+    entityType
+    actorId
+    changesJson
+    metadataJson
+    createdAt
+    actor {
+      id
+      email
+      firstName
+      lastName
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetActivitiesQuery__
+ *
+ * To run a query within a Vue component, call `useGetActivitiesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetActivitiesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useGetActivitiesQuery({
+ *   entityId: // value for 'entityId'
+ *   entityType: // value for 'entityType'
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useGetActivitiesQuery(variables: GetActivitiesQueryVariables | VueCompositionApi.Ref<GetActivitiesQueryVariables> | ReactiveFunction<GetActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<GetActivitiesQuery, GetActivitiesQueryVariables>(GetActivitiesDocument, variables, options);
+}
+export function useGetActivitiesLazyQuery(variables?: GetActivitiesQueryVariables | VueCompositionApi.Ref<GetActivitiesQueryVariables> | ReactiveFunction<GetActivitiesQueryVariables>, options: VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<GetActivitiesQuery, GetActivitiesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<GetActivitiesQuery, GetActivitiesQueryVariables>(GetActivitiesDocument, variables, options);
+}
+export type GetActivitiesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetActivitiesQuery, GetActivitiesQueryVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(input: {email: $email, password: $password}) {

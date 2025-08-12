@@ -1,43 +1,41 @@
 # Development Changelog
 
-## [2025-08-09] - GraphQL Enum Migration for Task System
 
-### 🛠 Task System GraphQL Enum Migration
+## [2025-08-11] - UI/UX Enhancements, Activity Logging, and Enum Migration
 
-- **projects.ts**: Migrated all task-related queries and mutations to use proper GraphQL enum types (`TaskStatus`, `TaskPriority`, `RecurrenceType`) for parameters and return values. This replaces previous usage of raw strings, ensuring full type safety and IDE autocomplete for all task operations.
-- **Schema Alignment**: All queries and mutations now match the backend schema, leveraging introspected enums for compile-time validation and improved developer experience.
-- **Benefits**:
-  - Full type safety from database to frontend
-  - Compile-time validation of enum values
-  - IDE autocomplete for all enum fields
-  - No string parsing overhead
-  - Database integrity enforced by PostgreSQL
-- **References**: See `FRONTEND_INTEGRATION.md` and `TASK_SYSTEM_INTEGRATION.md` for details on enum usage and migration patterns.
+### 🧩 Task Edit Panel & Activity Log Improvements
 
-### 🚀 Developer Experience Improvements
+- **TaskEditPanel.vue**: Added collapsible sections for improved navigation and clarity. Users can now expand/collapse details, comments, and activity log sections for a cleaner editing experience.
+- **Comment Functionality**: Activity log now supports adding comments directly from the task edit panel, improving collaboration and traceability.
+- **graphql/activities.ts**: Enhanced to support new comment features in the activity log.
+- **tsconfig.app.json**: Updated to support new features and stricter type safety.
 
+### 📱 Mobile Task Management
+
+- **TaskMobileCard.vue**: Introduced a new mobile-optimized card component for tasks, providing a better experience on small screens.
+- **TaskTableRow.vue**: Added for improved table row management and details view.
+- **TaskTableView.vue**: Updated to support mobile card and new row features, including mark complete and view details actions.
+
+### 🛠️ GraphQL Enum Migration & Type Safety
+
+- **projects.ts**: Migrated all task-related queries and mutations to use GraphQL enum types (`TaskStatus`, `TaskPriority`, `RecurrenceType`).
+- **generated/graphql.ts & schema.graphql**: Updated to reflect new enum usage and schema alignment.
 - **TypeScript Types**: All generated types now use enums for task status, priority, and recurrence, improving reliability and reducing runtime errors.
 - **Codegen**: Run `npm run codegen` after schema changes to update types automatically.
 
-## [2025-08-06] - Task Creation System Implementation & Permission System Fixes
+### 📝 Activity Logging for Tasks
 
-### 🛠 TaskTableView Actions Dropdown Improvements
+- **graphql/activities.ts**: Added new queries and types for activity logging, enabling tracking of task changes and comments.
+- **projects.ts**: Updated to support activity logging features.
+- **Documentation**: See `TASK_SYSTEM_INTEGRATION.md` and `FRONTEND_INTEGRATION.md` for migration and logging details.
 
-- **TaskTableView.vue**: Improved the actions dropdown for each task row. Enhanced event handling for edit, assign, and delete actions, ensuring more reliable click behavior and better accessibility. UI/UX of the dropdown and action items refined for consistency with the design system.
+### 🆕 Task Management Workflow & UI Improvements
 
-
-### 🆕 Integrated Task Toolbar, Inline Task Creation, and Table/Board Toggle
-
-- **Added `TaskToolbar.vue`**: Unified toolbar for task management, providing live stats (total, overdue, urgent), search, smart filters, and view toggle (table/kanban) in a single, professional UI. Used in `MyTasksPage.vue`.
-- **MyTasksPage.vue**: Refactored to use the new toolbar, replacing legacy header, stats, and filter components. Now supports toggling inline task creation directly from the toolbar, and switching between table and kanban views with a single control. All task actions and filters are integrated into the toolbar.
-- **TaskTableView.vue**: Enhanced to support an inline creator row, context-aware columns (shows "Assignee" or "Created By" as appropriate), and emits events for inline creation and cancellation. Now receives context and inline creator props for flexible usage.
-- **InlineTaskCreator.vue**: New component for fast, in-table task creation with keyboard navigation, validation, and feedback. Used as a row in the table view for seamless quick entry.
-- **UX Improvements**: Streamlined task management workflow—users can add tasks inline or via modal, filter/search tasks, and switch views without leaving the page. All controls are accessible, keyboard-friendly, and match the app's design system.
-
-### ✨ Inline Task Creation in Table View
-
-- **Added `InlineTaskCreator.vue`**: Enables fast, in-table task creation with full DaisyUI/Material Design 3 styling, validation, and feedback.
-- **TaskTableView.vue**: Now supports an inline creator row, context-aware columns (shows "Assignee" or "Created By" as appropriate), and emits events for inline creation and cancellation.
+- **InlineTaskCreator.vue**: Enables fast, in-table task creation with full DaisyUI/Material Design 3 styling, validation, and feedback.
+- **TaskToolbar.vue**: Unified toolbar for task management, providing live stats, search, smart filters, and view toggle (table/kanban).
+- **MyTasksPage.vue**: Refactored to use the new toolbar and support inline task creation and view toggling.
+- **TaskTableView.vue**: Enhanced to support inline creator row, context-aware columns, and improved event handling for edit, assign, and delete actions.
+- **UX Improvements**: Streamlined workflow—users can add tasks inline or via modal, filter/search tasks, and switch views without leaving the page. All controls are accessible, keyboard-friendly, and match the app's design system.
 - **MyTasksPage.vue**: Users can toggle the inline creator, add tasks directly from the table, and see immediate updates. The page handles all new events and state for inline creation.
 - **UX Improvements**: Streamlined quick entry for tasks, with keyboard navigation, default values, and error handling. Matches the design and accessibility standards of the rest of the app.
 
