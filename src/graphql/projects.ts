@@ -169,6 +169,7 @@ export const MY_ASSIGNED_TASKS_QUERY = gql`
       name
       description
       projectId
+      assigneeId
       status
       priority
       dueDate
@@ -180,6 +181,12 @@ export const MY_ASSIGNED_TASKS_QUERY = gql`
       activityCount
       createdAt
       updatedAt
+      assignee {
+        id
+        email
+        firstName
+        lastName
+      }
       project {
         id
         name

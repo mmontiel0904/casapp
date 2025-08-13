@@ -10,18 +10,17 @@
     
     <!-- Side Panel -->
     <div class="absolute right-0 top-0 h-full w-full max-w-2xl bg-base-100 shadow-2xl transform transition-transform ease-in-out duration-300 flex flex-col">
-      <!-- Panel Header -->
-      <div class="flex items-center justify-between p-6 border-b border-base-300 bg-gradient-to-r from-base-100 to-base-50">
-        <div class="flex items-center gap-4">
-          <div class="p-2 bg-primary/10 rounded-lg">
-            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-          </div>
-          <div>
-            <h2 class="text-xl font-semibold text-base-content">Edit Task</h2>
-            <p class="text-sm text-base-content/60">Update task details and status</p>
-          </div>
+      <!-- Panel Header with Editable Task Name -->
+      <div class="flex items-center justify-between p-6 bg-base-100">
+        <div class="flex-1 mr-4">
+          <input 
+            v-model="form.name"
+            type="text"
+            class="input input-ghost text-xl font-semibold text-base-content w-full focus:input-bordered focus:bg-base-50 hover:bg-base-100/50 placeholder:text-base-content/40 transition-all duration-200"
+            placeholder="Task name"
+            maxlength="255"
+            @blur="handleTaskNameBlur"
+          />
         </div>
         
         <button 
@@ -38,8 +37,8 @@
       <div class="flex-1 overflow-y-auto p-6 space-y-6">
           
           <!-- Task Information -->
-          <div class="card bg-base-50 border border-base-300">
-            <div class="card-body p-4">
+          <div class="bg-base-50 rounded-lg">
+            <div class="p-4">
               <!-- Collapsible Header -->
               <div 
                 class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
@@ -67,26 +66,14 @@
                 v-show="taskInfoExpanded"
                 class="space-y-4 mt-4 transition-all duration-200"
               >
+                <!-- Status and Priority -->
                 <div class="flex flex-col gap-4 md:flex-row md:gap-6">
-                  <!-- Task Name -->
-                  <div class="w-full">
-                    <div class="form-control w-full">
-                      <input 
-                        v-model="form.name"
-                        type="text"
-                        class="input input-bordered input-lg w-full placeholder:text-base-content/60 focus:ring-2 focus:ring-primary/20"
-                        placeholder="Task name*"
-                        maxlength="255"
-                        required
-                      />
-                    </div>
-                  </div>
                   <!-- Status -->
                   <div class="w-full md:w-auto md:min-w-48">
                     <div class="form-control w-full">
                       <select 
                         v-model="form.status"
-                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                        class="select select-ghost select-lg w-full bg-base-100 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
                       >
                         <option v-for="status in statusOptions" :key="status.value" :value="status.value">
                           {{ status.label }}
@@ -94,28 +81,12 @@
                       </select>
                     </div>
                   </div>
-                </div>
-                
-                <div class="flex flex-col gap-4 md:flex-row md:gap-6">
-                  <!-- Description -->
-                  <div class="w-full">
-                    <div class="form-control w-full">
-                      <textarea 
-                        v-model="form.description"
-                        class="textarea textarea-bordered textarea-lg w-full placeholder:text-base-content/60 focus:ring-2 focus:ring-primary/20 resize-none"
-                        placeholder="Description"
-                        rows="3"
-                        maxlength="1000"
-                      ></textarea>
-                      <span class="text-xs text-base-content/60 mt-1">{{ form.description?.length || 0 }}/1000</span>
-                    </div>
-                  </div>
                   <!-- Priority -->
                   <div class="w-full md:w-auto md:min-w-48">
                     <div class="form-control w-full">
                       <select 
                         v-model="form.priority"
-                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                        class="select select-ghost select-lg w-full bg-base-100 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
                       >
                         <option v-for="priority in priorityOptions" :key="priority.value" :value="priority.value">
                           {{ priority.label }}
@@ -124,13 +95,30 @@
                     </div>
                   </div>
                 </div>
+                
+                <!-- Description -->
+                <div class="w-full">
+                  <div class="form-control w-full">
+                    <textarea 
+                      v-model="form.description"
+                      class="textarea textarea-ghost textarea-lg w-full bg-base-100 placeholder:text-base-content/60 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200 resize-none"
+                      placeholder="Description"
+                      rows="3"
+                      maxlength="1000"
+                    ></textarea>
+                    <span class="text-xs text-base-content/60 mt-1">{{ form.description?.length || 0 }}/1000</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
           
+          <!-- Section Divider -->
+          <div v-if="taskInfoExpanded || assignmentExpanded" class="border-t border-dotted border-base-300 my-4"></div>
+          
           <!-- Assignment & Scheduling -->
-          <div class="card bg-base-50 border border-base-300">
-            <div class="card-body p-4">
+          <div class="bg-base-50 rounded-lg">
+            <div class="p-4">
               <!-- Collapsible Header -->
               <div 
                 class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
@@ -164,7 +152,7 @@
                     <div class="form-control w-full">
                       <select 
                         v-model="form.assigneeId"
-                        class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                        class="select select-ghost select-lg w-full bg-base-100 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
                         :disabled="usersLoading"
                       >
                         <option value="">Unassigned</option>
@@ -180,7 +168,7 @@
                       <input 
                         v-model="form.dueDate"
                         type="date"
-                        class="input input-bordered input-lg w-full focus:ring-2 focus:ring-primary/20"
+                        class="input input-ghost input-lg w-full bg-base-100 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
                         :min="todayDate"
                       />
                     </div>
@@ -190,7 +178,7 @@
                 <div v-if="showProject" class="form-control w-full">
                   <select 
                     v-model="form.projectId"
-                    class="select select-bordered select-lg w-full focus:ring-2 focus:ring-primary/20"
+                    class="select select-ghost select-lg w-full bg-base-100 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
                     :disabled="projectsLoading"
                     required
                   >
@@ -204,9 +192,12 @@
             </div>
           </div>
           
+          <!-- Section Divider -->
+          <div v-if="assignmentExpanded || activityExpanded" class="border-t border-dotted border-base-300 my-4"></div>
+          
           <!-- Activity Log -->
-          <div class="card bg-base-50 border border-base-300">
-            <div class="card-body p-4">
+          <div class="bg-base-50 rounded-lg">
+            <div class="p-4">
               <!-- Collapsible Header -->
               <div 
                 class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
@@ -219,6 +210,17 @@
                   <span class="font-semibold text-base">Activity Log</span>
                   <span class="badge badge-sm">{{ taskActivityCount }}</span>
                   <div v-if="isLoadingActivities" class="loading loading-spinner loading-sm"></div>
+                  <!-- Comments Filter Toggle -->
+                  <div class="form-control">
+                    <label class="label cursor-pointer gap-2 py-0">
+                      <span class="label-text text-xs text-base-content/70">Comments only</span>
+                      <input 
+                        v-model="showOnlyComments" 
+                        type="checkbox" 
+                        class="toggle toggle-xs toggle-accent" 
+                      />
+                    </label>
+                  </div>
                 </div>
                 <svg 
                   class="w-5 h-5 text-base-content/60 transition-transform duration-200"
@@ -237,53 +239,141 @@
                 class="space-y-4 mt-4 transition-all duration-200"
               >
                 <!-- Activity Log -->
-                <div class="max-h-64 overflow-y-auto space-y-3">
+                <div class="max-h-64 overflow-y-auto space-y-1">
                   <div v-if="isLoadingActivities" class="flex justify-center py-4">
-                    <div class="loading loading-spinner loading-md"></div>
+                    <div class="loading loading-spinner loading-sm text-primary"></div>
                   </div>
-                  <div v-else-if="taskActivities.length === 0" class="text-center py-4 text-base-content/60">
-                    No activity yet
+                  <div v-else-if="taskActivities.length === 0" class="text-center py-6 text-base-content/60">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-base-content/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                    </svg>
+                    <p class="text-sm">No activity yet</p>
                   </div>
-                  <div v-else v-for="activity in taskActivities" :key="activity.id" class="chat chat-start">
-                    <div class="chat-image avatar">
-                      <div class="w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <span class="text-xs font-bold text-primary">{{ getUserInitials(activity.actor) }}</span>
+                  <div v-else v-for="activity in taskActivities" :key="activity.id" class="group">
+                    <!-- Compact Activity Item -->
+                    <div class="flex px-2 py-1.5 rounded hover:bg-base-100 transition-colors duration-150" :class="{
+                      'flex-row-reverse gap-2': isCurrentUserComment(activity),
+                      'gap-2': !isCurrentUserComment(activity),
+                      'bg-accent/10 border-r-4 border-accent/30': isCurrentUserComment(activity),
+                      'bg-accent/10 border-l-4 border-accent/30': activity.actionType === 'comment' && !isCurrentUserComment(activity),
+                      'bg-base-100/50': activity.actionType !== 'comment'
+                    }">
+                      <!-- Compact Avatar -->
+                      <div class="flex-shrink-0 mt-0.5">
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center" :class="{
+                          'bg-accent/20': activity.actionType === 'comment',
+                          'bg-primary/15': activity.actionType !== 'comment'
+                        }">
+                          <span class="text-xs font-medium" :class="{
+                            'text-accent': activity.actionType === 'comment',
+                            'text-primary': activity.actionType !== 'comment'
+                          }">{{ getUserInitials(activity.actor) }}</span>
+                        </div>
                       </div>
-                    </div>
-                    <div class="chat-header text-xs text-base-content/60 mb-1">
-                      {{ getUserName(activity.actor) }}
-                      <time class="text-xs opacity-50 ml-2">{{ formatDate(activity.createdAt) }}</time>
-                    </div>
-                    <div class="chat-bubble chat-bubble-primary text-sm">
-                      {{ activity.description || activity.actionType || 'Activity performed' }}
-                    </div>
-                    <div v-if="activity.changesJson" class="chat-footer text-xs text-base-content/60 mt-1">
-                      <span class="badge badge-xs badge-outline">{{ activity.changesJson }}</span>
+                      
+                      <!-- Compact Content -->
+                      <div class="flex-1 min-w-0">
+                        <!-- Inline header with user, action, and time -->
+                        <div class="flex items-baseline gap-1 text-xs" :class="{
+                          'flex-row-reverse': isCurrentUserComment(activity)
+                        }">
+                          <span class="font-medium" :class="{
+                            'text-accent': activity.actionType === 'comment',
+                            'text-base-content': activity.actionType !== 'comment'
+                          }">{{ getUserName(activity.actor) }}</span>
+                          <span v-if="getActivityTypeLabel(activity.actionType)" 
+                                class="px-1.5 py-0.5 rounded text-xs font-medium" :class="{
+                                  'bg-accent/15 text-accent': activity.actionType === 'comment',
+                                  'bg-info/10 text-info': activity.actionType !== 'comment'
+                                }">
+                            {{ getActivityTypeLabel(activity.actionType) }}
+                          </span>
+                          <span class="text-base-content/60">{{ formatRelativeTime(activity.createdAt) }}</span>
+                        </div>
+                        
+                        <!-- Activity description in same line or wrapped -->
+                        <div class="mt-0.5 leading-relaxed" :class="{
+                          'text-slate-700 font-serif font-normal bg-accent/5 px-2 py-1 rounded text-sm': activity.actionType === 'comment',
+                          'text-base-content/80 text-xs': activity.actionType !== 'comment',
+                          'text-right': isCurrentUserComment(activity)
+                        }">
+                          {{ activity.description || getDefaultActivityDescription(activity.actionType) }}
+                        </div>
+                        
+                        <!-- Compact metadata display -->
+                        <div v-if="activity.changesJson" class="mt-1">
+                          <div class="flex flex-wrap gap-1 text-xs">
+                            <span v-for="(change, key) in parseJsonMetadata(activity.changesJson)" :key="String(key)" 
+                                  class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-base-200/50 rounded text-xs">
+                              <span class="font-medium text-base-content/70">{{ formatFieldName(String(key)) }}:</span>
+                              <span v-if="change && typeof change === 'object' && change.from !== undefined" 
+                                    class="font-mono text-error/70 line-through">{{ formatFieldValue(change.from) }}</span>
+                              <svg v-if="change && typeof change === 'object' && change.from !== undefined" 
+                                   class="w-2.5 h-2.5 text-base-content/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                              </svg>
+                              <span class="font-mono text-success/80">{{ 
+                                change && typeof change === 'object' && change.to !== undefined 
+                                  ? formatFieldValue(change.to) 
+                                  : formatFieldValue(change) 
+                              }}</span>
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <!-- Expandable metadata for complex data -->
+                        <div v-if="activity.metadataJson && activity.metadataJson !== activity.changesJson" 
+                             class="mt-1">
+                          <details class="text-xs">
+                            <summary class="cursor-pointer text-base-content/60 hover:text-base-content">
+                              Additional details
+                            </summary>
+                            <div class="mt-1 font-mono text-xs text-base-content/70 bg-base-100 rounded border p-1.5 max-h-20 overflow-auto">
+                              {{ formatJsonDisplay(activity.metadataJson) }}
+                            </div>
+                          </details>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <!-- Add Comment Input -->
-                <div class="divider text-sm">Add Comment</div>
-                <div class="flex gap-2">
-                  <input 
-                    v-model="newComment"
-                    type="text"
-                    class="input input-bordered input-sm flex-1 placeholder:text-base-content/60"
-                    placeholder="Add a comment..."
-                    @keyup.enter="handleAddComment"
-                    :disabled="isSubmittingComment"
-                  />
-                  <button 
-                    class="btn btn-primary btn-sm"
-                    @click="handleAddComment"
-                    :disabled="!newComment.trim() || isSubmittingComment"
-                  >
-                    <div v-if="isSubmittingComment" class="loading loading-spinner loading-xs"></div>
-                    <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                    </svg>
-                  </button>
+                <!-- Add Comment Input - Compact -->
+                <div class="mt-4 pt-3 border-t border-base-300/50">
+                  <div class="flex gap-2">
+                    <div class="w-6 h-6 rounded-full bg-primary/15 flex items-center justify-center flex-shrink-0 mt-1">
+                      <span class="text-xs font-medium text-primary">{{ getUserInitials(currentUser) }}</span>
+                    </div>
+                    <div class="flex-1">
+                      <textarea 
+                        v-model="newComment"
+                        class="textarea textarea-ghost textarea-sm w-full bg-base-100 resize-none placeholder:text-base-content/60 focus:bg-base-50 hover:bg-base-200/30 hover:border-primary/40 focus:outline-none border-b-2 border-transparent focus:border-primary transition-all duration-200"
+                        :class="{
+                          'textarea-disabled': isSubmittingComment,
+                          'border-primary/40': newComment.trim()
+                        }"
+                        placeholder="Add a comment... (Ctrl+Enter to send)"
+                        @keydown.ctrl.enter="handleAddComment"
+                        @keydown.meta.enter="handleAddComment"
+                        :disabled="isSubmittingComment"
+                        rows="2"
+                      ></textarea>
+                      <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-base-content/50">{{ newComment.length }}/500</span>
+                        <button 
+                          class="btn btn-primary btn-sm"
+                          @click="handleAddComment"
+                          :disabled="!newComment.trim() || isSubmittingComment"
+                        >
+                          <div v-if="isSubmittingComment" class="loading loading-spinner loading-xs"></div>
+                          <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                          </svg>
+                          <span class="ml-1">{{ isSubmittingComment ? 'Sending...' : 'Send' }}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -291,7 +381,7 @@
         </div>
         
         <!-- Panel Footer - Actions -->
-        <div class="flex items-center justify-between p-6 border-t border-base-300 bg-base-50">
+        <div class="flex items-center justify-between p-6 bg-base-50">
           <div class="flex gap-3">
             <button 
               @click="handleDelete"
@@ -332,9 +422,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, EntityType, type UpdateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useAssignTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, EntityType, type UpdateTaskInput, type AssignTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { type TaskWithPartialUser } from '../composables/useTasks'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
+import { useAuth } from '../composables/useAuth'
 
 // Props & Emits
 interface Props {
@@ -356,10 +447,14 @@ const emit = defineEmits<{
 }>()
 
 // Apollo mutations
-const { mutate: updateTask, loading: updateLoading, error: updateError } = useUpdateTaskMutation()
+const { mutate: updateTask, loading: updateLoading } = useUpdateTaskMutation()
+const { mutate: assignTask, loading: assignLoading } = useAssignTaskMutation()
 const { mutate: deleteTask, loading: deleteLoading, error: deleteError } = useDeleteTaskMutation()
 const { mutate: addComment, loading: addCommentLoading } = useAddCommentMutation()
 const feedback = useApolloFeedback()
+
+// Auth
+const { currentUser } = useAuth()
 
 // Data fetching
 const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery({
@@ -392,8 +487,18 @@ const availableUsers = computed((): AllUsersQuery['allUsers'] => {
 
 // Real activities from API
 const taskActivities = computed(() => {
-  return taskActivitiesResult.value?.task?.activities || []
+  const activities = taskActivitiesResult.value?.task?.activities || []
+  
+  if (showOnlyComments.value) {
+    return activities.filter(activity => activity.actionType === 'comment')
+  }
+  return activities
 })
+
+// Helper to check if comment is from current user
+const isCurrentUserComment = (activity: any): boolean => {
+  return activity.actionType === 'comment' && activity.actor?.id === currentUser.value?.id
+}
 
 const taskActivityCount = computed(() => {
   return taskActivitiesResult.value?.task?.activityCount || 0
@@ -405,7 +510,7 @@ const todayDate = computed(() => {
   return new Date().toISOString().split('T')[0]
 })
 
-const isSubmitting = computed(() => updateLoading.value || deleteLoading.value)
+const isSubmitting = computed(() => updateLoading.value || assignLoading.value || deleteLoading.value)
 
 // Form state
 const form = ref<{
@@ -426,10 +531,16 @@ const form = ref<{
   dueDate: ''
 })
 
+// Track original form values for partial updates
+const originalForm = ref<typeof form.value | null>(null)
+
 // Expandable sections state
-const taskInfoExpanded = ref(true)
-const assignmentExpanded = ref(true)
+const taskInfoExpanded = ref(false)
+const assignmentExpanded = ref(false)
 const activityExpanded = ref(true)
+
+// Activity log filters
+const showOnlyComments = ref(false)
 
 // Options
 const statusOptions = computed(() => [
@@ -451,16 +562,6 @@ const getUserDisplayName = (user: AllUsersQuery['allUsers'][0]): string => {
   return fullName || user.email
 }
 
-const formatDate = (dateString: string): string => {
-  if (!dateString) return 'N/A'
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
 
 // Helper to get user initials
 const getUserInitials = (user: any): string => {
@@ -480,6 +581,104 @@ const getUserName = (user: any): string => {
   if (!user) return 'Unknown User'
   const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim()
   return fullName || user.email || 'Unknown User'
+}
+
+// Enhanced metadata parsing and formatting functions
+const parseJsonMetadata = (jsonString: string): any => {
+  try {
+    if (!jsonString || jsonString.trim() === '') return {}
+    const parsed = JSON.parse(jsonString)
+    // Ensure we return an object with proper structure
+    if (typeof parsed !== 'object' || parsed === null) return {}
+    return parsed
+  } catch (error) {
+    console.warn('Failed to parse JSON metadata:', error)
+    return {}
+  }
+}
+
+const formatFieldName = (fieldName: string): string => {
+  return fieldName
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .replace(/_/g, ' ') // Replace underscores with spaces
+    .trim()
+}
+
+const formatFieldValue = (value: any): string => {
+  if (value === null || value === undefined) return 'None'
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'string') {
+    // Handle enum values - make them more readable
+    if (value.includes('_')) {
+      return value.split('_').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      ).join(' ')
+    }
+    return value
+  }
+  if (typeof value === 'object') return JSON.stringify(value, null, 2)
+  return String(value)
+}
+
+const formatJsonDisplay = (jsonString: string): string => {
+  try {
+    const parsed = JSON.parse(jsonString)
+    return JSON.stringify(parsed, null, 2)
+  } catch (error) {
+    return jsonString
+  }
+}
+
+const getActivityTypeLabel = (actionType: string): string => {
+  const typeLabels: Record<string, string> = {
+    'create': 'Created',
+    'update': 'Updated',
+    'delete': 'Deleted',
+    'assign': 'Assigned',
+    'comment': 'Comment',
+    'status_change': 'Status Changed',
+    'priority_change': 'Priority Changed',
+    'complete': 'Completed',
+    'reopen': 'Reopened'
+  }
+  
+  return typeLabels[actionType] || actionType
+}
+
+const getDefaultActivityDescription = (actionType: string): string => {
+  const descriptions: Record<string, string> = {
+    'create': 'Created this task',
+    'update': 'Updated task details',
+    'delete': 'Deleted this task',
+    'assign': 'Assigned the task',
+    'comment': 'Added a comment',
+    'status_change': 'Changed task status',
+    'priority_change': 'Changed task priority',
+    'complete': 'Marked task as complete',
+    'reopen': 'Reopened the task'
+  }
+  
+  return descriptions[actionType] || 'Performed an action on this task'
+}
+
+const formatRelativeTime = (dateString: string): string => {
+  if (!dateString) return 'Unknown'
+  
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  
+  if (diffInSeconds < 60) return 'Just now'
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`
+  
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+  })
 }
 
 // Comment input state
@@ -518,7 +717,7 @@ const handleAddComment = async () => {
 // Form management
 const resetForm = () => {
   if (props.task) {
-    form.value = {
+    const formData = {
       name: props.task.name || '',
       description: props.task.description || '',
       status: (props.task.status as TaskStatus) || TaskStatus.Todo,
@@ -527,6 +726,60 @@ const resetForm = () => {
       projectId: props.task.projectId || '',
       dueDate: props.task.dueDate ? new Date(props.task.dueDate).toISOString().split('T')[0] : ''
     }
+    form.value = { ...formData }
+    // Store original values for comparison
+    originalForm.value = { ...formData }
+  }
+}
+
+// Helper to detect which fields have changed
+const getChangedFields = (): UpdateTaskInput => {
+  if (!originalForm.value || !props.task) {
+    return { taskId: props.task?.id || '' }
+  }
+  
+  const changes: UpdateTaskInput = {
+    taskId: props.task.id
+  }
+  
+  // Only include fields that have actually changed
+  if (form.value.name !== originalForm.value.name) {
+    changes.name = form.value.name.trim()
+  }
+  if (form.value.description !== originalForm.value.description) {
+    changes.description = form.value.description || undefined
+  }
+  if (form.value.status !== originalForm.value.status) {
+    changes.status = form.value.status
+  }
+  if (form.value.priority !== originalForm.value.priority) {
+    changes.priority = form.value.priority
+  }
+  if (form.value.dueDate !== originalForm.value.dueDate) {
+    changes.dueDate = form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+  }
+  
+  return changes
+}
+
+// Handle task name blur (auto-save on name change)
+const handleTaskNameBlur = async () => {
+  if (!originalForm.value || !props.task) return
+  
+  // Only save if name changed and is not empty
+  if (form.value.name !== originalForm.value.name && form.value.name.trim()) {
+    const changes: UpdateTaskInput = { taskId: props.task.id, name: form.value.name.trim() }
+    
+    try {
+      await updateTask({ input: changes })
+      // Update original form to reflect the saved change
+      originalForm.value.name = form.value.name
+      feedback.success('Task Updated', 'Task name updated successfully')
+    } catch (error) {
+      // Revert to original name on error
+      form.value.name = originalForm.value.name
+      feedback.error('Update Failed', 'Could not update task name')
+    }
   }
 }
 
@@ -534,28 +787,49 @@ const resetForm = () => {
 const handleSave = async () => {
   if (!props.task || !form.value.name.trim()) return
 
-  const updateInput: UpdateTaskInput = {
-    taskId: props.task.id,
-    name: form.value.name.trim(),
-    description: form.value.description || undefined,
-    status: form.value.status,
-    priority: form.value.priority,
-    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+  const changes = getChangedFields()
+  const assigneeChanged = originalForm.value && form.value.assigneeId !== originalForm.value.assigneeId
+  const projectChanged = originalForm.value && form.value.projectId !== originalForm.value.projectId
+  
+  // Check if any actual fields changed (exclude taskId from count)
+  const changedFields = Object.keys(changes).filter(key => key !== 'taskId')
+  if (changedFields.length === 0 && !assigneeChanged && !projectChanged) {
+    emit('close')
+    return
   }
 
-  feedback.handleMutation(updateLoading, updateError, async () => {
-    emit('saved', updateInput)
-    emit('close')
-  }, {
-    successTitle: 'Task Updated',
-    successMessage: `"${form.value.name}" has been updated successfully`,
-    errorTitle: 'Update Failed'
-  })
-
   try {
-    await updateTask({ input: updateInput })
+    const promises: Promise<any>[] = []
+    
+    // Handle regular task updates
+    if (changedFields.length > 0) {
+      promises.push(updateTask({ input: changes }))
+    }
+    
+    // Handle assignee changes separately
+    if (assigneeChanged) {
+      const assignInput: AssignTaskInput = {
+        taskId: props.task.id,
+        assigneeId: form.value.assigneeId || undefined
+      }
+      promises.push(assignTask({ input: assignInput }))
+    }
+    
+    // Execute all mutations
+    await Promise.all(promises)
+    
+    // Update original form to reflect saved changes
+    if (originalForm.value) {
+      Object.assign(originalForm.value, form.value)
+    }
+    
+    feedback.success('Task Updated', `"${form.value.name}" has been updated successfully`)
+    emit('saved', { ...changes, assigneeId: form.value.assigneeId, projectId: form.value.projectId })
+    emit('close')
+    
   } catch (error) {
     console.error('Task update failed:', error)
+    feedback.error('Update Failed', 'Could not save task changes')
   }
 }
 

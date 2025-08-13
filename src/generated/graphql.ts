@@ -959,7 +959,7 @@ export type MyAssignedTasksQueryVariables = Exact<{
 }>;
 
 
-export type MyAssignedTasksQuery = { myAssignedTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, activityCount: number, createdAt: any, updatedAt: any, project?: { id: any, name: string } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null }> };
+export type MyAssignedTasksQuery = { myAssignedTasks: Array<{ id: any, name: string, description?: string | null, projectId: any, assigneeId?: any | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null, parentTaskId?: any | null, activityCount: number, createdAt: any, updatedAt: any, assignee?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, project?: { id: any, name: string } | null, creator?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null, parentTask?: { id: any, name: string, status: TaskStatus } | null }> };
 
 export type ProjectTaskStatsQueryVariables = Exact<{
   projectId: Scalars['UUID']['input'];
@@ -2257,6 +2257,7 @@ export const MyAssignedTasksDocument = gql`
     name
     description
     projectId
+    assigneeId
     status
     priority
     dueDate
@@ -2268,6 +2269,12 @@ export const MyAssignedTasksDocument = gql`
     activityCount
     createdAt
     updatedAt
+    assignee {
+      id
+      email
+      firstName
+      lastName
+    }
     project {
       id
       name

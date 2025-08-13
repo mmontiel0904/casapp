@@ -1,4 +1,15 @@
 # Development Changelog
+
+## [2025-08-12] - Task Edit Panel, Assignment, and GraphQL Improvements
+### 📝 TaskEditPanel.vue
+1. Refactored panel header to allow inline editing of task name with auto-save on blur.
+2. Improved collapsible sections and UI consistency for task info, assignment, and activity log.
+3. Added comment filter toggle (comments only) and visual distinction for user comments.
+4. Enhanced assignment logic: assignment changes now trigger dedicated mutation and update only when changed.
+5. Improved metadata parsing, field formatting, and relative time display in activity log.
+### 🔗 GraphQL & Type Updates
+generated/graphql.ts, graphql/projects.ts: Updated queries and types to support assignee info for tasks, including assigneeId and assignee details in MyAssignedTasks query.
+
 ## [2025-08-11] - Enhanced Feedback System & UI/UX Improvements
 
 ### 🧠 Enhanced Feedback System
