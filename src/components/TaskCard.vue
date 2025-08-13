@@ -75,6 +75,22 @@
           </svg>
           Overdue
         </div>
+        
+        <!-- Recurrence Badge -->
+        <div v-if="isRecurringTask" class="badge badge-info badge-sm font-sans">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getRecurrenceIcon(task?.recurrenceType)" />
+          </svg>
+          {{ formatRecurrenceType(task?.recurrenceType) }}
+        </div>
+        
+        <!-- Recurring Instance Badge -->
+        <div v-if="isRecurringInstance" class="badge badge-outline badge-sm font-sans">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Instance
+        </div>
       </div>
 
       <!-- Project Info (for My Tasks view) -->
@@ -112,7 +128,7 @@
       </div>
 
       <!-- Progress indicator for In Progress tasks -->
-      <div v-if="task.status === 'in_progress'" class="mt-3">
+      <div v-if="task.status === TaskStatus.InProgress" class="mt-3">
         <div class="w-full bg-base-200 rounded-full h-1">
           <div class="bg-warning h-1 rounded-full" style="width: 60%"></div>
         </div>
@@ -124,6 +140,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { TaskWithPartialUser } from '../composables/useTasks'
+import { useRecurringTasks } from '../composables/useRecurringTasks'
+import { TaskStatus } from '../generated/graphql'
 
 interface Props {
   task: TaskWithPartialUser
@@ -145,13 +163,25 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<Emits>()
 
+// Recurring tasks functionality
+const { 
+  formatRecurrenceType, 
+  getRecurrenceIcon, 
+  isRecurringTask: checkIsRecurringTask, 
+  isRecurringInstance: checkIsRecurringInstance 
+} = useRecurringTasks()
+
 // Computed properties
 const isOverdue = computed(() => {
   if (!props.task.dueDate) return false
   const now = new Date()
   const dueDate = new Date(props.task.dueDate)
-  return dueDate < now && props.task.status !== 'completed'
+  return dueDate < now && props.task.status !== TaskStatus.Completed
 })
+
+// Recurrence computed properties
+const isRecurringTask = computed(() => checkIsRecurringTask(props.task))
+const isRecurringInstance = computed(() => checkIsRecurringInstance(props.task))
 
 // Helper functions following FRONTEND_INTEGRATION.md patterns
 const getStatusDisplayName = (status: string): string => {

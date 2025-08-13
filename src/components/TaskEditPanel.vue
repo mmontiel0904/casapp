@@ -193,7 +193,86 @@
           </div>
           
           <!-- Section Divider -->
-          <div v-if="assignmentExpanded || activityExpanded" class="border-t border-dotted border-base-300 my-4"></div>
+          <div v-if="assignmentExpanded || recurrenceExpanded" class="border-t border-dotted border-base-300 my-4"></div>
+          
+          <!-- Recurrence Management -->
+          <div class="bg-base-50 rounded-lg">
+            <div class="p-4">
+              <!-- Collapsible Header -->
+              <div 
+                class="flex items-center justify-between cursor-pointer hover:bg-base-200/50 -m-2 p-2 rounded-lg transition-colors"
+                @click="recurrenceExpanded = !recurrenceExpanded"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                  </svg>
+                  <span class="font-semibold text-base">Recurrence Settings</span>
+                  <div v-if="isRecurringTask" class="badge badge-info badge-sm">
+                    {{ formatRecurrenceType(task?.recurrenceType) }}
+                  </div>
+                  <div v-if="isRecurringInstance" class="badge badge-outline badge-sm">
+                    Instance
+                  </div>
+                </div>
+                <svg 
+                  class="w-5 h-5 text-base-content/60 transition-transform duration-200"
+                  :class="{ 'rotate-180': recurrenceExpanded }"
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                </svg>
+              </div>
+
+              <!-- Collapsible Content -->
+              <div 
+                v-show="recurrenceExpanded"
+                class="space-y-4 mt-4 transition-all duration-200"
+              >
+                <!-- Warning for Recurring Instances -->
+                <div v-if="isRecurringInstance" class="alert alert-warning">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <span class="text-sm">This is a recurring task instance. Recurrence settings are managed by the parent task.</span>
+                  <button v-if="task?.parentTaskId" @click="$emit('viewParent', task.parentTaskId)" class="btn btn-warning btn-sm">
+                    View Parent Task
+                  </button>
+                </div>
+
+                <!-- Recurrence Settings (for non-instances) -->
+                <div v-if="!isRecurringInstance" class="space-y-4">
+                  <RecurrenceSelector 
+                    v-model:recurrence-type="form.recurrenceType"
+                    v-model:recurrence-day="form.recurrenceDay"
+                  />
+                  
+                  <!-- Recurring Instances Info (if this is a recurring parent) -->
+                  <div v-if="isRecurringTask && recurringInstancesCount > 0" class="bg-info/10 border border-info/20 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                      <svg class="w-4 h-4 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      <span class="font-medium text-info">Recurring Instances</span>
+                      <span class="badge badge-info badge-sm">{{ recurringInstancesCount }}</span>
+                    </div>
+                    <p class="text-sm text-base-content/70 mb-3">
+                      This task has {{ recurringInstancesCount }} instance{{ recurringInstancesCount !== 1 ? 's' : '' }}.
+                      Changes to recurrence settings will affect future instances only.
+                    </p>
+                    <button @click="showInstancesModal = true" class="btn btn-info btn-sm">
+                      Manage Instances
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Section Divider -->
+          <div v-if="recurrenceExpanded || activityExpanded" class="border-t border-dotted border-base-300 my-4"></div>
           
           <!-- Activity Log -->
           <div class="bg-base-50 rounded-lg">
@@ -422,10 +501,12 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useAssignTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, EntityType, type UpdateTaskInput, type AssignTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useAssignTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, RecurrenceType, EntityType, type UpdateTaskInput, type AssignTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { type TaskWithPartialUser } from '../composables/useTasks'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 import { useAuth } from '../composables/useAuth'
+import { useRecurringTasks } from '../composables/useRecurringTasks'
+import RecurrenceSelector from './RecurrenceSelector.vue'
 
 // Props & Emits
 interface Props {
@@ -444,6 +525,7 @@ const emit = defineEmits<{
   close: []
   saved: [task: any]
   deleted: [taskId: string]
+  viewParent: [taskId: string]
 }>()
 
 // Apollo mutations
@@ -455,6 +537,14 @@ const feedback = useApolloFeedback()
 
 // Auth
 const { currentUser } = useAuth()
+
+// Recurring tasks functionality
+const { 
+  formatRecurrenceType, 
+  isRecurringTask: checkIsRecurringTask, 
+  isRecurringInstance: checkIsRecurringInstance,
+  recurringInstancesCount
+} = useRecurringTasks(props.task?.id)
 
 // Data fetching
 const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery({
@@ -521,6 +611,8 @@ const form = ref<{
   assigneeId: string
   projectId: string
   dueDate: string
+  recurrenceType: RecurrenceType
+  recurrenceDay: number | null
 }>({
   name: '',
   description: '',
@@ -528,7 +620,9 @@ const form = ref<{
   priority: TaskPriority.Medium,
   assigneeId: '',
   projectId: '',
-  dueDate: ''
+  dueDate: '',
+  recurrenceType: RecurrenceType.None,
+  recurrenceDay: null
 })
 
 // Track original form values for partial updates
@@ -537,10 +631,18 @@ const originalForm = ref<typeof form.value | null>(null)
 // Expandable sections state
 const taskInfoExpanded = ref(false)
 const assignmentExpanded = ref(false)
+const recurrenceExpanded = ref(false)
 const activityExpanded = ref(true)
 
 // Activity log filters
 const showOnlyComments = ref(false)
+
+// Modal state for instances management
+const showInstancesModal = ref(false)
+
+// Recurrence computed properties
+const isRecurringTask = computed(() => checkIsRecurringTask(props.task))
+const isRecurringInstance = computed(() => checkIsRecurringInstance(props.task))
 
 // Options
 const statusOptions = computed(() => [
@@ -724,7 +826,9 @@ const resetForm = () => {
       priority: (props.task.priority as TaskPriority) || TaskPriority.Medium,
       assigneeId: props.task.assigneeId || '',
       projectId: props.task.projectId || '',
-      dueDate: props.task.dueDate ? new Date(props.task.dueDate).toISOString().split('T')[0] : ''
+      dueDate: props.task.dueDate ? new Date(props.task.dueDate).toISOString().split('T')[0] : '',
+      recurrenceType: (props.task?.recurrenceType as RecurrenceType) || RecurrenceType.None,
+      recurrenceDay: props.task?.recurrenceDay || null
     }
     form.value = { ...formData }
     // Store original values for comparison
@@ -757,6 +861,12 @@ const getChangedFields = (): UpdateTaskInput => {
   }
   if (form.value.dueDate !== originalForm.value.dueDate) {
     changes.dueDate = form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+  }
+  if (form.value.recurrenceType !== originalForm.value.recurrenceType) {
+    changes.recurrenceType = form.value.recurrenceType
+  }
+  if (form.value.recurrenceDay !== originalForm.value.recurrenceDay) {
+    changes.recurrenceDay = form.value.recurrenceDay
   }
   
   return changes

@@ -113,6 +113,22 @@
               <option value="URGENT">Urgent</option>
             </select>
             
+            <!-- Recurrence Filter -->
+            <select 
+              v-model="selectedRecurrence"
+              @change="$emit('recurrenceFilter', selectedRecurrence)"
+              class="select select-sm select-bordered bg-base-100 text-sm min-w-32"
+            >
+              <option value="">All Tasks</option>
+              <option value="NONE">One-time</option>
+              <option value="DAILY">Daily</option>
+              <option value="WEEKDAYS">Weekdays</option>
+              <option value="WEEKLY">Weekly</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="INSTANCES">Instances Only</option>
+              <option value="PARENTS">Parent Tasks Only</option>
+            </select>
+            
             <!-- Quick Filters -->
             <div class="flex items-center gap-1">
               <button 
@@ -222,6 +238,7 @@ defineEmits<{
   search: [query: string]
   statusFilter: [status: string]
   priorityFilter: [priority: string]
+  recurrenceFilter: [recurrence: string]
   quickFilter: [type: string, active: boolean]
   clearFilters: []
   viewMode: [mode: 'table' | 'kanban']
@@ -231,9 +248,10 @@ defineEmits<{
 const searchQuery = ref('')
 const selectedStatus = ref('')
 const selectedPriority = ref('')
+const selectedRecurrence = ref('')
 
 // Computed
 const hasActiveFilters = computed(() => {
-  return searchQuery.value || selectedStatus.value || selectedPriority.value
+  return searchQuery.value || selectedStatus.value || selectedPriority.value || selectedRecurrence.value
 })
 </script>

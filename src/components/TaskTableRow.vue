@@ -30,6 +30,12 @@
       <div v-if="isOverdue(task)" class="badge badge-error badge-xs mt-1">
         Overdue
       </div>
+      <div v-if="isRecurringTask(task)" class="badge badge-info badge-xs mt-1">
+        {{ formatRecurrenceType(task?.recurrenceType) }}
+      </div>
+      <div v-if="isRecurringInstance(task)" class="badge badge-outline badge-xs mt-1">
+        Instance
+      </div>
     </td>
     
     <!-- Assignee (for project tasks) -->
@@ -136,6 +142,7 @@
 
 <script setup lang="ts">
 import type { TaskWithPartialUser } from '../composables/useTasks'
+import { useRecurringTasks } from '../composables/useRecurringTasks'
 
 interface Props {
   task: TaskWithPartialUser
@@ -158,6 +165,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+// Recurring tasks functionality
+const { 
+  formatRecurrenceType, 
+  isRecurringTask, 
+  isRecurringInstance 
+} = useRecurringTasks()
 
 // Event handlers with dropdown closing
 const closeDropdown = () => {

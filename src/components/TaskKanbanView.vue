@@ -21,7 +21,7 @@
                   To Do
                 </div>
                 <div class="badge badge-neutral badge-sm">
-                  {{ tasksByStatus.todo.length }}
+                  {{ tasksByStatus[TaskStatus.Todo].length }}
                 </div>
               </div>
               <button 
@@ -37,7 +37,7 @@
             
             <!-- Tasks -->
             <div class="space-y-3 overflow-y-auto max-h-96">
-              <div v-if="tasksByStatus.todo.length === 0" class="text-center py-8 text-base-content/50">
+              <div v-if="tasksByStatus[TaskStatus.Todo].length === 0" class="text-center py-8 text-base-content/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -45,7 +45,7 @@
               </div>
               
               <TaskCard
-                v-for="task in tasksByStatus.todo"
+                v-for="task in tasksByStatus[TaskStatus.Todo]"
                 :key="task.id"
                 :task="task"
                 :selected="selectedTask?.id === task.id"
@@ -71,7 +71,7 @@
                   In Progress
                 </div>
                 <div class="badge badge-neutral badge-sm">
-                  {{ tasksByStatus.in_progress.length }}
+                  {{ tasksByStatus[TaskStatus.InProgress].length }}
                 </div>
               </div>
               <button 
@@ -87,7 +87,7 @@
             
             <!-- Tasks -->
             <div class="space-y-3 overflow-y-auto max-h-96">
-              <div v-if="tasksByStatus.in_progress.length === 0" class="text-center py-8 text-base-content/50">
+              <div v-if="tasksByStatus[TaskStatus.InProgress].length === 0" class="text-center py-8 text-base-content/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
@@ -95,7 +95,7 @@
               </div>
               
               <TaskCard
-                v-for="task in tasksByStatus.in_progress"
+                v-for="task in tasksByStatus[TaskStatus.InProgress]"
                 :key="task.id"
                 :task="task"
                 :selected="selectedTask?.id === task.id"
@@ -121,7 +121,7 @@
                   Completed
                 </div>
                 <div class="badge badge-neutral badge-sm">
-                  {{ tasksByStatus.completed.length }}
+                  {{ tasksByStatus[TaskStatus.Completed].length }}
                 </div>
               </div>
               <button 
@@ -137,7 +137,7 @@
             
             <!-- Tasks -->
             <div class="space-y-3 overflow-y-auto max-h-96">
-              <div v-if="tasksByStatus.completed.length === 0" class="text-center py-8 text-base-content/50">
+              <div v-if="tasksByStatus[TaskStatus.Completed].length === 0" class="text-center py-8 text-base-content/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
@@ -145,7 +145,7 @@
               </div>
               
               <TaskCard
-                v-for="task in tasksByStatus.completed"
+                v-for="task in tasksByStatus[TaskStatus.Completed]"
                 :key="task.id"
                 :task="task"
                 :selected="selectedTask?.id === task.id"
@@ -171,7 +171,7 @@
                   Cancelled
                 </div>
                 <div class="badge badge-neutral badge-sm">
-                  {{ tasksByStatus.cancelled.length }}
+                  {{ tasksByStatus[TaskStatus.Cancelled].length }}
                 </div>
               </div>
               <button 
@@ -187,7 +187,7 @@
             
             <!-- Tasks -->
             <div class="space-y-3 overflow-y-auto max-h-96">
-              <div v-if="tasksByStatus.cancelled.length === 0" class="text-center py-8 text-base-content/50">
+              <div v-if="tasksByStatus[TaskStatus.Cancelled].length === 0" class="text-center py-8 text-base-content/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -195,7 +195,7 @@
               </div>
               
               <TaskCard
-                v-for="task in tasksByStatus.cancelled"
+                v-for="task in tasksByStatus[TaskStatus.Cancelled]"
                 :key="task.id"
                 :task="task"
                 :selected="selectedTask?.id === task.id"
@@ -217,6 +217,7 @@
 import { computed } from 'vue'
 import TaskCard from './TaskCard.vue'
 import type { TaskWithPartialUser } from '../composables/useTasks'
+import { TaskStatus } from '../generated/graphql'
 
 interface Props {
   tasks: TaskWithPartialUser[]
@@ -243,14 +244,14 @@ defineEmits<Emits>()
 // Group tasks by status for Kanban columns
 const tasksByStatus = computed(() => {
   const grouped = {
-    todo: [] as TaskWithPartialUser[],
-    in_progress: [] as TaskWithPartialUser[],
-    completed: [] as TaskWithPartialUser[],
-    cancelled: [] as TaskWithPartialUser[]
+    [TaskStatus.Todo]: [] as TaskWithPartialUser[],
+    [TaskStatus.InProgress]: [] as TaskWithPartialUser[],
+    [TaskStatus.Completed]: [] as TaskWithPartialUser[],
+    [TaskStatus.Cancelled]: [] as TaskWithPartialUser[]
   }
 
   props.tasks.forEach(task => {
-    const status = task.status as keyof typeof grouped
+    const status = task.status
     if (grouped[status]) {
       grouped[status].push(task)
     }

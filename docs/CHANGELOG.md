@@ -1,14 +1,37 @@
 # Development Changelog
 
-## [2025-08-12] - Task Edit Panel, Assignment, and GraphQL Improvements
+generated/graphql.ts, graphql/projects.ts: Updated queries and types to support assignee info for tasks, including assigneeId and assignee details in MyAssignedTasks query.
+
+## [2025-08-12] - Recurring Tasks System, Task Edit Panel, and GraphQL Improvements
+
+### ♻️ Recurring Tasks System & UI
+- **Recurring Tasks Support**: Added full support for recurring tasks, including daily, weekly, monthly, and weekday patterns.
+- **RecurrenceSelector.vue**: New reusable component for selecting recurrence type and day, with live preview and validation.
+- **TaskCreateModal.vue**: Task creation form now includes recurrence options, allowing users to set up recurring tasks at creation.
+- **TaskEditPanel.vue**: Recurrence settings are now editable for tasks, with collapsible UI, parent/instance distinction, and instance management.
+- **TaskTableRow.vue, TaskCard.vue, TaskKanbanView.vue**: Recurrence badges and instance indicators added to all task views for clear visibility.
+- **TaskToolbar.vue**: Added recurrence filter to toolbar for filtering by recurrence type or instance/parent status.
+- **useRecurringTasks.ts**: New composable for managing recurrence logic, analytics, and instance queries.
+
+### 📊 Recurring Task Analytics
+- **Instance Management**: TaskEditPanel now displays the number of recurring instances and allows navigation to parent tasks.
+- **Analytics**: useRecurringTasks composable provides analytics on active recurring tasks, completion rates, and upcoming instances.
+
 ### 📝 TaskEditPanel.vue
 1. Refactored panel header to allow inline editing of task name with auto-save on blur.
-2. Improved collapsible sections and UI consistency for task info, assignment, and activity log.
+2. Improved collapsible sections and UI consistency for task info, assignment, recurrence, and activity log.
 3. Added comment filter toggle (comments only) and visual distinction for user comments.
 4. Enhanced assignment logic: assignment changes now trigger dedicated mutation and update only when changed.
 5. Improved metadata parsing, field formatting, and relative time display in activity log.
+6. Recurrence management: Collapsible recurrence section, instance/parent distinction, and instance analytics.
+
 ### 🔗 GraphQL & Type Updates
-generated/graphql.ts, graphql/projects.ts: Updated queries and types to support assignee info for tasks, including assigneeId and assignee details in MyAssignedTasks query.
+- `generated/graphql.ts`, `graphql/projects.ts`: Updated queries and types to support assignee info for tasks, including `assigneeId` and assignee details in `MyAssignedTasks` query.
+- Recurrence fields (`recurrenceType`, `recurrenceDay`, `isRecurring`, `parentTaskId`, `nextDueDate`) added to task types and queries.
+
+### 🛠️ Other Improvements
+- All task views and filters now support and display recurrence information.
+- Enhanced type safety and UI consistency for recurring and one-time tasks.
 
 ## [2025-08-11] - Enhanced Feedback System & UI/UX Improvements
 

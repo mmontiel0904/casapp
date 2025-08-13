@@ -9,6 +9,7 @@ import {
   useDeleteTaskMutation,
   TaskStatus,
   TaskPriority,
+  RecurrenceType,
   type CreateTaskInput,
   type UpdateTaskInput,
   type AssignTaskInput,
@@ -28,11 +29,17 @@ export type TaskWithPartialUser = {
   name: string
   description?: string | null
   projectId: any
-  status: string
-  priority: string
+  status: TaskStatus
+  priority: TaskPriority
   dueDate?: any
   createdAt: any
   updatedAt: any
+  // Recurrence fields
+  isRecurring?: boolean
+  recurrenceType?: RecurrenceType
+  recurrenceDay?: number | null
+  parentTaskId?: any
+  nextDueDate?: any
   // Fields that are only present in ProjectTasksQuery
   assigneeId?: any
   creatorId?: any

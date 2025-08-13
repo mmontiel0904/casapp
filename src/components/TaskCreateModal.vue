@@ -167,6 +167,14 @@
           </div>
         </div>
 
+        <!-- Recurrence Settings -->
+        <div class="mb-6">
+          <RecurrenceSelector 
+            v-model:recurrence-type="form.recurrenceType"
+            v-model:recurrence-day="form.recurrenceDay"
+          />
+        </div>
+
         <!-- Form Actions -->
         <div class="flex gap-3 pt-4 border-t border-base-300">
           <button 
@@ -209,9 +217,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
 import ProjectCreateModal from './ProjectCreateModal.vue'
+import RecurrenceSelector from './RecurrenceSelector.vue'
 
 // Props & Emits
 interface Props {
@@ -249,6 +258,8 @@ const form = ref<{
   priority: TaskPriority
   dueDate: string
   assigneeId: string
+  recurrenceType: RecurrenceType
+  recurrenceDay: number | null
 }>({
   name: '',
   description: '',
@@ -260,7 +271,9 @@ const form = ref<{
     tomorrow.setDate(tomorrow.getDate() + 1)
     return tomorrow.toISOString().split('T')[0]
   })(), // Default to tomorrow
-  assigneeId: ''
+  assigneeId: '',
+  recurrenceType: RecurrenceType.None,
+  recurrenceDay: null
 })
 
 const isSubmitting = ref(false)
@@ -349,7 +362,9 @@ const resetForm = () => {
     status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
     priority: TaskPriority.Medium,
     dueDate: tomorrowDate.value, // Default to tomorrow
-    assigneeId: ''
+    assigneeId: '',
+    recurrenceType: RecurrenceType.None,
+    recurrenceDay: null
   }
 }
 
@@ -381,7 +396,9 @@ const handleSubmit = async () => {
     projectId: form.value.projectId,
     priority: form.value.priority,
     assigneeId: form.value.assigneeId || undefined,
-    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined,
+    recurrenceType: form.value.recurrenceType,
+    recurrenceDay: form.value.recurrenceDay || undefined
   }
 
   // Use Apollo feedback system for automatic success/error handling
