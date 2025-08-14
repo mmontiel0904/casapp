@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RecurrenceType } from '../generated/graphql'
+import { RecurrenceType } from '../../generated/graphql'
 
 interface Props {
   recurrenceType?: RecurrenceType

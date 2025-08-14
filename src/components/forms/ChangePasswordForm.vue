@@ -138,8 +138,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { useChangePasswordMutation } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
+import { useChangePasswordMutation } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
 
 const { mutate: changePassword, loading, error } = useChangePasswordMutation()
 const feedback = useApolloFeedback()

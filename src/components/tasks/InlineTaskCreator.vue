@@ -134,8 +134,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
 
 // Props & Emits
 interface Props {

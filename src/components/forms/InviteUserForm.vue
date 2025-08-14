@@ -93,8 +93,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useInviteUserMutation } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
+import { useInviteUserMutation } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
 
 const email = ref('')
 const recentInvitations = ref<Array<{

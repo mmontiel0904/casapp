@@ -56,10 +56,9 @@ export type TaskStats = ProjectTaskStatsQuery['projectTaskStats']
 export const TASK_STATUS = TaskStatus
 export const TASK_PRIORITY = TaskPriority
 
-// Task view modes
+// Task view modes - simplified to table only
 export const TASK_VIEW_MODE = {
-  TABLE: 'table',
-  KANBAN: 'kanban'
+  TABLE: 'table'
 } as const
 
 export type TaskViewMode = typeof TASK_VIEW_MODE[keyof typeof TASK_VIEW_MODE]
@@ -162,25 +161,6 @@ export function useTasks(projectId?: string) {
     }
 
     return filtered
-  })
-
-  // Tasks grouped by status for Kanban view
-  const tasksByStatus = computed(() => {
-    const grouped = {
-      [TaskStatus.Todo]: [] as TaskWithPartialUser[],
-      [TaskStatus.InProgress]: [] as TaskWithPartialUser[],
-      [TaskStatus.Completed]: [] as TaskWithPartialUser[],
-      [TaskStatus.Cancelled]: [] as TaskWithPartialUser[]
-    }
-
-    filteredTasks.value.forEach((task: TaskWithPartialUser) => {
-      const status = task.status as TaskStatus
-      if (grouped[status]) {
-        grouped[status].push(task)
-      }
-    })
-
-    return grouped
   })
 
   // Priority-based filtering
@@ -339,13 +319,7 @@ export function useTasks(projectId?: string) {
     }
   }
 
-  // View mode toggle
-  const toggleViewMode = () => {
-    viewMode.value = viewMode.value === TASK_VIEW_MODE.TABLE 
-      ? TASK_VIEW_MODE.KANBAN 
-      : TASK_VIEW_MODE.TABLE
-  }
-
+  // View mode - simplified to table only
   const setViewMode = (mode: TaskViewMode) => {
     viewMode.value = mode
   }
@@ -426,7 +400,6 @@ export function useTasks(projectId?: string) {
     searchQuery,
 
     // Grouped data
-    tasksByStatus,
     tasksByPriority,
     overdueTasks,
     urgentTasks,
@@ -444,7 +417,6 @@ export function useTasks(projectId?: string) {
     refetchTasks,
 
     // View controls
-    toggleViewMode,
     setViewMode,
 
     // Filter controls

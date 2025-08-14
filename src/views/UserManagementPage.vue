@@ -284,7 +284,7 @@ import {
 } from '../generated/graphql'
 import { usePermissions } from '../composables/usePermissions'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
-import AdminResetPasswordModal from '../components/AdminResetPasswordModal.vue'
+import AdminResetPasswordModal from '../components/modals/AdminResetPasswordModal.vue'
 import type { AuthUser } from '../services/permissions'
 
 // Type aliases for actual GraphQL query results

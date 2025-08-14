@@ -127,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskWithPartialUser } from '../composables/useTasks'
+import type { TaskWithPartialUser } from '../../composables/useTasks'
 
 interface Props {
   task: TaskWithPartialUser

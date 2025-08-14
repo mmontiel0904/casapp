@@ -224,7 +224,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { usePermissions } from '../composables/usePermissions'
-import PasswordChangeForm from '../components/PasswordChangeForm.vue'
+import PasswordChangeForm from '../components/forms/PasswordChangeForm.vue'
 import type { Role } from '../generated/graphql'
 
 // Auth and permissions

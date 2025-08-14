@@ -124,7 +124,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { TaskWithPartialUser } from '../composables/useTasks'
+import type { TaskWithPartialUser } from '../../composables/useTasks'
 import TaskMobileCard from './TaskMobileCard.vue'
 import TaskTableRow from './TaskTableRow.vue'
 import InlineTaskCreator from './InlineTaskCreator.vue'

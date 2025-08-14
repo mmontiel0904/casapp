@@ -202,7 +202,7 @@ import UiGrid from '../components/ui/Grid.vue'
 import UiStats from '../components/ui/Stats.vue'
 import UiSearchFilters from '../components/ui/SearchFilters.vue'
 import UiActionMenu from '../components/ui/ActionMenu.vue'
-import ProjectCreateModal from '../components/ProjectCreateModal.vue'
+import ProjectCreateModal from '../components/modals/ProjectCreateModal.vue'
 
 // Icons
 const FolderPlusIcon = 'svg'

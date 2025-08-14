@@ -138,7 +138,7 @@ import { ref, computed } from 'vue'
 import { useAuth } from '../composables/useAuth'
 import { useHealthQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
-import InviteUserForm from '../components/InviteUserForm.vue'
+import InviteUserForm from '../components/forms/InviteUserForm.vue'
 
 const { currentUser } = useAuth()
 

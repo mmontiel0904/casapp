@@ -115,9 +115,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useCreateProjectMutation } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
-import type { CreateProjectInput } from '../generated/graphql'
+import { useCreateProjectMutation } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import type { CreateProjectInput } from '../../generated/graphql'
 
 // Props & Emits
 interface Props {

@@ -100,9 +100,9 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAdminResetUserPasswordMutation } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
-import type { AllUsersQuery } from '../generated/graphql'
+import { useAdminResetUserPasswordMutation } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import type { AllUsersQuery } from '../../generated/graphql'
 
 type QueryUser = AllUsersQuery['allUsers'][0]
 

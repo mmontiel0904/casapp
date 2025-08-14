@@ -82,9 +82,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '../composables/useAuth'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
-import InputField from './ui/InputField.vue'
+import { useAuth } from '../../composables/useAuth'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import InputField from '../ui/InputField.vue'
 
 const loginForm = reactive({
   email: '',

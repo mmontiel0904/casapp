@@ -238,8 +238,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '../composables/useAuth'
-import { usePermissions } from '../composables/usePermissions'
+import { useAuth } from '../../composables/useAuth'
+import { usePermissions } from '../../composables/usePermissions'
 
 // Props & Emits
 interface Props {

@@ -217,10 +217,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../generated/graphql'
-import { useApolloFeedback } from '../composables/useApolloFeedback'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
+import { useApolloFeedback } from '../../composables/useApolloFeedback'
 import ProjectCreateModal from './ProjectCreateModal.vue'
-import RecurrenceSelector from './RecurrenceSelector.vue'
+import RecurrenceSelector from '../tasks/RecurrenceSelector.vue'
 
 // Props & Emits
 interface Props {

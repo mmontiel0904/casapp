@@ -6,7 +6,6 @@
       :total-count="tasks.length"
       :overdue-count="overdueTasks.length"
       :urgent-count="urgentTasks.length"
-      :view-mode="viewMode"
       :loading="loading"
       :can-create-tasks="canCreateTasks"
       :active-filters="{ myTasks: false, overdue: false }"
@@ -18,14 +17,12 @@
       @priority-filter="setPriorityFilter"
       @quick-filter="handleQuickFilter"
       @clear-filters="clearFilters"
-      @view-mode="setViewMode"
     />
 
       <!-- Task Views -->
       <div class="transition-all duration-200">
-        <!-- Table View -->
+        <!-- Table View Only -->
         <TaskTableView
-          v-if="viewMode === 'table'"
           :tasks="tasks"
           :loading="loading"
           :selected-task="selectedTask"
@@ -40,20 +37,6 @@
           @mark-complete="handleTaskMarkComplete"
           @task-created="handleInlineTaskCreated"
           @cancel-inline-creator="showInlineCreator = false"
-        />
-        
-        <!-- Kanban View -->
-        <TaskKanbanView
-          v-else
-          :tasks="tasks"
-          :loading="loading"
-          :selected-task="selectedTask"
-          :show-project="true"
-          @select="handleTaskSelect"
-          @edit="handleTaskEdit"
-          @assign="handleTaskAssign"
-          @delete="handleTaskDelete"
-          @create-task="handleCreateTask"
         />
       </div>
 
@@ -94,22 +77,19 @@
 import { ref, onMounted } from 'vue'
 import { useTasks, type TaskWithPartialUser } from '../composables/useTasks'
 import { usePermissions } from '../composables/usePermissions'
-import TaskTableView from '../components/TaskTableView.vue'
-import TaskKanbanView from '../components/TaskKanbanView.vue'
-import TaskCreateModal from '../components/TaskCreateModal.vue'
-import TaskToolbar from '../components/TaskToolbar.vue'
-import TaskEditPanel from '../components/TaskEditPanel.vue'
+import TaskTableView from '../components/tasks/TaskTableView.vue'
+import TaskCreateModal from '../components/modals/TaskCreateModal.vue'
+import TaskToolbar from '../components/tasks/TaskToolbar.vue'
+import TaskEditPanel from '../components/tasks/TaskEditPanel.vue'
 
 // Initialize task management for "My Tasks" (no projectId)
 const {
   tasks,
   loading,
   error,
-  viewMode,
   searchQuery,
   overdueTasks,
   urgentTasks,
-  setViewMode,
   setStatusFilter,
   setPriorityFilter,
   clearFilters,
@@ -164,12 +144,6 @@ const handleTaskDelete = async (task: TaskWithPartialUser) => {
   if (confirm(`Are you sure you want to delete "${task.name}"?`)) {
     await removeTask(task.id)
   }
-}
-
-const handleCreateTask = (status: string) => {
-  // Open create task modal with pre-selected status from Kanban column
-  console.log('Opening task creation modal with status:', status)
-  showCreateModal.value = true
 }
 
 const handleTaskCreated = async (task: any) => {

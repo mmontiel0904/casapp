@@ -2,8 +2,8 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from './composables/useAuth'
-import AppLayout from './components/AppLayout.vue'
-import GlobalFeedback from './components/GlobalFeedback.vue'
+import AppLayout from './components/layout/AppLayout.vue'
+import GlobalFeedback from './components/ui/GlobalFeedback.vue'
 
 const route = useRoute()
 const { isInitializing, isAuthenticated } = useAuth()

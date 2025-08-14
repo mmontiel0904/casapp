@@ -139,9 +139,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { TaskWithPartialUser } from '../composables/useTasks'
-import { useRecurringTasks } from '../composables/useRecurringTasks'
-import { TaskStatus } from '../generated/graphql'
+import type { TaskWithPartialUser } from '../../composables/useTasks'
+import { useRecurringTasks } from '../../composables/useRecurringTasks'
+import { TaskStatus } from '../../generated/graphql'
 
 interface Props {
   task: TaskWithPartialUser
@@ -274,6 +274,7 @@ const formatDueDate = (dueDate: string): string => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

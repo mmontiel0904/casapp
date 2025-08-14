@@ -141,8 +141,8 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskWithPartialUser } from '../composables/useTasks'
-import { useRecurringTasks } from '../composables/useRecurringTasks'
+import type { TaskWithPartialUser } from '../../composables/useTasks'
+import { useRecurringTasks } from '../../composables/useRecurringTasks'
 
 interface Props {
   task: TaskWithPartialUser

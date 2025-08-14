@@ -158,28 +158,12 @@
         
         <!-- Right: Actions and View Controls -->
         <div class="flex items-center gap-3">
-          <!-- View Toggle -->
-          <div class="join bg-base-100 border border-base-300">
-            <button 
-              @click="$emit('viewMode', 'table')"
-              :class="['btn btn-sm join-item gap-2', viewMode === 'table' ? 'btn-primary' : 'btn-ghost']"
-              title="Table view"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-7 8H8m8 4H8m8-8h6m-6 4h6"></path>
-              </svg>
-              <span class="hidden sm:inline">Table</span>
-            </button>
-            <button 
-              @click="$emit('viewMode', 'kanban')"
-              :class="['btn btn-sm join-item gap-2', viewMode === 'kanban' ? 'btn-primary' : 'btn-ghost']"
-              title="Kanban board view"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-              </svg>
-              <span class="hidden sm:inline">Board</span>
-            </button>
+          <!-- View Mode - Table Only -->
+          <div class="badge badge-primary badge-lg gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18m-7 8H8m8 4H8m8-8h6m-6 4h6"></path>
+            </svg>
+            <span>Table View</span>
           </div>
           
           <!-- Primary Add Task Button - Now positioned near table -->
@@ -210,7 +194,6 @@ interface Props {
   totalCount?: number
   overdueCount?: number
   urgentCount?: number
-  viewMode?: 'table' | 'kanban'
   loading?: boolean
   canCreateTasks?: boolean
   activeFilters?: {
@@ -224,7 +207,6 @@ withDefaults(defineProps<Props>(), {
   totalCount: 0,
   overdueCount: 0,
   urgentCount: 0,
-  viewMode: 'table',
   loading: false,
   canCreateTasks: true,
   activeFilters: () => ({ myTasks: false, overdue: false })
@@ -241,7 +223,6 @@ defineEmits<{
   recurrenceFilter: [recurrence: string]
   quickFilter: [type: string, active: boolean]
   clearFilters: []
-  viewMode: [mode: 'table' | 'kanban']
 }>()
 
 // Local state

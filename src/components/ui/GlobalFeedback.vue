@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { useFeedback } from '../composables/useFeedback'
+import { useFeedback } from '../../composables/useFeedback'
 
 const { messages, removeMessage } = useFeedback()
 
