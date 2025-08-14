@@ -66,6 +66,11 @@ input ChangePasswordInput {
   newPassword: String!
 }
 
+type CompleteTaskWithRecurrenceResponse {
+  nextInstance: Task
+  originalTask: Task!
+}
+
 input CreatePermissionInput {
   action: String!
   description: String
@@ -156,6 +161,7 @@ type MutationRoot {
   assignRole(input: AssignRoleInput!): User!
   assignTask(input: AssignTaskInput!): Task!
   changePassword(input: ChangePasswordInput!): MessageResponse!
+  completeTaskWithRecurrence(taskId: UUID!): CompleteTaskWithRecurrenceResponse!
   createPermission(input: CreatePermissionInput!): Permission!
   createProject(input: CreateProjectInput!): Project!
   createResource(input: CreateResourceInput!): Resource!

@@ -15,26 +15,11 @@ import {
   type CreateTaskInput,
   type UpdateTaskInput,
   type ProjectTaskStatsQuery,
-  type Task,
-  type MyAssignedTasksQuery,
-  type ProjectTasksQuery
+  type Task
 } from '../generated/graphql'
 import { useApolloFeedback } from './useApolloFeedback'
 
 // ========== TYPES & INTERFACES ==========
-
-/**
- * Proper API-generated task types for different contexts
- * Following FRONTEND_INTEGRATION.md patterns for type safety
- */
-export type MyAssignedTask = MyAssignedTasksQuery['myAssignedTasks'][0]
-export type ProjectTask = ProjectTasksQuery['projectTasks'][0]
-
-/**
- * Union type for tasks that can appear in different contexts
- * This ensures we always use API-generated types
- */
-export type TaskItem = MyAssignedTask | ProjectTask
 
 /**
  * Recurrence form data structure for task creation/editing

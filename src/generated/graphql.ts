@@ -98,6 +98,11 @@ export type ChangePasswordInput = {
   newPassword: Scalars['String']['input'];
 };
 
+export type CompleteTaskWithRecurrenceResponse = {
+  nextInstance?: Maybe<Task>;
+  originalTask: Task;
+};
+
 export type CreatePermissionInput = {
   action: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
@@ -181,6 +186,7 @@ export type MutationRoot = {
   assignRole: User;
   assignTask: Task;
   changePassword: MessageResponse;
+  completeTaskWithRecurrence: CompleteTaskWithRecurrenceResponse;
   createPermission: Permission;
   createProject: Project;
   createResource: Resource;
@@ -251,6 +257,11 @@ export type MutationRootAssignTaskArgs = {
 
 export type MutationRootChangePasswordArgs = {
   input: ChangePasswordInput;
+};
+
+
+export type MutationRootCompleteTaskWithRecurrenceArgs = {
+  taskId: Scalars['UUID']['input'];
 };
 
 
@@ -904,6 +915,13 @@ export type InviteUserWithRoleMutationVariables = Exact<{
 
 
 export type InviteUserWithRoleMutation = { inviteUserWithRole: { id: any, email: string, inviterUserId: any, isUsed: boolean, createdAt: any, expiresAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null } };
+
+export type CompleteTaskWithRecurrenceMutationVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+}>;
+
+
+export type CompleteTaskWithRecurrenceMutation = { completeTaskWithRecurrence: { originalTask: { id: any, name: string, status: TaskStatus, updatedAt: any, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null }, nextInstance?: { id: any, name: string, status: TaskStatus, dueDate?: any | null, parentTaskId?: any | null, createdAt: any, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null } | null } };
 
 export type MyProjectsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1963,6 +1981,55 @@ export function useInviteUserWithRoleMutation(options: VueApolloComposable.UseMu
   return VueApolloComposable.useMutation<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>(InviteUserWithRoleDocument, options);
 }
 export type InviteUserWithRoleMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<InviteUserWithRoleMutation, InviteUserWithRoleMutationVariables>;
+export const CompleteTaskWithRecurrenceDocument = gql`
+    mutation CompleteTaskWithRecurrence($taskId: UUID!) {
+  completeTaskWithRecurrence(taskId: $taskId) {
+    originalTask {
+      id
+      name
+      status
+      updatedAt
+      isRecurring
+      recurrenceType
+      recurrenceDay
+    }
+    nextInstance {
+      id
+      name
+      status
+      dueDate
+      parentTaskId
+      createdAt
+      isRecurring
+      recurrenceType
+      recurrenceDay
+      nextDueDate
+    }
+  }
+}
+    `;
+
+/**
+ * __useCompleteTaskWithRecurrenceMutation__
+ *
+ * To run a mutation, you first call `useCompleteTaskWithRecurrenceMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCompleteTaskWithRecurrenceMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCompleteTaskWithRecurrenceMutation({
+ *   variables: {
+ *     taskId: // value for 'taskId'
+ *   },
+ * });
+ */
+export function useCompleteTaskWithRecurrenceMutation(options: VueApolloComposable.UseMutationOptions<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables>(CompleteTaskWithRecurrenceDocument, options);
+}
+export type CompleteTaskWithRecurrenceMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables>;
 export const MyProjectsDocument = gql`
     query MyProjects($limit: Int, $offset: Int) {
   myProjects(limit: $limit, offset: $offset) {

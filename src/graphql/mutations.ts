@@ -180,3 +180,31 @@ export const INVITE_USER_WITH_ROLE_MUTATION = gql`
     }
   }
 `
+
+export const COMPLETE_TASK_WITH_RECURRENCE_MUTATION = gql`
+  mutation CompleteTaskWithRecurrence($taskId: UUID!) {
+    completeTaskWithRecurrence(taskId: $taskId) {
+      originalTask {
+        id
+        name
+        status
+        updatedAt
+        isRecurring
+        recurrenceType
+        recurrenceDay
+      }
+      nextInstance {
+        id
+        name
+        status
+        dueDate
+        parentTaskId
+        createdAt
+        isRecurring
+        recurrenceType
+        recurrenceDay
+        nextDueDate
+      }
+    }
+  }
+`

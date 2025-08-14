@@ -502,10 +502,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useAssignTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, RecurrenceType, EntityType, type UpdateTaskInput, type AssignTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
-import { type TaskWithPartialUser } from '../../composables/useTasks'
+import { useTasks, type TaskWithPartialUser } from '../../composables/useTasks'
 import { useApolloFeedback } from '../../composables/useApolloFeedback'
 import { useAuth } from '../../composables/useAuth'
-import { useRecurringTasks } from '../../composables/useRecurringTasks'
 import RecurrenceSelector from './RecurrenceSelector.vue'
 
 // Props & Emits
@@ -538,13 +537,13 @@ const feedback = useApolloFeedback()
 // Auth
 const { currentUser } = useAuth()
 
-// Recurring tasks functionality
+// Unified tasks functionality - includes all recurring task helpers
 const { 
   formatRecurrenceType, 
   isRecurringTask: checkIsRecurringTask, 
   isRecurringInstance: checkIsRecurringInstance,
   recurringInstancesCount
-} = useRecurringTasks(props.task?.id)
+} = useTasks(undefined, props.task?.id)
 
 // Data fetching
 const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery({

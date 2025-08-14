@@ -94,7 +94,8 @@ const {
   setPriorityFilter,
   clearFilters,
   refetchTasks,
-  removeTask
+  removeTask,
+  completeTask // New: Complete task with recurrency support
 } = useTasks() // No projectId = standalone "My Tasks" view
 
 // Permissions

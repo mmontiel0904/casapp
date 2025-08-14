@@ -141,8 +141,7 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskWithPartialUser } from '../../composables/useTasks'
-import { useRecurringTasks } from '../../composables/useRecurringTasks'
+import { useTasks, type TaskWithPartialUser } from '../../composables/useTasks'
 
 interface Props {
   task: TaskWithPartialUser
@@ -166,12 +165,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
-// Recurring tasks functionality
+// Unified tasks functionality - includes all recurring task helpers
 const { 
   formatRecurrenceType, 
   isRecurringTask, 
   isRecurringInstance 
-} = useRecurringTasks()
+} = useTasks()
 
 // Event handlers with dropdown closing
 const closeDropdown = () => {

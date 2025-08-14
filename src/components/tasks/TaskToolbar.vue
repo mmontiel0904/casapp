@@ -187,6 +187,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { TaskStatus, TaskPriority } from '../../generated/graphql'
 
 // Props
 interface Props {
@@ -212,23 +213,23 @@ withDefaults(defineProps<Props>(), {
   activeFilters: () => ({ myTasks: false, overdue: false })
 })
 
-// Emits
+// Emits with proper enum types
 defineEmits<{
   addTask: []
   refresh: []
   export: []
   search: [query: string]
-  statusFilter: [status: string]
-  priorityFilter: [priority: string]
+  statusFilter: [status: TaskStatus | '']
+  priorityFilter: [priority: TaskPriority | '']
   recurrenceFilter: [recurrence: string]
   quickFilter: [type: string, active: boolean]
   clearFilters: []
 }>()
 
-// Local state
+// Local state with proper enum types
 const searchQuery = ref('')
-const selectedStatus = ref('')
-const selectedPriority = ref('')
+const selectedStatus = ref<TaskStatus | ''>('')
+const selectedPriority = ref<TaskPriority | ''>('')
 const selectedRecurrence = ref('')
 
 // Computed

@@ -139,8 +139,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { TaskWithPartialUser } from '../../composables/useTasks'
-import { useRecurringTasks } from '../../composables/useRecurringTasks'
+import { useTasks, type TaskWithPartialUser } from '../../composables/useTasks'
 import { TaskStatus } from '../../generated/graphql'
 
 interface Props {
@@ -163,13 +162,17 @@ const props = withDefaults(defineProps<Props>(), {
 
 defineEmits<Emits>()
 
-// Recurring tasks functionality
+// Unified tasks functionality - now includes all recurring task helpers
 const { 
   formatRecurrenceType, 
   getRecurrenceIcon, 
   isRecurringTask: checkIsRecurringTask, 
-  isRecurringInstance: checkIsRecurringInstance 
-} = useRecurringTasks()
+  isRecurringInstance: checkIsRecurringInstance,
+  getStatusDisplayName,
+  getPriorityDisplayName,
+  getPriorityColor,
+  getStatusColor
+} = useTasks()
 
 // Computed properties
 const isOverdue = computed(() => {
@@ -183,47 +186,7 @@ const isOverdue = computed(() => {
 const isRecurringTask = computed(() => checkIsRecurringTask(props.task))
 const isRecurringInstance = computed(() => checkIsRecurringInstance(props.task))
 
-// Helper functions following FRONTEND_INTEGRATION.md patterns
-const getStatusDisplayName = (status: string): string => {
-  const names = {
-    'todo': 'To Do',
-    'in_progress': 'In Progress',
-    'completed': 'Completed',
-    'cancelled': 'Cancelled'
-  }
-  return names[status as keyof typeof names] || status
-}
-
-const getPriorityDisplayName = (priority: string): string => {
-  const names = {
-    'low': 'Low',
-    'medium': 'Medium',
-    'high': 'High', 
-    'urgent': 'Urgent'
-  }
-  return names[priority as keyof typeof names] || priority
-}
-
-const getPriorityColor = (priority: string): string => {
-  const colors = {
-    'low': 'badge-ghost',
-    'medium': 'badge-info',
-    'high': 'badge-warning',
-    'urgent': 'badge-error'
-  }
-  return colors[priority as keyof typeof colors] || 'badge-ghost'
-}
-
-const getStatusColor = (status: string): string => {
-  const colors = {
-    'todo': 'badge-ghost',
-    'in_progress': 'badge-warning',
-    'completed': 'badge-success',
-    'cancelled': 'badge-error'
-  }
-  return colors[status as keyof typeof colors] || 'badge-ghost'
-}
-
+// Component-specific helper functions
 const getAssigneeInitials = (assignee: any): string => {
   if (!assignee) return '?'
   const firstName = assignee.firstName || ''
