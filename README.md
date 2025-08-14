@@ -95,7 +95,44 @@ The project automatically generates TypeScript types and Vue composables from yo
 
 ```
 src/
-├── components/           # Vue components
+├── components/           # Organized Vue components
+│   ├── admin/           # Admin-specific components
+│   │   ├── PermissionsTable.vue
+│   │   ├── ResourcesTable.vue
+│   │   ├── RolePermissionMatrix.vue
+│   │   └── RolesTable.vue
+│   ├── forms/           # Form-related components
+│   │   ├── ChangePasswordForm.vue
+│   │   ├── InviteUserForm.vue
+│   │   ├── LoginForm.vue
+│   │   └── PasswordChangeForm.vue
+│   ├── layout/          # Layout components
+│   │   ├── AppLayout.vue
+│   │   └── NavigationSidePanel.vue
+│   ├── modals/          # Modal components
+│   │   ├── AdminResetPasswordModal.vue
+│   │   ├── ProjectCreateModal.vue
+│   │   └── TaskCreateModal.vue
+│   ├── tasks/           # Task-related components
+│   │   ├── InlineTaskCreator.vue
+│   │   ├── RecurrenceSelector.vue
+│   │   ├── TaskCard.vue
+│   │   ├── TaskEditPanel.vue
+│   │   ├── TaskFilters.vue
+│   │   ├── TaskMobileCard.vue
+│   │   ├── TaskTableRow.vue
+│   │   ├── TaskTableView.vue
+│   │   └── TaskToolbar.vue
+│   └── ui/              # Generic, reusable UI components
+│       ├── ActionMenu.vue
+│       ├── Alert.vue
+│       ├── Card.vue
+│       ├── EmptyState.vue
+│       ├── GlobalFeedback.vue
+│       ├── Grid.vue
+│       ├── InputField.vue
+│       ├── SearchFilters.vue
+│       └── Stats.vue
 ├── composables/         # Vue 3 composables (useAuth, useApiState)
 ├── services/            # API service layer with type safety
 ├── types/               # TypeScript type definitions
