@@ -99,6 +99,8 @@ export function useTasks(projectId?: string, taskId?: string) {
   const selectedStatus = ref<TaskStatus | ''>('')
   const selectedPriority = ref<TaskPriority | ''>('')
   const selectedAssignee = ref<string>('')
+  const selectedRecurrence = ref<string>('')
+  const overdueFilter = ref<boolean>(false)
   const searchQuery = ref('')
 
   // ========== QUERY VARIABLES ==========
@@ -222,6 +224,29 @@ export function useTasks(projectId?: string, taskId?: string) {
     // Assignee filter (only for project context)
     if (selectedAssignee.value && projectId) {
       filtered = filtered.filter(task => task.assigneeId === selectedAssignee.value)
+    }
+
+    // Recurrence filter
+    if (selectedRecurrence.value) {
+      if (selectedRecurrence.value === 'NONE') {
+        filtered = filtered.filter(task => !task.recurrenceType || task.recurrenceType === RecurrenceType.None)
+      } else if (selectedRecurrence.value === 'INSTANCES') {
+        filtered = filtered.filter(task => task.parentTaskId !== null)
+      } else if (selectedRecurrence.value === 'PARENTS') {
+        filtered = filtered.filter(task => task.recurrenceType && task.recurrenceType !== RecurrenceType.None && !task.parentTaskId)
+      } else {
+        filtered = filtered.filter(task => task.recurrenceType === selectedRecurrence.value)
+      }
+    }
+
+    // Overdue filter
+    if (overdueFilter.value) {
+      const now = new Date()
+      filtered = filtered.filter(task => 
+        task.dueDate && 
+        new Date(task.dueDate) < now && 
+        task.status !== TaskStatus.Completed
+      )
     }
 
     return filtered
@@ -750,12 +775,28 @@ export function useTasks(projectId?: string, taskId?: string) {
   }
 
   /**
+   * Set recurrence filter
+   */
+  const setRecurrenceFilter = (recurrence: string) => {
+    selectedRecurrence.value = recurrence
+  }
+
+  /**
+   * Set overdue filter
+   */
+  const setOverdueFilter = (active: boolean) => {
+    overdueFilter.value = active
+  }
+
+  /**
    * Clear all filters
    */
   const clearFilters = () => {
     selectedStatus.value = ''
     selectedPriority.value = ''
     selectedAssignee.value = ''
+    selectedRecurrence.value = ''
+    overdueFilter.value = false
     searchQuery.value = ''
   }
 
@@ -779,6 +820,8 @@ export function useTasks(projectId?: string, taskId?: string) {
     selectedStatus,
     selectedPriority,
     selectedAssignee,
+    selectedRecurrence,
+    overdueFilter,
 
     // ========== TASK GROUPINGS ==========
     tasksByPriority,
@@ -820,6 +863,8 @@ export function useTasks(projectId?: string, taskId?: string) {
     setStatusFilter,
     setPriorityFilter,
     setAssigneeFilter,
+    setRecurrenceFilter,
+    setOverdueFilter,
     clearFilters,
 
     // ========== LOADING STATES ==========

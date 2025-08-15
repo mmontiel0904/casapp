@@ -3,18 +3,19 @@
     <!-- Integrated Task Toolbar -->
     <TaskToolbar
       title="My Tasks"
-      :total-count="tasks.length"
+      :total-count="filteredTasks.length"
       :overdue-count="overdueTasks.length"
       :urgent-count="urgentTasks.length"
       :loading="loading"
       :can-create-tasks="canCreateTasks"
-      :active-filters="{ myTasks: false, overdue: false }"
+      :active-filters="activeFilters"
       @add-task="showInlineCreator = !showInlineCreator"
       @refresh="refetchTasks"
       @export="handleExport"
       @search="searchQuery = $event"
       @status-filter="setStatusFilter"
       @priority-filter="setPriorityFilter"
+      @recurrence-filter="setRecurrenceFilter"
       @quick-filter="handleQuickFilter"
       @clear-filters="clearFilters"
     />
@@ -23,7 +24,7 @@
       <div class="transition-all duration-200">
         <!-- Table View Only -->
         <TaskTableView
-          :tasks="tasks"
+          :tasks="filteredTasks"
           :loading="loading"
           :complete-loading="completeLoading"
           :selected-task="selectedTask"
@@ -85,7 +86,7 @@ import TaskEditPanel from '../components/tasks/TaskEditPanel.vue'
 
 // Initialize task management for "My Tasks" (no projectId)
 const {
-  tasks,
+  filteredTasks,
   loading,
   error,
   searchQuery,
@@ -93,6 +94,8 @@ const {
   urgentTasks,
   setStatusFilter,
   setPriorityFilter,
+  setRecurrenceFilter,
+  setOverdueFilter,
   clearFilters,
   refetchTasks,
   removeTask,
@@ -109,6 +112,12 @@ const selectedTaskForEdit = ref<TaskItem | null>(null)
 const showCreateModal = ref(false)
 const showInlineCreator = ref(false)
 const showTaskEditPanel = ref(false)
+
+// Active filters state
+const activeFilters = ref({
+  myTasks: false, // This is always false since this IS the "My Tasks" page
+  overdue: false
+})
 
 // Event handlers
 const handleTaskSelect = (task: TaskItem) => {
@@ -169,11 +178,13 @@ const handleExport = () => {
 
 const handleQuickFilter = (filterType: string, active: boolean) => {
   if (filterType === 'overdue') {
-    // TODO: Implement overdue filter logic
-    console.log('Overdue filter:', active)
+    // Set overdue filter - this will filter tasks by due date
+    setOverdueFilter(active)
+    activeFilters.value.overdue = active
   } else if (filterType === 'myTasks') {
-    // This is already "My Tasks" view, so this filter is always active
-    console.log('My tasks filter:', active)
+    // This is already "My Tasks" view, so this filter doesn't apply
+    // Keep it false since we're already showing "my tasks"
+    activeFilters.value.myTasks = false
   }
 }
 
