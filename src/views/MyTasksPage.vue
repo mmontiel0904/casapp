@@ -25,6 +25,7 @@
         <TaskTableView
           :tasks="tasks"
           :loading="loading"
+          :complete-loading="completeLoading"
           :selected-task="selectedTask"
           :show-project="true"
           :show-inline-creator="showInlineCreator"
@@ -75,7 +76,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useTasks, type TaskWithPartialUser } from '../composables/useTasks'
+import { useTasks, type TaskItem } from '../composables/useTasks'
 import { usePermissions } from '../composables/usePermissions'
 import TaskTableView from '../components/tasks/TaskTableView.vue'
 import TaskCreateModal from '../components/modals/TaskCreateModal.vue'
@@ -95,53 +96,53 @@ const {
   clearFilters,
   refetchTasks,
   removeTask,
-  completeTask // New: Complete task with recurrency support
+  completeTask,
+  completeLoading
 } = useTasks() // No projectId = standalone "My Tasks" view
 
 // Permissions
 const { canCreateTasks } = usePermissions()
 
 // Local state
-const selectedTask = ref<TaskWithPartialUser | null>(null)
-const selectedTaskForEdit = ref<TaskWithPartialUser | null>(null)
+const selectedTask = ref<TaskItem | null>(null)
+const selectedTaskForEdit = ref<TaskItem | null>(null)
 const showCreateModal = ref(false)
 const showInlineCreator = ref(false)
 const showTaskEditPanel = ref(false)
 
 // Event handlers
-const handleTaskSelect = (task: TaskWithPartialUser) => {
+const handleTaskSelect = (task: TaskItem) => {
   selectedTask.value = selectedTask.value?.id === task.id ? null : task
 }
 
-const handleTaskViewDetails = (task: TaskWithPartialUser) => {
+const handleTaskViewDetails = (task: TaskItem) => {
   // Primary action - open detail view (same as edit for now, but can be different)
   selectedTaskForEdit.value = task
   showTaskEditPanel.value = true
   selectedTask.value = task // Also select the task for visual feedback
 }
 
-const handleTaskEdit = (task: TaskWithPartialUser) => {
+const handleTaskEdit = (task: TaskItem) => {
   selectedTaskForEdit.value = task
   showTaskEditPanel.value = true
 }
 
-const handleTaskMarkComplete = async (task: TaskWithPartialUser) => {
+const handleTaskMarkComplete = async (task: TaskItem) => {
   try {
-    // TODO: Add updateTask composable from useTasks to handle status update
-    console.log('Marking task complete:', task.id)
-    // For now, just trigger a refresh
-    await refetchTasks()
+    // Use the unified completeTask composable which handles recurrence automatically
+    // The completeLoading state provides UI feedback automatically
+    await completeTask(task.id)
   } catch (error) {
     console.error('Failed to mark task complete:', error)
   }
 }
 
-const handleTaskAssign = (task: TaskWithPartialUser) => {
+const handleTaskAssign = (task: TaskItem) => {
   // TODO: Open task assignment modal
   console.log('Assign task:', task.id)
 }
 
-const handleTaskDelete = async (task: TaskWithPartialUser) => {
+const handleTaskDelete = async (task: TaskItem) => {
   if (confirm(`Are you sure you want to delete "${task.name}"?`)) {
     await removeTask(task.id)
   }

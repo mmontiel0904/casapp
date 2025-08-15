@@ -1,5 +1,40 @@
 # Development Changelog
 
+## [2025-08-14] - Task Completion System Fixes & Recurring Task Mutation Integration
+
+### 🐛 Critical Bug Fixes: Task Completion Flow
+- **Fixed "Mark Complete" Button Issue**: Resolved issue where "Mark Complete" button in TaskTableRow was not triggering any network activity due to improper use of `feedback.handleMutation()`.
+- **Fixed TaskEditPanel Completion**: Resolved issue where changing task status to "Completed" in TaskEditPanel was using generic `UpdateTask` mutation instead of the recurrence-aware `CompleteTaskWithRecurrence` mutation.
+
+### 🔄 Recurring Task Completion Integration  
+- **useTasks.ts**: Completely refactored `completeTask` function to:
+  - Directly call `completeTaskWithRecurrence` mutation instead of using `feedback.handleMutation` wrapper
+  - Properly handle mutation results and return values
+  - Maintain all recurrence logic for creating next instances
+  - Add manual success/error feedback handling
+  - Preserve cache updates and query refetching
+
+- **TaskEditPanel.vue**: Enhanced to use recurrence-aware completion:
+  - When task status changes to "Completed", now calls `completeTask()` instead of generic `updateTask()`
+  - Ensures recurring tasks create next instances when completed via side panel
+  - Maintains separation of concerns for other field updates (name, description, assignment, etc.)
+
+### ⚡ Performance & Code Quality
+- **GraphQL Codegen Sync**: Verified and updated generated types to ensure alignment with current schema
+- **Type Safety**: Removed unused variables and ensured all TypeScript compilation passes
+- **Event Flow Validation**: Confirmed proper event emission chain from UI components → page handlers → composable mutations
+
+### 🧪 Testing & Validation
+- **Network Activity**: Both "Mark Complete" button and TaskEditPanel status changes now properly trigger `CompleteTaskWithRecurrence` mutation
+- **Recurring Tasks**: Server-side recurrence logic is now properly invoked from all UI completion paths
+- **UI Feedback**: Success/error messages display correctly for all completion scenarios
+- **Cache Updates**: Next recurring instances appear in UI immediately after completion
+
+### 🔧 Technical Details
+- **Root Cause**: `feedback.handleMutation()` was designed for fire-and-forget operations and doesn't return mutation results
+- **Solution**: Direct mutation calls with manual feedback handling for operations that need return values
+- **Impact**: All task completion flows (table row, mobile card, side panel) now use consistent recurrence-aware mutation
+
 generated/graphql.ts, graphql/projects.ts: Updated queries and types to support assignee info for tasks, including assigneeId and assignee details in MyAssignedTasks query.
 
 ## [2025-08-12] - Recurring Tasks System, Task Edit Panel, and GraphQL Improvements

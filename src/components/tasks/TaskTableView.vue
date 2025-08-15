@@ -43,6 +43,7 @@
           :is-selected="selectedTask?.id === task.id"
           :show-project="showProject"
           :context="context"
+          :complete-loading="completeLoading"
           @view-details="emit('viewDetails', $event)"
           @edit="emit('edit', $event)"
           @mark-complete="emit('markComplete', $event)"
@@ -111,6 +112,7 @@
             :is-selected="selectedTask?.id === task.id"
             :show-project="showProject"
             :context="context"
+            :complete-loading="completeLoading"
             @view-details="emit('viewDetails', $event)"
             @edit="emit('edit', $event)"
             @mark-complete="emit('markComplete', $event)"
@@ -124,28 +126,29 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { TaskWithPartialUser } from '../../composables/useTasks'
+import type { TaskItem } from '../../composables/useTasks'
 import TaskMobileCard from './TaskMobileCard.vue'
 import TaskTableRow from './TaskTableRow.vue'
 import InlineTaskCreator from './InlineTaskCreator.vue'
 
 interface Props {
-  tasks: TaskWithPartialUser[]
+  tasks: TaskItem[]
   loading?: boolean
-  selectedTask?: TaskWithPartialUser | null
+  selectedTask?: TaskItem | null
   showProject?: boolean
   showInlineCreator?: boolean
   preselectedProjectId?: string
   context?: 'myTasks' | 'projectTasks'
+  completeLoading?: boolean
 }
 
 interface Emits {
-  (e: 'select', task: TaskWithPartialUser): void
-  (e: 'viewDetails', task: TaskWithPartialUser): void
-  (e: 'edit', task: TaskWithPartialUser): void
-  (e: 'assign', task: TaskWithPartialUser): void
-  (e: 'delete', task: TaskWithPartialUser): void
-  (e: 'markComplete', task: TaskWithPartialUser): void
+  (e: 'select', task: TaskItem): void
+  (e: 'viewDetails', task: TaskItem): void
+  (e: 'edit', task: TaskItem): void
+  (e: 'assign', task: TaskItem): void
+  (e: 'delete', task: TaskItem): void
+  (e: 'markComplete', task: TaskItem): void
   (e: 'taskCreated', task: any): void
   (e: 'cancelInlineCreator'): void
 }
@@ -155,7 +158,8 @@ const props = withDefaults(defineProps<Props>(), {
   showProject: false,
   showInlineCreator: false,
   preselectedProjectId: '',
-  context: 'projectTasks'
+  context: 'projectTasks',
+  completeLoading: false
 })
 
 const emit = defineEmits<Emits>()

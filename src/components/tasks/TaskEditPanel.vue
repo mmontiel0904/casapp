@@ -502,7 +502,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useMyProjectsQuery, useAllUsersQuery, useUpdateTaskMutation, useDeleteTaskMutation, useAssignTaskMutation, useTaskWithActivitiesQuery, useAddCommentMutation, TaskPriority, TaskStatus, RecurrenceType, EntityType, type UpdateTaskInput, type AssignTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
-import { useTasks, type TaskWithPartialUser } from '../../composables/useTasks'
+import { useTasks, type TaskItem } from '../../composables/useTasks'
 import { useApolloFeedback } from '../../composables/useApolloFeedback'
 import { useAuth } from '../../composables/useAuth'
 import RecurrenceSelector from './RecurrenceSelector.vue'
@@ -510,7 +510,7 @@ import RecurrenceSelector from './RecurrenceSelector.vue'
 // Props & Emits
 interface Props {
   isOpen?: boolean
-  task?: TaskWithPartialUser | null
+  task?: TaskItem | null
   showProject?: boolean
 }
 
@@ -537,12 +537,13 @@ const feedback = useApolloFeedback()
 // Auth
 const { currentUser } = useAuth()
 
-// Unified tasks functionality - includes all recurring task helpers
+// Unified tasks functionality - includes recurrence helpers and completion mutation
 const { 
   formatRecurrenceType, 
   isRecurringTask: checkIsRecurringTask, 
   isRecurringInstance: checkIsRecurringInstance,
-  recurringInstancesCount
+  recurringInstancesCount,
+  completeTask
 } = useTasks(undefined, props.task?.id)
 
 // Data fetching
@@ -907,14 +908,22 @@ const handleSave = async () => {
     return
   }
 
-  try {
+    try {
     const promises: Promise<any>[] = []
-    
-    // Handle regular task updates
-    if (changedFields.length > 0) {
+
+    // If status changed to Completed, call the recurrence-aware mutation instead
+    if (changes.status === TaskStatus.Completed && originalForm.value && originalForm.value.status !== TaskStatus.Completed) {
+      // Use unified completeTask so recurrence is handled server-side
+      promises.push(completeTask(props.task!.id))
+      // Remove status from changes so updateTask doesn't try to set it again
+      delete changes.status
+    }
+
+    // Handle remaining regular task updates (exclude status if already handled)
+    if (Object.keys(changes).length > 0) {
       promises.push(updateTask({ input: changes }))
     }
-    
+
     // Handle assignee changes separately
     if (assigneeChanged) {
       const assignInput: AssignTaskInput = {
@@ -923,7 +932,7 @@ const handleSave = async () => {
       }
       promises.push(assignTask({ input: assignInput }))
     }
-    
+
     // Execute all mutations
     await Promise.all(promises)
     

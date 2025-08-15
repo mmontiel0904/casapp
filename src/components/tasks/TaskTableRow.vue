@@ -66,7 +66,7 @@
     
     <!-- Project (conditional) -->
     <td v-if="showProject" class="py-4">
-      <div v-if="task.project" class="flex items-center gap-2">
+      <div v-if="'project' in task && task.project" class="flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
@@ -113,12 +113,17 @@
           </li>
           
           <!-- Quick Status Actions -->
-          <li v-if="task.status !== 'COMPLETED'">
-            <button @click="handleMarkComplete" class="flex items-center gap-2 p-2 text-sm hover:bg-success/10 rounded">
-              <svg class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <li v-if="task.status !== TaskStatus.Completed">
+            <button 
+              @click="handleMarkComplete" 
+              :disabled="props.completeLoading"
+              class="flex items-center gap-2 p-2 text-sm hover:bg-success/10 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg v-if="!props.completeLoading" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
               </svg>
-              <span>Mark Complete</span>
+              <span v-if="props.completeLoading" class="loading loading-spinner loading-xs text-success"></span>
+              <span>{{ props.completeLoading ? 'Completing...' : 'Mark Complete' }}</span>
             </button>
           </li>
           
@@ -141,26 +146,30 @@
 </template>
 
 <script setup lang="ts">
-import { useTasks, type TaskWithPartialUser } from '../../composables/useTasks'
+import { useTasks, type TaskItem } from '../../composables/useTasks'
+import { TaskStatus } from '../../generated/graphql'
 
 interface Props {
-  task: TaskWithPartialUser
+  task: TaskItem
   isSelected?: boolean
+  isOnBoard?: boolean
   showProject?: boolean
-  context?: 'myTasks' | 'projectTasks'
+  context?: 'projectTasks' | 'myTasks'
+  completeLoading?: boolean
 }
 
 interface Emits {
-  (e: 'viewDetails', task: TaskWithPartialUser): void
-  (e: 'edit', task: TaskWithPartialUser): void
-  (e: 'markComplete', task: TaskWithPartialUser): void
-  (e: 'delete', task: TaskWithPartialUser): void
+  (e: 'viewDetails', task: TaskItem): void
+  (e: 'edit', task: TaskItem): void
+  (e: 'markComplete', task: TaskItem): void
+  (e: 'delete', task: TaskItem): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isSelected: false,
   showProject: false,
-  context: 'projectTasks'
+  context: 'projectTasks',
+  completeLoading: false
 })
 
 const emit = defineEmits<Emits>()
@@ -169,7 +178,7 @@ const emit = defineEmits<Emits>()
 const { 
   formatRecurrenceType, 
   isRecurringTask, 
-  isRecurringInstance 
+  isRecurringInstance
 } = useTasks()
 
 // Event handlers with dropdown closing
@@ -247,8 +256,8 @@ const getPriorityColor = (priority: string): string => {
   return colorMap[priority] || 'badge-neutral'
 }
 
-const isOverdue = (task: TaskWithPartialUser): boolean => {
-  if (!task.dueDate || task.status === 'COMPLETED') return false
+const isOverdue = (task: TaskItem): boolean => {
+  if (!task.dueDate || task.status === TaskStatus.Completed) return false
   return new Date(task.dueDate) < new Date()
 }
 

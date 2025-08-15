@@ -61,48 +61,6 @@ export interface RecurringTaskAnalytics {
   }>
 }
 
-/**
- * Unified task type that includes all possible fields from different query results
- * Based on the latest GraphQL schema with full recurrence support
- */
-export type TaskWithPartialUser = {
-  id: any
-  name: string
-  description?: string | null
-  projectId: any
-  status: TaskStatus
-  priority: TaskPriority
-  dueDate?: any
-  createdAt: any
-  updatedAt: any
-  
-  // Recurrence fields - following TASK_SYSTEM_INTEGRATION.md patterns
-  isRecurring?: boolean
-  recurrenceType?: RecurrenceType
-  recurrenceDay?: number | null
-  parentTaskId?: any
-  nextDueDate?: any
-  
-  // Assignment fields
-  assigneeId?: any
-  creatorId?: any
-  assignee?: { id: any; email: string; firstName?: string | null; lastName?: string | null } | null
-  creator?: { id: any; email: string; firstName?: string | null; lastName?: string | null } | null
-  
-  // Project context (from MyAssignedTasksQuery)
-  project?: { id: any; name: string } | null
-  
-  // Parent-child relationships for recurring tasks
-  parentTask?: { id: any; name: string } | null
-  recurringInstances?: Array<{
-    id: any
-    name: string
-    status: TaskStatus
-    dueDate?: any
-    createdAt: any
-  }>
-}
-
 export type TaskStats = ProjectTaskStatsQuery['projectTaskStats']
 
 // Use GraphQL generated enums directly for perfect type alignment
@@ -193,16 +151,16 @@ export function useTasks(projectId?: string, taskId?: string) {
   const { mutate: updateTask, loading: updateLoading, error: updateError } = useUpdateTaskMutation()
   const { mutate: assignTask, loading: assignLoading, error: assignError } = useAssignTaskMutation()
   const { mutate: deleteTask, loading: deleteLoading, error: deleteError } = useDeleteTaskMutation()
-  const { mutate: completeTaskWithRecurrence, loading: completeLoading, error: completeError } = useCompleteTaskWithRecurrenceMutation()
+  const { mutate: completeTaskWithRecurrence, loading: completeLoading } = useCompleteTaskWithRecurrenceMutation()
 
   // ========== COMPUTED PROPERTIES ==========
   
   // Unified tasks from either my tasks or project tasks
-  const tasks = computed((): TaskWithPartialUser[] => {
+  const tasks = computed((): TaskItem[] => {
     if (projectId) {
-      return (projectTasksQuery.result.value?.projectTasks || []) as TaskWithPartialUser[]
+      return (projectTasksQuery.result.value?.projectTasks || []) as TaskItem[]
     } else {
-      return (myTasksQuery.result.value?.myAssignedTasks || []) as TaskWithPartialUser[]
+      return (myTasksQuery.result.value?.myAssignedTasks || []) as TaskItem[]
     }
   })
 
@@ -271,7 +229,7 @@ export function useTasks(projectId?: string, taskId?: string) {
 
   // Task groupings for better organization
   const tasksByPriority = computed(() => {
-    const groups: Record<TaskPriority, TaskWithPartialUser[]> = {
+    const groups: Record<TaskPriority, TaskItem[]> = {
       [TaskPriority.Urgent]: [],
       [TaskPriority.High]: [],
       [TaskPriority.Medium]: [],
@@ -626,28 +584,102 @@ export function useTasks(projectId?: string, taskId?: string) {
    * Follows TASK_SYSTEM_INTEGRATION.md patterns for recurring tasks
    */
   const completeTask = async (taskId: string) => {
-    return feedback.handleMutation(completeLoading, completeError, async () => {
+    try {
+      console.log('🔄 Starting task completion for:', taskId)
       const result = await completeTaskWithRecurrence({ taskId })
       
-      // Refetch relevant queries to show updated data
-      if (projectId) {
-        await projectTasksQuery.refetch()
-        await projectStatsQuery.refetch()
-      } else {
-        await myTasksQuery.refetch()
+      // Log the mutation result to debug recurring task creation
+      if (result?.data?.completeTaskWithRecurrence) {
+        const response = result.data.completeTaskWithRecurrence
+        console.log('✅ Task completion response:', {
+          originalTask: response.originalTask?.id,
+          originalStatus: response.originalTask?.status,
+          nextInstance: response.nextInstance?.id,
+          nextInstanceDueDate: response.nextInstance?.dueDate,
+          isRecurring: response.originalTask?.isRecurring,
+          recurrenceType: response.originalTask?.recurrenceType
+        })
+        
+        if (response.nextInstance) {
+          console.log('🔄 New recurring instance created:', response.nextInstance.id)
+        } else {
+          console.log('ℹ️ No next instance created (task not recurring or no more instances)')
+        }
       }
       
+      // Refetch relevant queries to show updated data
+      console.log('🔄 Refetching queries after task completion...')
+      if (projectId) {
+        await Promise.all([
+          projectTasksQuery.refetch(),
+          projectStatsQuery.refetch()
+        ])
+        console.log('✅ Project queries refetched')
+      } else {
+        await myTasksQuery.refetch()
+        console.log('✅ My tasks query refetched')
+      }
+
+      // If the mutation returned a nextInstance, ensure it's present in the
+      // corresponding query result (some cache/fetch policies may not surface
+      // the newly created instance immediately). We update the in-memory
+      // result as a fallback so the UI reflects the change immediately.
+      try {
+        const next = result?.data?.completeTaskWithRecurrence?.nextInstance
+        if (next) {
+          const nextId = next.id
+          console.log('🔁 Ensuring next instance is present in query results:', nextId)
+
+          if (projectId) {
+            const list = projectTasksQuery.result.value?.projectTasks
+              if (Array.isArray(list) && projectTasksQuery.result && projectTasksQuery.result.value) {
+                const exists = list.find((t: any) => t.id === nextId)
+                if (!exists) {
+                  // insert at front to show upcoming instance immediately
+                  projectTasksQuery.result.value = {
+                    ...projectTasksQuery.result.value,
+                    projectTasks: [next as any, ...list]
+                  } as any
+                  console.log('➕ Inserted next instance into projectTasks result')
+                } else {
+                  console.log('ℹ️ Next instance already present in projectTasks result')
+                }
+              }
+          } else {
+            const list = myTasksQuery.result.value?.myAssignedTasks
+            if (Array.isArray(list) && myTasksQuery.result && myTasksQuery.result.value) {
+              const exists = list.find((t: any) => t.id === nextId)
+              if (!exists) {
+                myTasksQuery.result.value = {
+                  ...myTasksQuery.result.value,
+                  myAssignedTasks: [next as any, ...list]
+                } as any
+                console.log('➕ Inserted next instance into myAssignedTasks result')
+              } else {
+                console.log('ℹ️ Next instance already present in myAssignedTasks result')
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('⚠️ Failed to ensure next instance in query results', e)
+      }
+
       // If taskId is provided, refetch instances as well
       if (taskId && instancesResult.value) {
         // The recurring instances query will automatically update
+        console.log('ℹ️ Recurring instances will auto-update via Apollo cache')
       }
       
+      // Show success feedback
+      feedback.success('Task Completed', 'Task completed successfully')
+      
       return result
-    }, {
-      successTitle: 'Task Completed',
-      successMessage: 'Task completed successfully',
-      errorTitle: 'Failed to Complete Task'
-    })
+    } catch (error) {
+      console.error('❌ Failed to complete task:', error)
+      feedback.error('Failed to Complete Task', 'Could not complete the task')
+      throw error
+    }
   }
 
   /**
