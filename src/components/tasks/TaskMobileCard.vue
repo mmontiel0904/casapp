@@ -18,16 +18,16 @@
         
         <!-- Mobile Actions Menu -->
         <div class="dropdown dropdown-end" @click.stop>
-          <label tabindex="0" class="btn btn-ghost btn-sm btn-circle hover:bg-base-200">
+          <label tabindex="0" class="btn btn-ghost btn-sm btn-circle hover:bg-base-200 min-h-[44px] min-w-[44px]">
             <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
             </svg>
           </label>
-          <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow-xl bg-base-100 border border-base-300 rounded-lg w-44">
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-1 shadow-xl bg-base-100 rounded-xl w-44">
             <!-- Primary Action - View Details -->
             <li>
-              <button @click="handleViewDetails" class="flex items-center gap-2 p-3 text-sm hover:bg-primary/10 rounded">
-                <svg class="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button @click="handleViewDetails" class="flex items-center gap-2 p-3 text-sm hover:bg-primary/10 rounded min-h-[44px] w-full">
+                <svg class="h-4 w-4 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
@@ -35,8 +35,8 @@
               </button>
             </li>
             <li>
-              <button @click="handleEdit" class="flex items-center gap-2 p-3 text-sm hover:bg-base-200 rounded">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button @click="handleEdit" class="flex items-center gap-2 p-3 text-sm hover:bg-base-200 rounded min-h-[44px] w-full">
+                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 <span>Edit</span>
@@ -46,19 +46,19 @@
               <button 
                 @click="handleMarkComplete" 
                 :disabled="props.completeLoading"
-                class="flex items-center gap-2 p-3 text-sm hover:bg-success/10 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                class="flex items-center gap-2 p-3 text-sm hover:bg-success/10 rounded disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] w-full"
               >
-                <svg v-if="!props.completeLoading" class="h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg v-if="!props.completeLoading" class="h-4 w-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4" />
                 </svg>
-                <span v-if="props.completeLoading" class="loading loading-spinner loading-xs text-success"></span>
+                <span v-if="props.completeLoading" class="loading loading-spinner loading-xs text-success flex-shrink-0"></span>
                 <span>{{ props.completeLoading ? 'Completing...' : 'Mark Complete' }}</span>
               </button>
             </li>
             <div class="divider my-1"></div>
             <li>
-              <button @click="handleDelete" class="flex items-center gap-2 p-3 text-sm hover:bg-error/10 rounded text-error">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button @click="handleDelete" class="flex items-center gap-2 p-3 text-sm hover:bg-error/10 rounded text-error min-h-[44px] w-full">
+                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 <span>Delete</span>
@@ -70,20 +70,44 @@
       
       <!-- Card Meta Info -->
       <div class="flex flex-wrap items-center gap-2 mb-3">
-        <!-- Status Badge -->
-        <div :class="getStatusColor(task.status)" class="badge badge-sm font-sans">
+        <!-- Status Chip -->
+        <Chip :variant="getStatusVariant(task.status)" size="sm">
           {{ getStatusDisplayName(task.status) }}
-        </div>
+        </Chip>
         
-        <!-- Priority Badge -->
-        <div :class="getPriorityColor(task.priority)" class="badge badge-sm font-sans">
+        <!-- Priority Chip -->
+        <Chip :variant="getPriorityVariant(task.priority)" size="sm">
           {{ getPriorityDisplayName(task.priority) }}
-        </div>
+        </Chip>
         
-        <!-- Overdue Badge -->
-        <div v-if="isOverdue(task)" class="badge badge-error badge-sm">
+        <!-- Secondary Indicators -->
+        <Chip v-if="isOverdue(task)" variant="error" size="sm">
+          <template #icon>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+          </template>
           Overdue
-        </div>
+        </Chip>
+        
+        <!-- Recurring Task Indicators -->
+        <Chip v-if="isRecurringTask(task)" variant="info" size="sm">
+          <template #icon>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+          </template>
+          {{ formatRecurrenceType(task?.recurrenceType) }}
+        </Chip>
+        
+        <Chip v-if="isRecurringInstance(task)" variant="ghost" size="sm">
+          <template #icon>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+            </svg>
+          </template>
+          Recurring Instance
+        </Chip>
       </div>
       
       <!-- Card Footer -->
@@ -132,8 +156,9 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskItem } from '../../composables/useTasks'
+import { useTasks, type TaskItem } from '../../composables/useTasks'
 import { TaskStatus } from '../../generated/graphql'
+import Chip from '../ui/Chip.vue'
 
 interface Props {
   task: TaskItem
@@ -158,6 +183,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+// Unified tasks functionality - includes all recurring task helpers
+const { 
+  formatRecurrenceType, 
+  isRecurringTask, 
+  isRecurringInstance
+} = useTasks()
 
 // Event handlers with dropdown closing
 const closeDropdown = () => {
@@ -204,14 +236,14 @@ const getStatusDisplayName = (status: string): string => {
   return statusMap[status] || status
 }
 
-const getStatusColor = (status: string): string => {
-  const colorMap: Record<string, string> = {
-    'TODO': 'badge-info',
-    'IN_PROGRESS': 'badge-warning',
-    'COMPLETED': 'badge-success',
-    'CANCELLED': 'badge-error'
+const getStatusVariant = (status: string): 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'ghost' => {
+  const variantMap: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'ghost'> = {
+    'TODO': 'info',
+    'IN_PROGRESS': 'warning', 
+    'COMPLETED': 'success',
+    'CANCELLED': 'error'
   }
-  return colorMap[status] || 'badge-neutral'
+  return variantMap[status] || 'neutral'
 }
 
 const getPriorityDisplayName = (priority: string): string => {
@@ -224,14 +256,14 @@ const getPriorityDisplayName = (priority: string): string => {
   return priorityMap[priority] || priority
 }
 
-const getPriorityColor = (priority: string): string => {
-  const colorMap: Record<string, string> = {
-    'LOW': 'badge-neutral',
-    'MEDIUM': 'badge-info',
-    'HIGH': 'badge-warning',
-    'URGENT': 'badge-error'
+const getPriorityVariant = (priority: string): 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'ghost' => {
+  const variantMap: Record<string, 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'neutral' | 'ghost'> = {
+    'LOW': 'neutral',
+    'MEDIUM': 'info',
+    'HIGH': 'warning',
+    'URGENT': 'error'
   }
-  return colorMap[priority] || 'badge-neutral'
+  return variantMap[priority] || 'neutral'
 }
 
 const isOverdue = (task: TaskItem): boolean => {

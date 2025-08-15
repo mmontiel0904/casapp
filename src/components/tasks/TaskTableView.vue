@@ -29,6 +29,7 @@
             <InlineTaskCreator
               :show-project="showProject"
               :preselected-project-id="preselectedProjectId"
+              :context="context"
               @task-created="handleTaskCreated"
               @cancel="emit('cancelInlineCreator')"
             />
@@ -76,6 +77,7 @@
             v-if="showInlineCreator"
             :show-project="showProject"
             :preselected-project-id="preselectedProjectId"
+            :context="context"
             @task-created="handleTaskCreated"
             @cancel="emit('cancelInlineCreator')"
           />

@@ -43,5 +43,5 @@
   font-display: swap;
 }
 @plugin "daisyui" {
-  themes: garden --default, forest --prefersdark;
+  themes: emerald --default, synthwave --prefersdark;
 }

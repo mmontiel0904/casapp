@@ -1,12 +1,12 @@
 <template>
   <tr class="bg-primary/5 border-2 border-primary/20">
     <!-- Task Name Input -->
-    <td class="max-w-xs">
+    <td class="max-w-[120px] sm:max-w-[200px] lg:max-w-xs">
       <input
         ref="nameInput"
         v-model="form.name"
         type="text"
-        class="input input-sm input-bordered w-full"
+        class="input input-sm input-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
         placeholder="Enter task name..."
         maxlength="255"
         @keydown.enter="handleSave"
@@ -19,7 +19,7 @@
     <td>
       <select 
         v-model="form.status"
-        class="select select-sm select-bordered w-full"
+        class="select select-sm select-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
       >
         <option 
           v-for="status in statusOptions" 
@@ -35,7 +35,7 @@
     <td>
       <select 
         v-model="form.priority"
-        class="select select-sm select-bordered w-full"
+        class="select select-sm select-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
       >
         <option 
           v-for="priority in priorityOptions" 
@@ -47,11 +47,11 @@
       </select>
     </td>
 
-    <!-- Assignee Select -->
-    <td>
+    <!-- Assignee Select (for project tasks) / Creator (for my tasks) -->
+    <td v-if="context === 'projectTasks'">
       <select 
         v-model="form.assigneeId"
-        class="select select-sm select-bordered w-full"
+        class="select select-sm select-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
         :disabled="usersLoading"
       >
         <option value="">Unassigned</option>
@@ -71,12 +71,15 @@
         Error loading users
       </div>
     </td>
+    <td v-else-if="context === 'myTasks'" class="py-4">
+      <span class="text-sm text-base-content/70">You</span>
+    </td>
 
     <!-- Project Column (if shown) -->
     <td v-if="showProject">
       <select 
         v-model="form.projectId"
-        class="select select-sm select-bordered w-full"
+        class="select select-sm select-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
         :disabled="projectsLoading"
         required
       >
@@ -91,24 +94,33 @@
       </select>
     </td>
 
-    <!-- Due Date -->
+    <!-- Due Date + Recurrence -->
     <td>
-      <input 
-        v-model="form.dueDate"
-        type="date" 
-        class="input input-sm input-bordered w-full"
-        :min="todayDate"
-      />
+      <div class="space-y-2">
+        <input 
+          v-model="form.dueDate"
+          type="date" 
+          class="input input-sm input-ghost bg-base-100 focus:bg-base-100 hover:bg-base-100 transition-all w-full min-h-[44px] md:min-h-0"
+            :min="todayDate"
+        />
+        <!-- Recurrence Selector -->
+        <RecurrenceSelector 
+          v-model:recurrence-type="form.recurrenceType"
+          v-model:recurrence-day="form.recurrenceDay"
+          size="sm"
+          compact
+        />
+      </div>
     </td>
 
     <!-- Actions -->
-    <td>
+    <td class="text-right">
       <div class="flex gap-1 justify-end">
         <button
           type="button"
           :disabled="!form.name.trim() || (!showProject && !preselectedProjectId) || (showProject && !form.projectId) || isSubmitting"
           @click="handleSave"
-          class="btn btn-primary btn-xs"
+          class="btn btn-primary btn-xs min-h-[44px] md:min-h-0"
           :class="{ 'loading': isSubmitting }"
         >
           <svg v-if="!isSubmitting" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +131,7 @@
         <button
           type="button"
           @click="handleCancel"
-          class="btn btn-ghost btn-xs"
+          class="btn btn-ghost btn-xs min-h-[44px] md:min-h-0"
           :disabled="isSubmitting"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -134,20 +146,23 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
+import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
 import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import RecurrenceSelector from './RecurrenceSelector.vue'
 
 // Props & Emits
 interface Props {
   showProject?: boolean
   preselectedProjectId?: string
   preselectedStatus?: string
+  context?: 'myTasks' | 'projectTasks'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showProject: true,
   preselectedProjectId: '',
-  preselectedStatus: TaskStatus.Todo
+  preselectedStatus: TaskStatus.Todo,
+  context: 'projectTasks'
 })
 
 const emit = defineEmits<{
@@ -190,7 +205,7 @@ const tomorrowDate = computed(() => {
   return tomorrow.toISOString().split('T')[0]
 })
 
-// Form state
+// Form state with recurrence support
 const form = ref<{
   name: string
   description: string
@@ -199,6 +214,8 @@ const form = ref<{
   priority: TaskPriority
   dueDate: string
   assigneeId: string
+  recurrenceType: RecurrenceType
+  recurrenceDay: number | null
 }>({
   name: '',
   description: '',
@@ -206,7 +223,9 @@ const form = ref<{
   status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
   priority: TaskPriority.Medium,
   dueDate: tomorrowDate.value,
-  assigneeId: ''
+  assigneeId: '',
+  recurrenceType: RecurrenceType.None,
+  recurrenceDay: null
 })
 
 const isSubmitting = ref(false)
@@ -258,7 +277,9 @@ const handleSave = async () => {
     projectId,
     priority: form.value.priority,
     assigneeId: form.value.assigneeId || undefined,
-    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined
+    dueDate: form.value.dueDate ? new Date(form.value.dueDate).toISOString() : undefined,
+    recurrenceType: form.value.recurrenceType,
+    recurrenceDay: form.value.recurrenceDay
   }
 
   feedback.handleMutation(createLoading, createError, async () => {
