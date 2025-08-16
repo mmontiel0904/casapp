@@ -1,0 +1,53 @@
+<template>
+  <svg 
+    :width="size" 
+    :height="size" 
+    viewBox="0 0 120 120" 
+    xmlns="http://www.w3.org/2000/svg"
+    :class="className"
+  >
+    <!-- Gradient definitions -->
+    <defs>
+      <linearGradient :id="`bgGradient-${gradientId}`" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+      </linearGradient>
+      <linearGradient :id="`heartGradient-${gradientId}`" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style="stop-color:#ff9a9e;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#fecfef;stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    
+    <!-- Background circle -->
+    <circle cx="60" cy="60" r="52" :fill="`url(#bgGradient-${gradientId})`"/>
+    
+    <!-- Minimalist family representation using simple circles -->
+    <!-- Parent figures (larger circles) -->
+    <circle cx="44" cy="54" r="8" fill="white" opacity="0.95"/>
+    <circle cx="76" cy="54" r="8" fill="white" opacity="0.95"/>
+    
+    <!-- Children figures (smaller circles) -->
+    <circle cx="52" cy="71" r="5.5" fill="#FFE066" opacity="0.9"/>
+    <circle cx="68" cy="71" r="5.5" fill="#66D9EF" opacity="0.9"/>
+    
+    <!-- Elegant heart with soft gradient -->
+    <path d="M60 41 C56 37, 50 37, 50 43 C50 37, 44 37, 44 43 C44 49, 55 60, 60 64 C65 60, 76 49, 76 43 C76 37, 70 37, 70 43 C70 37, 64 37, 60 41 Z" 
+          :fill="`url(#heartGradient-${gradientId})`" 
+          opacity="0.8"/>
+  </svg>
+</template>
+
+<script setup lang="ts">
+interface Props {
+  size?: string | number
+  className?: string
+}
+
+withDefaults(defineProps<Props>(), {
+  size: 32,
+  className: ''
+})
+
+// Generate a unique ID for gradients to avoid conflicts when multiple logos are on the same page
+const gradientId = Math.random().toString(36).substring(2, 9)
+</script>

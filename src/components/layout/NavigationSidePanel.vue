@@ -14,8 +14,35 @@
       <div class="flex items-center justify-between p-6 border-b border-base-300 bg-gradient-to-r from-primary/5 to-transparent">
         <div class="flex items-center gap-3">
           <div class="p-2 bg-primary/10 rounded-lg">
-            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            <svg width="24" height="24" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" class="text-primary">
+              <!-- Gradient definitions -->
+              <defs>
+                <linearGradient id="bgGradientNav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="heartGradientNav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ff9a9e;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#fecfef;stop-opacity:1" />
+                </linearGradient>
+              </defs>
+              
+              <!-- Background circle -->
+              <circle cx="60" cy="60" r="52" fill="url(#bgGradientNav)"/>
+              
+              <!-- Minimalist family representation using simple circles -->
+              <!-- Parent figures (larger circles) -->
+              <circle cx="44" cy="54" r="8" fill="white" opacity="0.95"/>
+              <circle cx="76" cy="54" r="8" fill="white" opacity="0.95"/>
+              
+              <!-- Children figures (smaller circles) -->
+              <circle cx="52" cy="71" r="5.5" fill="#FFE066" opacity="0.9"/>
+              <circle cx="68" cy="71" r="5.5" fill="#66D9EF" opacity="0.9"/>
+              
+              <!-- Elegant heart with soft gradient -->
+              <path d="M60 41 C56 37, 50 37, 50 43 C50 37, 44 37, 44 43 C44 49, 55 60, 60 64 C65 60, 76 49, 76 43 C76 37, 70 37, 70 43 C70 37, 64 37, 60 41 Z" 
+                    fill="url(#heartGradientNav)" 
+                    opacity="0.8"/>
             </svg>
           </div>
           <div>
