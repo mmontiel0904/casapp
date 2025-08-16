@@ -132,8 +132,13 @@ const authLink = setContext((operation, { headers, skipAuth }) => {
 })
 
 // HTTP link for GraphQL endpoint
+const graphqlUrl = `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_GRAPHQL_ENDPOINT}`
+console.log('Apollo Client GraphQL URL:', graphqlUrl)
+console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL)
+console.log('VITE_GRAPHQL_ENDPOINT:', import.meta.env.VITE_GRAPHQL_ENDPOINT)
+
 const httpLink = createHttpLink({
-  uri: `${import.meta.env.VITE_API_BASE_URL}${import.meta.env.VITE_GRAPHQL_ENDPOINT}`,
+  uri: graphqlUrl,
   credentials: 'omit' // Don't send credentials, use Bearer token instead
 })
 
