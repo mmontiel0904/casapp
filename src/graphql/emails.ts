@@ -31,6 +31,7 @@ export const PROJECT_EMAIL_CONTEXTS_QUERY = gql`
         processingStatus
         aiSummary
         messagePreview
+        fullMessage
         hasAttachments
         attachmentCount
         threadId
@@ -115,6 +116,7 @@ export const SEARCH_EMAIL_CONTEXTS_QUERY = gql`
       processingStatus
       aiSummary
       messagePreview
+      fullMessage
       hasAttachments
       attachmentCount
       threadId

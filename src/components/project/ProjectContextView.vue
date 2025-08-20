@@ -296,7 +296,23 @@
                           <span class="font-medium">To:</span> {{ email.toEmails.join(', ') }}
                         </div>
                         
-                        <p class="text-sm text-base-content/80 mb-3">{{ email.messagePreview || 'No preview available' }}</p>
+                        <!-- Message Content -->
+                        <div class="mb-3">
+                          <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium text-base-content/60">Message</span>
+                            <button 
+                              @click="toggleEmailExpansion(email.id)"
+                              class="btn btn-xs btn-ghost"
+                              v-if="email.fullMessage && email.fullMessage !== email.messagePreview"
+                            >
+                              {{ isEmailExpanded(email.id) ? 'Show Less' : 'Show Full Message' }}
+                            </button>
+                          </div>
+                          <div class="text-sm text-base-content/80 p-3 bg-base-200 rounded-lg">
+                            <div v-if="isEmailExpanded(email.id)" class="whitespace-pre-wrap">{{ email.fullMessage || 'No full message available' }}</div>
+                            <div v-else>{{ email.messagePreview || 'No preview available' }}</div>
+                          </div>
+                        </div>
                         
                         <div v-if="email.aiSummary" class="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-3">
                           <div class="text-xs font-medium text-primary mb-1">AI Summary</div>
@@ -384,6 +400,7 @@ const showEmailModal = ref(false)
 const showNavPanel = ref(false)
 const emailSearchQuery = ref('')
 const isSearching = ref(false)
+const expandedEmails = ref(new Set<string>()) // Track which emails have expanded messages
 
 // GraphQL Queries
 const { result: projectResult, loading: projectLoading } = useProjectQuery({
@@ -516,6 +533,18 @@ const clearEmailSearch = () => {
   emailSearchQuery.value = ''
   isSearching.value = false
   searchEmailsVariables.query = ''
+}
+
+const toggleEmailExpansion = (emailId: string) => {
+  if (expandedEmails.value.has(emailId)) {
+    expandedEmails.value.delete(emailId)
+  } else {
+    expandedEmails.value.add(emailId)
+  }
+}
+
+const isEmailExpanded = (emailId: string) => {
+  return expandedEmails.value.has(emailId)
 }
 
 const handleEmailIngestionSuccess = () => {

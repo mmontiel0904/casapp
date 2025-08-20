@@ -1102,7 +1102,7 @@ export type ProjectEmailContextsQueryVariables = Exact<{
 }>;
 
 
-export type ProjectEmailContextsQuery = { emailContexts: { totalCount: number, edges: Array<{ id: any, subject: string, fromEmail: string, fromName?: string | null, toEmails: Array<string>, ccEmails?: Array<string> | null, bccEmails?: Array<string> | null, messageDate?: any | null, receivedDate: any, processingStatus: ProcessingStatus, aiSummary?: string | null, messagePreview?: string | null, hasAttachments: boolean, attachmentCount: number, threadId?: string | null, replyTo?: string | null, inReplyTo?: string | null, processingNotes?: string | null, attachments: Array<{ id: any, filename: string, originalFilename: string, contentType?: string | null, fileSize?: number | null }> }> } };
+export type ProjectEmailContextsQuery = { emailContexts: { totalCount: number, edges: Array<{ id: any, subject: string, fromEmail: string, fromName?: string | null, toEmails: Array<string>, ccEmails?: Array<string> | null, bccEmails?: Array<string> | null, messageDate?: any | null, receivedDate: any, processingStatus: ProcessingStatus, aiSummary?: string | null, messagePreview?: string | null, fullMessage: string, hasAttachments: boolean, attachmentCount: number, threadId?: string | null, replyTo?: string | null, inReplyTo?: string | null, processingNotes?: string | null, attachments: Array<{ id: any, filename: string, originalFilename: string, contentType?: string | null, fileSize?: number | null }> }> } };
 
 export type EmailContextQueryVariables = Exact<{
   emailId: Scalars['UUID']['input'];
@@ -1118,7 +1118,7 @@ export type SearchEmailContextsQueryVariables = Exact<{
 }>;
 
 
-export type SearchEmailContextsQuery = { searchEmailContexts: Array<{ id: any, subject: string, fromEmail: string, fromName?: string | null, toEmails: Array<string>, messageDate?: any | null, receivedDate: any, processingStatus: ProcessingStatus, aiSummary?: string | null, messagePreview?: string | null, hasAttachments: boolean, attachmentCount: number, threadId?: string | null }> };
+export type SearchEmailContextsQuery = { searchEmailContexts: Array<{ id: any, subject: string, fromEmail: string, fromName?: string | null, toEmails: Array<string>, messageDate?: any | null, receivedDate: any, processingStatus: ProcessingStatus, aiSummary?: string | null, messagePreview?: string | null, fullMessage: string, hasAttachments: boolean, attachmentCount: number, threadId?: string | null }> };
 
 export type EmailThreadQueryVariables = Exact<{
   projectId: Scalars['UUID']['input'];
@@ -1846,6 +1846,7 @@ export const ProjectEmailContextsDocument = gql`
       processingStatus
       aiSummary
       messagePreview
+      fullMessage
       hasAttachments
       attachmentCount
       threadId
@@ -1969,6 +1970,7 @@ export const SearchEmailContextsDocument = gql`
     processingStatus
     aiSummary
     messagePreview
+    fullMessage
     hasAttachments
     attachmentCount
     threadId
