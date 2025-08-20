@@ -1,13 +1,10 @@
 <template>
-  <AppLayout>
-    <ProjectContextView :project-id="projectId" />
-  </AppLayout>
+  <ProjectContextView :project-id="projectId" />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import AppLayout from '@/components/layout/AppLayout.vue'
 import ProjectContextView from '@/components/project/ProjectContextView.vue'
 
 const route = useRoute()

@@ -396,7 +396,7 @@ type ProjectContextCategory {
   color: String!
   contextTypeId: UUID!
   createdAt: DateTime!
-  createdBy: UUID!
+  createdBy: UUID
   description: String
   id: UUID!
   isActive: Boolean!
