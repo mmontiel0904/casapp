@@ -224,7 +224,7 @@ const handleSubmit = async () => {
       name: form.name.trim(),
       description: form.description.trim() || undefined,
       assigneeId: form.assigneeId || undefined,
-      dueDate: form.dueDate || undefined,
+      dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : undefined,
       priority: form.priority
     }
 
