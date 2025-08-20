@@ -348,6 +348,37 @@
             </div>
           </div>
 
+          <!-- Context Tab -->
+          <div v-else-if="activeTab === 'context'" class="space-y-6">
+            <!-- Context Management Header -->
+            <div class="card bg-base-100 shadow">
+              <div class="card-body">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-xl font-semibold">Project Context Management</h3>
+                    <p class="text-base-content/70 mt-1">
+                      Organize and manage context categories and entries for this project
+                    </p>
+                  </div>
+                  <div class="flex gap-2">
+                    <button class="btn btn-outline btn-sm" @click="() => refetchContexts()">
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Refresh
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Categories Management -->
+            <ProjectCategoriesManager :project-id="projectId" />
+            
+            <!-- Context Entries -->
+            <ContextEntriesTable :project-id="projectId" />
+          </div>
+
           <!-- Other tabs placeholder -->
           <div v-else class="text-center py-12">
             <div class="text-base-content/50">
@@ -374,6 +405,8 @@
 import { ref, computed, watch, reactive } from 'vue'
 import NavigationSidePanel from '@/components/layout/NavigationSidePanel.vue'
 import EmailIngestionModal from '@/components/modals/EmailIngestionModal.vue'
+import ProjectCategoriesManager from '@/components/context/ProjectCategoriesManager.vue'
+import ContextEntriesTable from '@/components/context/ContextEntriesTable.vue'
 import { useFeedback } from '@/composables/useFeedback'
 import { 
   useProjectQuery,
@@ -381,6 +414,7 @@ import {
   useProjectTaskStatsQuery,
   useProjectEmailContextsQuery,
   useSearchEmailContextsQuery,
+  useProjectContextsQuery,
   TaskStatus,
   TaskPriority,
   ProcessingStatus
@@ -423,6 +457,10 @@ const { result: emailsResult, loading: emailsLoading, refetch: refetchEmails } =
   offset: 0
 })
 
+const { result: contextsResult, refetch: refetchContexts } = useProjectContextsQuery({
+  projectId: props.projectId
+})
+
 // For search emails, we'll use a simpler approach
 const searchEmailsVariables = reactive({
   projectId: props.projectId,
@@ -442,6 +480,7 @@ const projectTaskStats = computed(() => taskStatsResult.value?.projectTaskStats)
 const projectTasks = computed(() => tasksResult.value?.projectTasks || [])
 const projectEmails = computed(() => emailsResult.value?.emailContexts.edges || [])
 const searchedEmails = computed(() => searchEmailsResult.value?.searchEmailContexts || [])
+const allProjectContexts = computed(() => contextsResult.value?.projectContexts.edges || [])
 
 const currentEmails = computed(() => {
   return isSearching.value ? searchedEmails.value : projectEmails.value
@@ -451,6 +490,7 @@ const tabs = computed(() => [
   { key: 'overview', label: 'Overview', icon: '📊' },
   { key: 'tasks', label: 'Tasks', icon: '✅', count: projectTasks.value?.length || 0 },
   { key: 'emails', label: 'Emails', icon: '📧', count: projectEmails.value?.length || 0 },
+  { key: 'context', label: 'Context', icon: '🗂️', count: allProjectContexts.value?.length || 0 },
   { key: 'files', label: 'Files', icon: '📁' },
   { key: 'activities', label: 'Activities', icon: '🕒' },
   { key: 'settings', label: 'Settings', icon: '⚙️' }

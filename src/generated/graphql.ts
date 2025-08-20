@@ -1094,6 +1094,66 @@ export type GetActivitiesQueryVariables = Exact<{
 
 export type GetActivitiesQuery = { activities: Array<{ id: any, actionType: string, description?: string | null, entityId: any, entityType: string, actorId: any, changesJson?: string | null, metadataJson?: string | null, createdAt: any, actor?: { id: any, email: string, firstName?: string | null, lastName?: string | null } | null }> };
 
+export type ProjectContextCategoriesQueryVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+  contextTypeName?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type ProjectContextCategoriesQuery = { projectContextCategories: Array<{ id: any, name: string, description?: string | null, color: string, contextTypeId: any, projectId: any, isActive: boolean, createdAt: any, updatedAt: any, createdBy?: any | null }> };
+
+export type CreateContextCategoryMutationVariables = Exact<{
+  input: CreateContextCategoryInput;
+}>;
+
+
+export type CreateContextCategoryMutation = { createContextCategory: { id: any, name: string, description?: string | null, color: string, contextTypeId: any, projectId: any, isActive: boolean, createdAt: any, updatedAt: any } };
+
+export type UpdateContextCategoryMutationVariables = Exact<{
+  input: UpdateContextCategoryInput;
+}>;
+
+
+export type UpdateContextCategoryMutation = { updateContextCategory: { id: any, name: string, description?: string | null, color: string, isActive: boolean, updatedAt: any } };
+
+export type DeleteContextCategoryMutationVariables = Exact<{
+  categoryId: Scalars['UUID']['input'];
+}>;
+
+
+export type DeleteContextCategoryMutation = { deleteContextCategory: { message: string } };
+
+export type ProjectContextsQueryVariables = Exact<{
+  projectId: Scalars['UUID']['input'];
+  filters?: InputMaybe<ContextFilters>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type ProjectContextsQuery = { projectContexts: { totalCount: number, edges: Array<{ id: any, title: string, description?: string | null, tags?: Array<string> | null, isArchived: boolean, createdAt: any, updatedAt: any, createdBy?: any | null, contextType: { id: any, name: string, description?: string | null }, category?: { id: any, name: string, color: string, description?: string | null } | null, emailContext?: { id: any, subject: string, fromEmail: string, messagePreview?: string | null } | null, project: { id: any, name: string } }> } };
+
+export type ArchiveContextMutationVariables = Exact<{
+  contextId: Scalars['UUID']['input'];
+}>;
+
+
+export type ArchiveContextMutation = { archiveContext: { id: any, title: string, isArchived: boolean, updatedAt: any } };
+
+export type RestoreContextMutationVariables = Exact<{
+  contextId: Scalars['UUID']['input'];
+}>;
+
+
+export type RestoreContextMutation = { restoreContext: { id: any, title: string, isArchived: boolean, updatedAt: any } };
+
+export type ContextTypesQueryVariables = Exact<{
+  activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type ContextTypesQuery = { contextTypes: Array<{ id: any, name: string, description?: string | null, isActive: boolean, schemaVersion: number, createdAt: any, updatedAt: any }> };
+
 export type ProjectEmailContextsQueryVariables = Exact<{
   projectId: Scalars['UUID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -1824,6 +1884,318 @@ export function useGetActivitiesLazyQuery(variables?: GetActivitiesQueryVariable
   return VueApolloComposable.useLazyQuery<GetActivitiesQuery, GetActivitiesQueryVariables>(GetActivitiesDocument, variables, options);
 }
 export type GetActivitiesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<GetActivitiesQuery, GetActivitiesQueryVariables>;
+export const ProjectContextCategoriesDocument = gql`
+    query ProjectContextCategories($projectId: UUID!, $contextTypeName: String) {
+  projectContextCategories(
+    projectId: $projectId
+    contextTypeName: $contextTypeName
+  ) {
+    id
+    name
+    description
+    color
+    contextTypeId
+    projectId
+    isActive
+    createdAt
+    updatedAt
+    createdBy
+  }
+}
+    `;
+
+/**
+ * __useProjectContextCategoriesQuery__
+ *
+ * To run a query within a Vue component, call `useProjectContextCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectContextCategoriesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useProjectContextCategoriesQuery({
+ *   projectId: // value for 'projectId'
+ *   contextTypeName: // value for 'contextTypeName'
+ * });
+ */
+export function useProjectContextCategoriesQuery(variables: ProjectContextCategoriesQueryVariables | VueCompositionApi.Ref<ProjectContextCategoriesQueryVariables> | ReactiveFunction<ProjectContextCategoriesQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>(ProjectContextCategoriesDocument, variables, options);
+}
+export function useProjectContextCategoriesLazyQuery(variables?: ProjectContextCategoriesQueryVariables | VueCompositionApi.Ref<ProjectContextCategoriesQueryVariables> | ReactiveFunction<ProjectContextCategoriesQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>(ProjectContextCategoriesDocument, variables, options);
+}
+export type ProjectContextCategoriesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectContextCategoriesQuery, ProjectContextCategoriesQueryVariables>;
+export const CreateContextCategoryDocument = gql`
+    mutation CreateContextCategory($input: CreateContextCategoryInput!) {
+  createContextCategory(input: $input) {
+    id
+    name
+    description
+    color
+    contextTypeId
+    projectId
+    isActive
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useCreateContextCategoryMutation__
+ *
+ * To run a mutation, you first call `useCreateContextCategoryMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateContextCategoryMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateContextCategoryMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateContextCategoryMutation(options: VueApolloComposable.UseMutationOptions<CreateContextCategoryMutation, CreateContextCategoryMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateContextCategoryMutation, CreateContextCategoryMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateContextCategoryMutation, CreateContextCategoryMutationVariables>(CreateContextCategoryDocument, options);
+}
+export type CreateContextCategoryMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateContextCategoryMutation, CreateContextCategoryMutationVariables>;
+export const UpdateContextCategoryDocument = gql`
+    mutation UpdateContextCategory($input: UpdateContextCategoryInput!) {
+  updateContextCategory(input: $input) {
+    id
+    name
+    description
+    color
+    isActive
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUpdateContextCategoryMutation__
+ *
+ * To run a mutation, you first call `useUpdateContextCategoryMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateContextCategoryMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useUpdateContextCategoryMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateContextCategoryMutation(options: VueApolloComposable.UseMutationOptions<UpdateContextCategoryMutation, UpdateContextCategoryMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<UpdateContextCategoryMutation, UpdateContextCategoryMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<UpdateContextCategoryMutation, UpdateContextCategoryMutationVariables>(UpdateContextCategoryDocument, options);
+}
+export type UpdateContextCategoryMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<UpdateContextCategoryMutation, UpdateContextCategoryMutationVariables>;
+export const DeleteContextCategoryDocument = gql`
+    mutation DeleteContextCategory($categoryId: UUID!) {
+  deleteContextCategory(categoryId: $categoryId) {
+    message
+  }
+}
+    `;
+
+/**
+ * __useDeleteContextCategoryMutation__
+ *
+ * To run a mutation, you first call `useDeleteContextCategoryMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteContextCategoryMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useDeleteContextCategoryMutation({
+ *   variables: {
+ *     categoryId: // value for 'categoryId'
+ *   },
+ * });
+ */
+export function useDeleteContextCategoryMutation(options: VueApolloComposable.UseMutationOptions<DeleteContextCategoryMutation, DeleteContextCategoryMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<DeleteContextCategoryMutation, DeleteContextCategoryMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<DeleteContextCategoryMutation, DeleteContextCategoryMutationVariables>(DeleteContextCategoryDocument, options);
+}
+export type DeleteContextCategoryMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<DeleteContextCategoryMutation, DeleteContextCategoryMutationVariables>;
+export const ProjectContextsDocument = gql`
+    query ProjectContexts($projectId: UUID!, $filters: ContextFilters, $limit: Int = 50, $offset: Int = 0) {
+  projectContexts(
+    projectId: $projectId
+    filters: $filters
+    limit: $limit
+    offset: $offset
+  ) {
+    totalCount
+    edges {
+      id
+      title
+      description
+      tags
+      isArchived
+      contextType {
+        id
+        name
+        description
+      }
+      category {
+        id
+        name
+        color
+        description
+      }
+      emailContext {
+        id
+        subject
+        fromEmail
+        messagePreview
+      }
+      project {
+        id
+        name
+      }
+      createdAt
+      updatedAt
+      createdBy
+    }
+  }
+}
+    `;
+
+/**
+ * __useProjectContextsQuery__
+ *
+ * To run a query within a Vue component, call `useProjectContextsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectContextsQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useProjectContextsQuery({
+ *   projectId: // value for 'projectId'
+ *   filters: // value for 'filters'
+ *   limit: // value for 'limit'
+ *   offset: // value for 'offset'
+ * });
+ */
+export function useProjectContextsQuery(variables: ProjectContextsQueryVariables | VueCompositionApi.Ref<ProjectContextsQueryVariables> | ReactiveFunction<ProjectContextsQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ProjectContextsQuery, ProjectContextsQueryVariables>(ProjectContextsDocument, variables, options);
+}
+export function useProjectContextsLazyQuery(variables?: ProjectContextsQueryVariables | VueCompositionApi.Ref<ProjectContextsQueryVariables> | ReactiveFunction<ProjectContextsQueryVariables>, options: VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ProjectContextsQuery, ProjectContextsQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ProjectContextsQuery, ProjectContextsQueryVariables>(ProjectContextsDocument, variables, options);
+}
+export type ProjectContextsQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ProjectContextsQuery, ProjectContextsQueryVariables>;
+export const ArchiveContextDocument = gql`
+    mutation ArchiveContext($contextId: UUID!) {
+  archiveContext(contextId: $contextId) {
+    id
+    title
+    isArchived
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useArchiveContextMutation__
+ *
+ * To run a mutation, you first call `useArchiveContextMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useArchiveContextMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useArchiveContextMutation({
+ *   variables: {
+ *     contextId: // value for 'contextId'
+ *   },
+ * });
+ */
+export function useArchiveContextMutation(options: VueApolloComposable.UseMutationOptions<ArchiveContextMutation, ArchiveContextMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<ArchiveContextMutation, ArchiveContextMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<ArchiveContextMutation, ArchiveContextMutationVariables>(ArchiveContextDocument, options);
+}
+export type ArchiveContextMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<ArchiveContextMutation, ArchiveContextMutationVariables>;
+export const RestoreContextDocument = gql`
+    mutation RestoreContext($contextId: UUID!) {
+  restoreContext(contextId: $contextId) {
+    id
+    title
+    isArchived
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useRestoreContextMutation__
+ *
+ * To run a mutation, you first call `useRestoreContextMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useRestoreContextMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useRestoreContextMutation({
+ *   variables: {
+ *     contextId: // value for 'contextId'
+ *   },
+ * });
+ */
+export function useRestoreContextMutation(options: VueApolloComposable.UseMutationOptions<RestoreContextMutation, RestoreContextMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<RestoreContextMutation, RestoreContextMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<RestoreContextMutation, RestoreContextMutationVariables>(RestoreContextDocument, options);
+}
+export type RestoreContextMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<RestoreContextMutation, RestoreContextMutationVariables>;
+export const ContextTypesDocument = gql`
+    query ContextTypes($activeOnly: Boolean) {
+  contextTypes(activeOnly: $activeOnly) {
+    id
+    name
+    description
+    isActive
+    schemaVersion
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useContextTypesQuery__
+ *
+ * To run a query within a Vue component, call `useContextTypesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContextTypesQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useContextTypesQuery({
+ *   activeOnly: // value for 'activeOnly'
+ * });
+ */
+export function useContextTypesQuery(variables: ContextTypesQueryVariables | VueCompositionApi.Ref<ContextTypesQueryVariables> | ReactiveFunction<ContextTypesQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ContextTypesQuery, ContextTypesQueryVariables>(ContextTypesDocument, variables, options);
+}
+export function useContextTypesLazyQuery(variables: ContextTypesQueryVariables | VueCompositionApi.Ref<ContextTypesQueryVariables> | ReactiveFunction<ContextTypesQueryVariables> = {}, options: VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ContextTypesQuery, ContextTypesQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ContextTypesQuery, ContextTypesQueryVariables>(ContextTypesDocument, variables, options);
+}
+export type ContextTypesQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ContextTypesQuery, ContextTypesQueryVariables>;
 export const ProjectEmailContextsDocument = gql`
     query ProjectEmailContexts($projectId: UUID!, $limit: Int = 30, $offset: Int = 0, $filters: EmailContextFilters) {
   emailContexts(

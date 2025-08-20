@@ -175,6 +175,25 @@
                   <div class="text-xs text-base-content/60">Manage roles & permissions</div>
                 </div>
               </router-link>
+
+              <!-- Context Administration -->
+              <router-link 
+                v-if="canAdminSystem"
+                to="/admin/context" 
+                class="flex items-center gap-3 p-3 rounded-lg hover:bg-base-200 transition-colors group"
+                :class="{ 'bg-primary/10 text-primary': $route.path === '/admin/context' }"
+                @click="$emit('navigate')"
+              >
+                <div class="p-2 rounded-lg bg-primary/10 group-hover:bg-primary/20">
+                  <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <div class="font-semibold">Context Management</div>
+                  <div class="text-xs text-base-content/60">Manage context types & settings</div>
+                </div>
+              </router-link>
             </div>
           </div>
         </nav>

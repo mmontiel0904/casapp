@@ -11,6 +11,7 @@ const ForgotPasswordPage = () => import('../views/ForgotPasswordPage.vue')
 const ResetPasswordPage = () => import('../views/ResetPasswordPage.vue')
 const UserManagementPage = () => import('../views/UserManagementPage.vue')
 const RolePermissionAdminPage = () => import('../views/RolePermissionAdminPage.vue')
+const ContextAdminPage = () => import('../views/ContextAdminPage.vue')
 const ProfilePage = () => import('../views/ProfilePage.vue')
 const ProjectsPage = () => import('../views/ProjectsPage.vue')
 const MyTasksPage = () => import('../views/MyTasksPage.vue')
@@ -99,6 +100,15 @@ const routes = [
     path: '/admin/roles',
     name: 'RolePermissionAdmin',
     component: RolePermissionAdminPage,
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'system_admin'
+    }
+  },
+  {
+    path: '/admin/context',
+    name: 'ContextAdmin',
+    component: ContextAdminPage,
     meta: { 
       requiresAuth: true,
       requiresPermission: 'system_admin'
