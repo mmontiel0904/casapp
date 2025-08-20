@@ -208,3 +208,33 @@ export const COMPLETE_TASK_WITH_RECURRENCE_MUTATION = gql`
     }
   }
 `
+
+export const CREATE_TASK_FROM_CONTEXT_MUTATION = gql`
+  mutation CreateTaskFromContext($input: CreateTaskFromContextInput!) {
+    createTaskFromContext(input: $input) {
+      id
+      name
+      description
+      status
+      priority
+      dueDate
+      assigneeId
+      assignee {
+        id
+        firstName
+        lastName
+        email
+      }
+      contextId
+      context {
+        id
+        title
+        description
+        tags
+      }
+      projectId
+      createdAt
+      updatedAt
+    }
+  }
+`

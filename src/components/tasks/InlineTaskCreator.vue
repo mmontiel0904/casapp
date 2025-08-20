@@ -148,6 +148,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
 import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import { useAuth } from '../../composables/useAuth'
 import RecurrenceSelector from './RecurrenceSelector.vue'
 
 // Props & Emits
@@ -177,6 +178,9 @@ const nameInput = ref<HTMLInputElement>()
 const { mutate: createTask, loading: createLoading, error: createError } = useCreateTaskMutation()
 const feedback = useApolloFeedback()
 
+// Auth state
+const { currentUser } = useAuth()
+
 // Data fetching
 const { result: projectsResult, loading: projectsLoading } = useMyProjectsQuery({
   limit: 50,
@@ -205,6 +209,14 @@ const tomorrowDate = computed(() => {
   return tomorrow.toISOString().split('T')[0]
 })
 
+// Default assignee based on context
+const defaultAssigneeId = computed(() => {
+  if (props.context === 'myTasks' && currentUser.value?.id) {
+    return currentUser.value.id
+  }
+  return ''
+})
+
 // Form state with recurrence support
 const form = ref<{
   name: string
@@ -223,7 +235,7 @@ const form = ref<{
   status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
   priority: TaskPriority.Medium,
   dueDate: tomorrowDate.value,
-  assigneeId: '',
+  assigneeId: defaultAssigneeId.value,
   recurrenceType: RecurrenceType.None,
   recurrenceDay: null
 })
@@ -285,6 +297,7 @@ const handleSave = async () => {
   feedback.handleMutation(createLoading, createError, async () => {
     // Success callback
     emit('taskCreated', taskInput)
+    resetForm()
     isSubmitting.value = false
   }, {
     successTitle: 'Task Created',
@@ -300,7 +313,23 @@ const handleSave = async () => {
   }
 }
 
+// Reset form to initial values
+const resetForm = () => {
+  form.value = {
+    name: '',
+    description: '',
+    projectId: props.preselectedProjectId,
+    status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
+    priority: TaskPriority.Medium,
+    dueDate: tomorrowDate.value,
+    assigneeId: defaultAssigneeId.value,
+    recurrenceType: RecurrenceType.None,
+    recurrenceDay: null
+  }
+}
+
 const handleCancel = () => {
+  resetForm()
   emit('cancel')
 }
 

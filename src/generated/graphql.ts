@@ -170,6 +170,15 @@ export type CreateRoleInput = {
   name: Scalars['String']['input'];
 };
 
+export type CreateTaskFromContextInput = {
+  assigneeId?: InputMaybe<Scalars['UUID']['input']>;
+  contextId: Scalars['UUID']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  priority?: InputMaybe<TaskPriority>;
+};
+
 export type CreateTaskInput = {
   assigneeId?: InputMaybe<Scalars['UUID']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -322,6 +331,8 @@ export type MutationRoot = {
   createResource: Resource;
   createRole: Role;
   createTask: Task;
+  /** Create a task directly from a context element */
+  createTaskFromContext: Task;
   /** Delete (soft delete) a context category */
   deleteContextCategory: MessageResponse;
   deletePermission: MessageResponse;
@@ -437,6 +448,11 @@ export type MutationRootCreateRoleArgs = {
 
 export type MutationRootCreateTaskArgs = {
   input: CreateTaskInput;
+};
+
+
+export type MutationRootCreateTaskFromContextArgs = {
+  input: CreateTaskFromContextInput;
 };
 
 
@@ -920,6 +936,8 @@ export type Task = {
   activityCount: Scalars['Int']['output'];
   assignee?: Maybe<User>;
   assigneeId?: Maybe<Scalars['UUID']['output']>;
+  context?: Maybe<ProjectContext>;
+  contextId?: Maybe<Scalars['UUID']['output']>;
   createdAt: Scalars['DateTime']['output'];
   creator?: Maybe<User>;
   creatorId: Scalars['UUID']['output'];
@@ -1307,6 +1325,13 @@ export type CompleteTaskWithRecurrenceMutationVariables = Exact<{
 
 
 export type CompleteTaskWithRecurrenceMutation = { completeTaskWithRecurrence: { originalTask: { id: any, name: string, status: TaskStatus, updatedAt: any, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null }, nextInstance?: { id: any, name: string, status: TaskStatus, dueDate?: any | null, parentTaskId?: any | null, createdAt: any, isRecurring: boolean, recurrenceType: RecurrenceType, recurrenceDay?: number | null, nextDueDate?: any | null } | null } };
+
+export type CreateTaskFromContextMutationVariables = Exact<{
+  input: CreateTaskFromContextInput;
+}>;
+
+
+export type CreateTaskFromContextMutation = { createTaskFromContext: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null, assigneeId?: any | null, contextId?: any | null, projectId: any, createdAt: any, updatedAt: any, assignee?: { id: any, firstName?: string | null, lastName?: string | null, email: string } | null, context?: { id: any, title: string, description?: string | null, tags?: Array<string> | null } | null } };
 
 export type MyProjectsQueryVariables = Exact<{
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -2991,6 +3016,57 @@ export function useCompleteTaskWithRecurrenceMutation(options: VueApolloComposab
   return VueApolloComposable.useMutation<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables>(CompleteTaskWithRecurrenceDocument, options);
 }
 export type CompleteTaskWithRecurrenceMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CompleteTaskWithRecurrenceMutation, CompleteTaskWithRecurrenceMutationVariables>;
+export const CreateTaskFromContextDocument = gql`
+    mutation CreateTaskFromContext($input: CreateTaskFromContextInput!) {
+  createTaskFromContext(input: $input) {
+    id
+    name
+    description
+    status
+    priority
+    dueDate
+    assigneeId
+    assignee {
+      id
+      firstName
+      lastName
+      email
+    }
+    contextId
+    context {
+      id
+      title
+      description
+      tags
+    }
+    projectId
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useCreateTaskFromContextMutation__
+ *
+ * To run a mutation, you first call `useCreateTaskFromContextMutation` within a Vue component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTaskFromContextMutation` returns an object that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - Several other properties: https://v4.apollo.vuejs.org/api/use-mutation.html#return
+ *
+ * @param options that will be passed into the mutation, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/mutation.html#options;
+ *
+ * @example
+ * const { mutate, loading, error, onDone } = useCreateTaskFromContextMutation({
+ *   variables: {
+ *     input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateTaskFromContextMutation(options: VueApolloComposable.UseMutationOptions<CreateTaskFromContextMutation, CreateTaskFromContextMutationVariables> | ReactiveFunction<VueApolloComposable.UseMutationOptions<CreateTaskFromContextMutation, CreateTaskFromContextMutationVariables>> = {}) {
+  return VueApolloComposable.useMutation<CreateTaskFromContextMutation, CreateTaskFromContextMutationVariables>(CreateTaskFromContextDocument, options);
+}
+export type CreateTaskFromContextMutationCompositionFunctionResult = VueApolloComposable.UseMutationReturn<CreateTaskFromContextMutation, CreateTaskFromContextMutationVariables>;
 export const MyProjectsDocument = gql`
     query MyProjects($limit: Int, $offset: Int) {
   myProjects(limit: $limit, offset: $offset) {

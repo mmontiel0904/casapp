@@ -59,6 +59,7 @@
       <!-- Task Creation Modal -->
       <TaskCreateModal 
         :is-open="showCreateModal"
+        :default-to-current-user="true"
         @close="showCreateModal = false"
         @task-created="handleTaskCreated"
       />

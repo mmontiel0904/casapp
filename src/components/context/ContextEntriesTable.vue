@@ -210,13 +210,35 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01" />
                     </svg>
                   </label>
-                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
-                    <li><a @click="viewContext(context)">View</a></li>
+                  <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48">
+                    <li><a @click="viewContext(context)">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                      View
+                    </a></li>
+                    <li><a @click="createTaskFromContext(context)">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Create Task
+                    </a></li>
                     <li v-if="!context.isArchived">
-                      <a @click="archiveContext(context)" class="text-warning">Archive</a>
+                      <a @click="archiveContext(context)" class="text-warning">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8l4-4h6l4 4m0 0v11a2 2 0 01-2 2H7a2 2 0 01-2-2V8z" />
+                        </svg>
+                        Archive
+                      </a>
                     </li>
                     <li v-else>
-                      <a @click="restoreContext(context)" class="text-success">Restore</a>
+                      <a @click="restoreContext(context)" class="text-success">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Restore
+                      </a>
                     </li>
                   </ul>
                 </div>
@@ -237,11 +259,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Create Task from Context Modal -->
+  <CreateTaskFromContextModal
+    :is-open="showTaskModal"
+    :context="selectedContextForTask"
+    :project-id="projectId"
+    @close="closeTaskModal"
+    @success="handleTaskCreated"
+  />
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import { useFeedback } from '@/composables/useFeedback'
+import CreateTaskFromContextModal from '@/components/modals/CreateTaskFromContextModal.vue'
 import {
   useProjectContextsQuery,
   useProjectContextCategoriesQuery,
@@ -268,6 +300,10 @@ const filters = reactive({
 // Tag editing state
 const editingTags = ref<Record<string, string[]>>({})
 const newTagInput = ref<Record<string, string>>({})
+
+// Task creation state
+const showTaskModal = ref(false)
+const selectedContextForTask = ref<any>(null)
 
 // GraphQL
 const { result: contextsResult, loading: contextsLoading, refetch: refetchContexts } = useProjectContextsQuery({
@@ -375,6 +411,23 @@ const saveTagChanges = async (context: any) => {
   
   // Cancel editing mode
   cancelEditTags(context.id)
+}
+
+// Task creation methods
+const createTaskFromContext = (context: any) => {
+  selectedContextForTask.value = context
+  showTaskModal.value = true
+}
+
+const handleTaskCreated = (task: any) => {
+  feedback.success('Task Created', `Task "${task.name}" created successfully`)
+  showTaskModal.value = false
+  selectedContextForTask.value = null
+}
+
+const closeTaskModal = () => {
+  showTaskModal.value = false
+  selectedContextForTask.value = null
 }
 
 const archiveContext = async (context: any) => {

@@ -63,6 +63,17 @@
             Activity
             <div v-if="taskActivityCount > 0" class="badge badge-neutral badge-sm ml-1">{{ taskActivityCount }}</div>
           </a>
+          <a 
+            v-if="(task as any)?.contextId || (task as any)?.context"
+            class="tab tab-lg" 
+            :class="{ 'tab-active': activeTab === 'context' }"
+            @click="activeTab = 'context'"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Context
+          </a>
         </div>
       </div>
 
@@ -104,6 +115,24 @@
           @add-comment="handleAddComment"
           @refresh-activities="refetchActivities"
         />
+
+        <!-- Context Tab -->
+        <div v-show="activeTab === 'context'" class="p-6">
+          <div v-if="(task as any)?.context">
+            <TaskContextView :context="(task as any).context" />
+          </div>
+          <div v-else-if="(task as any)?.contextId" class="text-center py-8">
+            <div class="loading loading-spinner loading-lg"></div>
+            <p class="mt-4 text-base-content/60">Loading context information...</p>
+            <!-- TODO: Add context query by contextId -->
+          </div>
+          <div v-else class="text-center py-8 text-base-content/50">
+            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p>No context information available</p>
+          </div>
+        </div>
       </div>
         
       <!-- Smart Save Footer -->
@@ -164,6 +193,7 @@ import TaskEditHeader from './TaskEditHeader.vue'
 import TaskEditDetails from './TaskEditDetails.vue'
 import TaskEditSchedule from './TaskEditSchedule.vue'
 import TaskEditActivity from './TaskEditActivity.vue'
+import TaskContextView from './TaskContextView.vue'
 
 // Props & Emits
 interface Props {

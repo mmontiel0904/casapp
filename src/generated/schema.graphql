@@ -136,6 +136,15 @@ input CreateRoleInput {
   name: String!
 }
 
+input CreateTaskFromContextInput {
+  assigneeId: UUID
+  contextId: UUID!
+  description: String
+  dueDate: DateTime
+  name: String!
+  priority: TaskPriority
+}
+
 input CreateTaskInput {
   assigneeId: UUID
   description: String
@@ -300,6 +309,9 @@ type MutationRoot {
   createResource(input: CreateResourceInput!): Resource!
   createRole(input: CreateRoleInput!): Role!
   createTask(input: CreateTaskInput!): Task!
+
+  """Create a task directly from a context element"""
+  createTaskFromContext(input: CreateTaskFromContextInput!): Task!
 
   """Delete (soft delete) a context category"""
   deleteContextCategory(categoryId: UUID!): MessageResponse!
@@ -540,6 +552,8 @@ type Task {
   activityCount: Int!
   assignee: User
   assigneeId: UUID
+  context: ProjectContext
+  contextId: UUID
   createdAt: DateTime!
   creator: User
   creatorId: UUID!

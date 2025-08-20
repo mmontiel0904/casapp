@@ -219,6 +219,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { useMyProjectsQuery, useAllUsersQuery, useCreateTaskMutation, TaskPriority, TaskStatus, RecurrenceType, type CreateTaskInput, type MyProjectsQuery, type AllUsersQuery } from '../../generated/graphql'
 import { useApolloFeedback } from '../../composables/useApolloFeedback'
+import { useAuth } from '../../composables/useAuth'
 import ProjectCreateModal from './ProjectCreateModal.vue'
 import RecurrenceSelector from '../tasks/RecurrenceSelector.vue'
 
@@ -227,12 +228,14 @@ interface Props {
   isOpen?: boolean
   preselectedStatus?: string
   preselectedProjectId?: string
+  defaultToCurrentUser?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   isOpen: false,
   preselectedStatus: '',
-  preselectedProjectId: ''
+  preselectedProjectId: '',
+  defaultToCurrentUser: false
 })
 
 const emit = defineEmits<{
@@ -245,9 +248,18 @@ const modal = ref<HTMLDialogElement>()
 
 // Task management - use Apollo directly for better control
 const { mutate: createTask, loading: createLoading, error: createError } = useCreateTaskMutation()
-
-// Automatic Apollo feedback
 const feedback = useApolloFeedback()
+
+// Auth state
+const { currentUser } = useAuth()
+
+// Default assignee based on props
+const defaultAssigneeId = computed(() => {
+  if (props.defaultToCurrentUser && currentUser.value?.id) {
+    return currentUser.value.id
+  }
+  return ''
+})
 
 // Form state
 const form = ref<{
@@ -271,7 +283,7 @@ const form = ref<{
     tomorrow.setDate(tomorrow.getDate() + 1)
     return tomorrow.toISOString().split('T')[0]
   })(), // Default to tomorrow
-  assigneeId: '',
+  assigneeId: defaultAssigneeId.value,
   recurrenceType: RecurrenceType.None,
   recurrenceDay: null
 })
@@ -362,7 +374,7 @@ const resetForm = () => {
     status: (props.preselectedStatus as TaskStatus) || TaskStatus.Todo,
     priority: TaskPriority.Medium,
     dueDate: tomorrowDate.value, // Default to tomorrow
-    assigneeId: '',
+    assigneeId: defaultAssigneeId.value,
     recurrenceType: RecurrenceType.None,
     recurrenceDay: null
   }
