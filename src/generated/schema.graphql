@@ -10,6 +10,17 @@ input AcceptInvitationInput {
   password: String!
 }
 
+enum AccountingProcess {
+  AP
+  AR
+  AUDIT
+  BR
+  GENERAL
+  PAYROLL
+  REPORTING
+  TAX
+}
+
 type Activity {
   actionType: String!
   actor: User
@@ -71,6 +82,38 @@ type CompleteTaskWithRecurrenceResponse {
   originalTask: Task!
 }
 
+type ContextConnection {
+  edges: [ProjectContext!]!
+  totalCount: Int!
+}
+
+input ContextFilters {
+  categoryId: UUID
+  contextTypeName: String
+  createdAfter: DateTime
+  createdBefore: DateTime
+  isArchived: Boolean
+  tags: [String!]
+}
+
+type ContextType {
+  createdAt: DateTime!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  name: String!
+  schemaVersion: Int!
+  updatedAt: DateTime!
+}
+
+input CreateContextCategoryInput {
+  color: String
+  contextTypeName: String!
+  description: String
+  name: String!
+  projectId: UUID!
+}
+
 input CreatePermissionInput {
   action: String!
   description: String
@@ -111,6 +154,87 @@ The input/output is a string in RFC3339 format.
 """
 scalar DateTime
 
+type EmailAttachment {
+  contentType: String
+  createdAt: DateTime!
+  emailContextId: UUID!
+  extractedText: String
+  fileHash: String
+  fileSize: Int
+  filename: String!
+  id: UUID!
+  isProcessed: Boolean!
+  originalFilename: String!
+  storagePath: String!
+}
+
+type EmailContext {
+  accountingProcess: AccountingProcess!
+  aiSummary: String
+  attachmentCount: Int!
+  attachments: [EmailAttachment!]!
+  bccEmails: [String!]
+  ccEmails: [String!]
+  fromEmail: String!
+  fromName: String
+  fullMessage: String!
+  hasAttachments: Boolean!
+  id: UUID!
+  inReplyTo: String
+  messageDate: DateTime
+  messageHtml: String
+  messageId: String
+  messagePreview: String
+  processingNotes: String
+  processingStatus: ProcessingStatus!
+  projectContext: ProjectContext!
+  receivedDate: DateTime!
+  replyTo: String
+  subject: String!
+  threadId: String
+  toEmails: [String!]!
+}
+
+type EmailContextConnection {
+  edges: [EmailContext!]!
+  totalCount: Int!
+}
+
+input EmailContextFilters {
+  accountingProcess: AccountingProcess
+  fromEmail: String
+  hasAttachments: Boolean
+  messageDateAfter: DateTime
+  messageDateBefore: DateTime
+  processingStatus: ProcessingStatus
+  searchText: String
+}
+
+input EmailIngestInput {
+  accountingProcess: AccountingProcess!
+  aiSummary: String
+  attachmentCount: Int
+  bccEmails: [String!]
+  categoryName: String
+  ccEmails: [String!]
+  confidenceScore: Float
+  extractedEntities: JSON
+  fromEmail: String!
+  fromName: String
+  fullMessage: String!
+  hasAttachments: Boolean
+  inReplyTo: String
+  messageDate: DateTime
+  messageHtml: String
+  messageId: String
+  messagePreview: String
+  processingNotes: String
+  projectId: UUID!
+  subject: String!
+  threadId: String
+  toEmails: [String!]!
+}
+
 enum EntityType {
   PROJECT
   SETTINGS
@@ -143,6 +267,9 @@ input InviteUserWithRoleInput {
   roleId: UUID
 }
 
+"""A scalar that can represent any JSON value."""
+scalar JSON
+
 input LoginInput {
   email: String!
   password: String!
@@ -157,22 +284,34 @@ type MutationRoot {
   addComment(input: AddCommentInput!): Activity!
   addProjectMember(input: AddProjectMemberInput!): MessageResponse!
   adminResetUserPassword(input: AdminResetUserPasswordInput!): MessageResponse!
+
+  """Archive a project context"""
+  archiveContext(contextId: UUID!): ProjectContext!
   assignPermissionToRole(input: AssignPermissionToRoleInput!): MessageResponse!
   assignRole(input: AssignRoleInput!): User!
   assignTask(input: AssignTaskInput!): Task!
   changePassword(input: ChangePasswordInput!): MessageResponse!
   completeTaskWithRecurrence(taskId: UUID!): CompleteTaskWithRecurrenceResponse!
+
+  """Create a new context category for a project"""
+  createContextCategory(input: CreateContextCategoryInput!): ProjectContextCategory!
   createPermission(input: CreatePermissionInput!): Permission!
   createProject(input: CreateProjectInput!): Project!
   createResource(input: CreateResourceInput!): Resource!
   createRole(input: CreateRoleInput!): Role!
   createTask(input: CreateTaskInput!): Task!
+
+  """Delete (soft delete) a context category"""
+  deleteContextCategory(categoryId: UUID!): MessageResponse!
   deletePermission(permissionId: UUID!): MessageResponse!
   deleteProject(projectId: UUID!): MessageResponse!
   deleteResource(resourceId: UUID!): MessageResponse!
   deleteRole(roleId: UUID!): MessageResponse!
   deleteTask(taskId: UUID!): MessageResponse!
   grantUserPermission(input: GrantUserPermissionInput!): MessageResponse!
+
+  """Ingest email context (webhook endpoint)"""
+  ingestEmailContext(input: EmailIngestInput!): EmailContext!
   inviteUser(input: InviteUserInput!): Invitation!
   inviteUserWithRole(input: InviteUserWithRoleInput!): Invitation!
   login(input: LoginInput!): AuthPayload!
@@ -184,7 +323,16 @@ type MutationRoot {
   removeUserRole(userId: UUID!): User!
   requestPasswordReset(input: RequestPasswordResetInput!): MessageResponse!
   resetPassword(input: ResetPasswordInput!): MessageResponse!
+
+  """Restore an archived project context"""
+  restoreContext(contextId: UUID!): ProjectContext!
   revokeUserPermission(input: RevokeUserPermissionInput!): MessageResponse!
+
+  """Update an existing context category"""
+  updateContextCategory(input: UpdateContextCategoryInput!): ProjectContextCategory!
+
+  """Update email processing status"""
+  updateEmailProcessingStatus(emailId: UUID!, notes: String, status: ProcessingStatus!): EmailContext!
   updateMemberRole(input: UpdateMemberRoleInput!): MessageResponse!
   updatePermission(input: UpdatePermissionInput!): Permission!
   updateProject(input: UpdateProjectInput!): Project!
@@ -206,6 +354,13 @@ type Permission {
   updatedAt: DateTime!
 }
 
+enum ProcessingStatus {
+  COMPLETED
+  FAILED
+  MANUAL_REVIEW
+  PENDING
+}
+
 type Project {
   createdAt: DateTime!
   description: String
@@ -216,6 +371,37 @@ type Project {
   owner: User
   ownerId: UUID!
   tasks(assigneeId: UUID, limit: Int, offset: Int, status: TaskStatus): [Task!]!
+  updatedAt: DateTime!
+}
+
+type ProjectContext {
+  category: ProjectContextCategory
+  categoryId: UUID
+  contextType: ContextType!
+  contextTypeId: UUID!
+  createdAt: DateTime!
+  createdBy: UUID
+  description: String
+  emailContext: EmailContext
+  id: UUID!
+  isArchived: Boolean!
+  project: Project!
+  projectId: UUID!
+  tags: [String!]
+  title: String!
+  updatedAt: DateTime!
+}
+
+type ProjectContextCategory {
+  color: String!
+  contextTypeId: UUID!
+  createdAt: DateTime!
+  createdBy: UUID!
+  description: String
+  id: UUID!
+  isActive: Boolean!
+  name: String!
+  projectId: UUID!
   updatedAt: DateTime!
 }
 
@@ -235,6 +421,18 @@ type QueryRoot {
   allRoles: [Role!]!
   allRolesWithPermissions: [RoleWithPermissions!]!
   allUsers: [UserWithRole!]!
+
+  """Get all available context types"""
+  contextTypes(activeOnly: Boolean): [ContextType!]!
+
+  """Get single email context by ID"""
+  emailContext(emailId: UUID!): EmailContext
+
+  """Get email contexts with filtering and pagination"""
+  emailContexts(filters: EmailContextFilters, limit: Int, offset: Int, projectId: UUID!): EmailContextConnection!
+
+  """Get email thread by thread ID"""
+  emailThread(projectId: UUID!, threadId: String!): [EmailContext!]!
   health: String!
   me: User!
   myAssignedTasks(limit: Int, offset: Int, status: TaskStatus): [Task!]!
@@ -242,11 +440,20 @@ type QueryRoot {
   myProjects(limit: Int, offset: Int): [Project!]!
   permissionById(permissionId: UUID!): Permission
   project(projectId: UUID!): Project
+
+  """Get project context categories"""
+  projectContextCategories(contextTypeName: String, projectId: UUID!): [ProjectContextCategory!]!
+
+  """Get project contexts with filtering and pagination"""
+  projectContexts(filters: ContextFilters, limit: Int, offset: Int, projectId: UUID!): ContextConnection!
   projectTaskStats(projectId: UUID!): TaskStats!
   projectTasks(assigneeId: UUID, limit: Int, offset: Int, projectId: UUID!, status: TaskStatus): [Task!]!
   resourceById(resourceId: UUID!): Resource
   roleById(roleId: UUID!): RoleWithPermissions
   rolePermissions(roleId: UUID!): [Permission!]!
+
+  """Search email contexts with full-text search"""
+  searchEmailContexts(limit: Int, projectId: UUID!, query: String!): [EmailContext!]!
   task(taskId: UUID!): Task
   userById(userId: UUID!): UserWithRole!
   userDirectPermissions(userId: UUID!): [Permission!]!
@@ -388,6 +595,14 @@ entities without requiring a central allocating authority.
 * [RFC4122: A Universally Unique Identifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
 """
 scalar UUID
+
+input UpdateContextCategoryInput {
+  categoryId: UUID!
+  color: String
+  description: String
+  isActive: Boolean
+  name: String
+}
 
 input UpdateMemberRoleInput {
   projectId: UUID!

@@ -22,6 +22,8 @@ export type Scalars = {
    * The input/output is a string in RFC3339 format.
    */
   DateTime: { input: any; output: any; }
+  /** A scalar that can represent any JSON value. */
+  JSON: { input: any; output: any; }
   /**
    * A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
    * Strings within GraphQL. UUIDs are used to assign unique identifiers to
@@ -41,6 +43,17 @@ export type AcceptInvitationInput = {
   lastName?: InputMaybe<Scalars['String']['input']>;
   password: Scalars['String']['input'];
 };
+
+export enum AccountingProcess {
+  Ap = 'AP',
+  Ar = 'AR',
+  Audit = 'AUDIT',
+  Br = 'BR',
+  General = 'GENERAL',
+  Payroll = 'PAYROLL',
+  Reporting = 'REPORTING',
+  Tax = 'TAX'
+}
 
 export type Activity = {
   actionType: Scalars['String']['output'];
@@ -103,6 +116,38 @@ export type CompleteTaskWithRecurrenceResponse = {
   originalTask: Task;
 };
 
+export type ContextConnection = {
+  edges: Array<ProjectContext>;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ContextFilters = {
+  categoryId?: InputMaybe<Scalars['UUID']['input']>;
+  contextTypeName?: InputMaybe<Scalars['String']['input']>;
+  createdAfter?: InputMaybe<Scalars['DateTime']['input']>;
+  createdBefore?: InputMaybe<Scalars['DateTime']['input']>;
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type ContextType = {
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  schemaVersion: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type CreateContextCategoryInput = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  contextTypeName: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  projectId: Scalars['UUID']['input'];
+};
+
 export type CreatePermissionInput = {
   action: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
@@ -134,6 +179,87 @@ export type CreateTaskInput = {
   projectId: Scalars['UUID']['input'];
   recurrenceDay?: InputMaybe<Scalars['Int']['input']>;
   recurrenceType?: InputMaybe<RecurrenceType>;
+};
+
+export type EmailAttachment = {
+  contentType?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  emailContextId: Scalars['UUID']['output'];
+  extractedText?: Maybe<Scalars['String']['output']>;
+  fileHash?: Maybe<Scalars['String']['output']>;
+  fileSize?: Maybe<Scalars['Int']['output']>;
+  filename: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  isProcessed: Scalars['Boolean']['output'];
+  originalFilename: Scalars['String']['output'];
+  storagePath: Scalars['String']['output'];
+};
+
+export type EmailContext = {
+  accountingProcess: AccountingProcess;
+  aiSummary?: Maybe<Scalars['String']['output']>;
+  attachmentCount: Scalars['Int']['output'];
+  attachments: Array<EmailAttachment>;
+  bccEmails?: Maybe<Array<Scalars['String']['output']>>;
+  ccEmails?: Maybe<Array<Scalars['String']['output']>>;
+  fromEmail: Scalars['String']['output'];
+  fromName?: Maybe<Scalars['String']['output']>;
+  fullMessage: Scalars['String']['output'];
+  hasAttachments: Scalars['Boolean']['output'];
+  id: Scalars['UUID']['output'];
+  inReplyTo?: Maybe<Scalars['String']['output']>;
+  messageDate?: Maybe<Scalars['DateTime']['output']>;
+  messageHtml?: Maybe<Scalars['String']['output']>;
+  messageId?: Maybe<Scalars['String']['output']>;
+  messagePreview?: Maybe<Scalars['String']['output']>;
+  processingNotes?: Maybe<Scalars['String']['output']>;
+  processingStatus: ProcessingStatus;
+  projectContext: ProjectContext;
+  receivedDate: Scalars['DateTime']['output'];
+  replyTo?: Maybe<Scalars['String']['output']>;
+  subject: Scalars['String']['output'];
+  threadId?: Maybe<Scalars['String']['output']>;
+  toEmails: Array<Scalars['String']['output']>;
+};
+
+export type EmailContextConnection = {
+  edges: Array<EmailContext>;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type EmailContextFilters = {
+  accountingProcess?: InputMaybe<AccountingProcess>;
+  fromEmail?: InputMaybe<Scalars['String']['input']>;
+  hasAttachments?: InputMaybe<Scalars['Boolean']['input']>;
+  messageDateAfter?: InputMaybe<Scalars['DateTime']['input']>;
+  messageDateBefore?: InputMaybe<Scalars['DateTime']['input']>;
+  processingStatus?: InputMaybe<ProcessingStatus>;
+  searchText?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EmailIngestInput = {
+  accountingProcess: AccountingProcess;
+  aiSummary?: InputMaybe<Scalars['String']['input']>;
+  attachmentCount?: InputMaybe<Scalars['Int']['input']>;
+  bccEmails?: InputMaybe<Array<Scalars['String']['input']>>;
+  categoryName?: InputMaybe<Scalars['String']['input']>;
+  ccEmails?: InputMaybe<Array<Scalars['String']['input']>>;
+  confidenceScore?: InputMaybe<Scalars['Float']['input']>;
+  extractedEntities?: InputMaybe<Scalars['JSON']['input']>;
+  fromEmail: Scalars['String']['input'];
+  fromName?: InputMaybe<Scalars['String']['input']>;
+  fullMessage: Scalars['String']['input'];
+  hasAttachments?: InputMaybe<Scalars['Boolean']['input']>;
+  inReplyTo?: InputMaybe<Scalars['String']['input']>;
+  messageDate?: InputMaybe<Scalars['DateTime']['input']>;
+  messageHtml?: InputMaybe<Scalars['String']['input']>;
+  messageId?: InputMaybe<Scalars['String']['input']>;
+  messagePreview?: InputMaybe<Scalars['String']['input']>;
+  processingNotes?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['UUID']['input'];
+  subject: Scalars['String']['input'];
+  threadId?: InputMaybe<Scalars['String']['input']>;
+  toEmails: Array<Scalars['String']['input']>;
 };
 
 export enum EntityType {
@@ -182,22 +308,30 @@ export type MutationRoot = {
   addComment: Activity;
   addProjectMember: MessageResponse;
   adminResetUserPassword: MessageResponse;
+  /** Archive a project context */
+  archiveContext: ProjectContext;
   assignPermissionToRole: MessageResponse;
   assignRole: User;
   assignTask: Task;
   changePassword: MessageResponse;
   completeTaskWithRecurrence: CompleteTaskWithRecurrenceResponse;
+  /** Create a new context category for a project */
+  createContextCategory: ProjectContextCategory;
   createPermission: Permission;
   createProject: Project;
   createResource: Resource;
   createRole: Role;
   createTask: Task;
+  /** Delete (soft delete) a context category */
+  deleteContextCategory: MessageResponse;
   deletePermission: MessageResponse;
   deleteProject: MessageResponse;
   deleteResource: MessageResponse;
   deleteRole: MessageResponse;
   deleteTask: MessageResponse;
   grantUserPermission: MessageResponse;
+  /** Ingest email context (webhook endpoint) */
+  ingestEmailContext: EmailContext;
   inviteUser: Invitation;
   inviteUserWithRole: Invitation;
   login: AuthPayload;
@@ -209,7 +343,13 @@ export type MutationRoot = {
   removeUserRole: User;
   requestPasswordReset: MessageResponse;
   resetPassword: MessageResponse;
+  /** Restore an archived project context */
+  restoreContext: ProjectContext;
   revokeUserPermission: MessageResponse;
+  /** Update an existing context category */
+  updateContextCategory: ProjectContextCategory;
+  /** Update email processing status */
+  updateEmailProcessingStatus: EmailContext;
   updateMemberRole: MessageResponse;
   updatePermission: Permission;
   updateProject: Project;
@@ -240,6 +380,11 @@ export type MutationRootAdminResetUserPasswordArgs = {
 };
 
 
+export type MutationRootArchiveContextArgs = {
+  contextId: Scalars['UUID']['input'];
+};
+
+
 export type MutationRootAssignPermissionToRoleArgs = {
   input: AssignPermissionToRoleInput;
 };
@@ -265,6 +410,11 @@ export type MutationRootCompleteTaskWithRecurrenceArgs = {
 };
 
 
+export type MutationRootCreateContextCategoryArgs = {
+  input: CreateContextCategoryInput;
+};
+
+
 export type MutationRootCreatePermissionArgs = {
   input: CreatePermissionInput;
 };
@@ -287,6 +437,11 @@ export type MutationRootCreateRoleArgs = {
 
 export type MutationRootCreateTaskArgs = {
   input: CreateTaskInput;
+};
+
+
+export type MutationRootDeleteContextCategoryArgs = {
+  categoryId: Scalars['UUID']['input'];
 };
 
 
@@ -317,6 +472,11 @@ export type MutationRootDeleteTaskArgs = {
 
 export type MutationRootGrantUserPermissionArgs = {
   input: GrantUserPermissionInput;
+};
+
+
+export type MutationRootIngestEmailContextArgs = {
+  input: EmailIngestInput;
 };
 
 
@@ -370,8 +530,25 @@ export type MutationRootResetPasswordArgs = {
 };
 
 
+export type MutationRootRestoreContextArgs = {
+  contextId: Scalars['UUID']['input'];
+};
+
+
 export type MutationRootRevokeUserPermissionArgs = {
   input: RevokeUserPermissionInput;
+};
+
+
+export type MutationRootUpdateContextCategoryArgs = {
+  input: UpdateContextCategoryInput;
+};
+
+
+export type MutationRootUpdateEmailProcessingStatusArgs = {
+  emailId: Scalars['UUID']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  status: ProcessingStatus;
 };
 
 
@@ -421,6 +598,13 @@ export type Permission = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export enum ProcessingStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  ManualReview = 'MANUAL_REVIEW',
+  Pending = 'PENDING'
+}
+
 export type Project = {
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
@@ -442,6 +626,37 @@ export type ProjectTasksArgs = {
   status?: InputMaybe<TaskStatus>;
 };
 
+export type ProjectContext = {
+  category?: Maybe<ProjectContextCategory>;
+  categoryId?: Maybe<Scalars['UUID']['output']>;
+  contextType: ContextType;
+  contextTypeId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy?: Maybe<Scalars['UUID']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  emailContext?: Maybe<EmailContext>;
+  id: Scalars['UUID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  project: Project;
+  projectId: Scalars['UUID']['output'];
+  tags?: Maybe<Array<Scalars['String']['output']>>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ProjectContextCategory = {
+  color: Scalars['String']['output'];
+  contextTypeId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Scalars['UUID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  projectId: Scalars['UUID']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type ProjectMember = {
   id: Scalars['UUID']['output'];
   joinedAt: Scalars['DateTime']['output'];
@@ -458,6 +673,14 @@ export type QueryRoot = {
   allRoles: Array<Role>;
   allRolesWithPermissions: Array<RoleWithPermissions>;
   allUsers: Array<UserWithRole>;
+  /** Get all available context types */
+  contextTypes: Array<ContextType>;
+  /** Get single email context by ID */
+  emailContext?: Maybe<EmailContext>;
+  /** Get email contexts with filtering and pagination */
+  emailContexts: EmailContextConnection;
+  /** Get email thread by thread ID */
+  emailThread: Array<EmailContext>;
   health: Scalars['String']['output'];
   me: User;
   myAssignedTasks: Array<Task>;
@@ -465,11 +688,17 @@ export type QueryRoot = {
   myProjects: Array<Project>;
   permissionById?: Maybe<Permission>;
   project?: Maybe<Project>;
+  /** Get project context categories */
+  projectContextCategories: Array<ProjectContextCategory>;
+  /** Get project contexts with filtering and pagination */
+  projectContexts: ContextConnection;
   projectTaskStats: TaskStats;
   projectTasks: Array<Task>;
   resourceById?: Maybe<Resource>;
   roleById?: Maybe<RoleWithPermissions>;
   rolePermissions: Array<Permission>;
+  /** Search email contexts with full-text search */
+  searchEmailContexts: Array<EmailContext>;
   task?: Maybe<Task>;
   userById: UserWithRole;
   userDirectPermissions: Array<Permission>;
@@ -488,6 +717,30 @@ export type QueryRootActivitiesArgs = {
 
 export type QueryRootAllPermissionsArgs = {
   resourceId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+export type QueryRootContextTypesArgs = {
+  activeOnly?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryRootEmailContextArgs = {
+  emailId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootEmailContextsArgs = {
+  filters?: InputMaybe<EmailContextFilters>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootEmailThreadArgs = {
+  projectId: Scalars['UUID']['input'];
+  threadId: Scalars['String']['input'];
 };
 
 
@@ -510,6 +763,20 @@ export type QueryRootPermissionByIdArgs = {
 
 
 export type QueryRootProjectArgs = {
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootProjectContextCategoriesArgs = {
+  contextTypeName?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootProjectContextsArgs = {
+  filters?: InputMaybe<ContextFilters>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   projectId: Scalars['UUID']['input'];
 };
 
@@ -540,6 +807,13 @@ export type QueryRootRoleByIdArgs = {
 
 export type QueryRootRolePermissionsArgs = {
   roleId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootSearchEmailContextsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  projectId: Scalars['UUID']['input'];
+  query: Scalars['String']['input'];
 };
 
 
@@ -700,6 +974,14 @@ export enum TaskStatus {
   InProgress = 'IN_PROGRESS',
   Todo = 'TODO'
 }
+
+export type UpdateContextCategoryInput = {
+  categoryId: Scalars['UUID']['input'];
+  color?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type UpdateMemberRoleInput = {
   projectId: Scalars['UUID']['input'];

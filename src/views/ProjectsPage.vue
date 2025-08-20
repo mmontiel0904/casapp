@@ -31,6 +31,16 @@
               </svg>
               New Project
             </button>
+
+            <button 
+              @click="showEmailIngestionModal = true"
+              class="btn btn-secondary shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              Ingest Emails
+            </button>
             
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-outline btn-square">
@@ -102,8 +112,26 @@
               />
             </template>
             
-            <!-- Project Details -->
-            <div class="space-y-4">
+              <div class="space-y-4">
+              <!-- Email Context Stats -->
+              <div v-if="project.emailStats" class="flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-info" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 7.89a2 2 0 002.83 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <span class="text-base-content/70">{{ project.emailStats.total || 0 }} emails</span>
+                </div>
+                <button 
+                  @click.stop="openEmailIngestionForProject(project.id)"
+                  class="btn btn-outline btn-xs"
+                >
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Add Emails
+                </button>
+              </div>
+
               <!-- Owner and Members -->
               <div class="flex items-center justify-between text-sm">
                 <div class="flex items-center gap-2">
@@ -187,6 +215,15 @@
       @close="showCreateModal = false"
       @project-created="handleProjectCreated"
     />
+
+    <!-- Email Ingestion Modal -->
+    <EmailIngestionModal 
+      :is-open="showEmailIngestionModal"
+      :project-id="selectedProjectForEmail"
+      @close="closeEmailIngestionModal"
+      @success="handleEmailIngestionSuccess"
+      @error="handleEmailIngestionError"
+    />
   </div>
 </template>
 
@@ -203,12 +240,15 @@ import UiStats from '../components/ui/Stats.vue'
 import UiSearchFilters from '../components/ui/SearchFilters.vue'
 import UiActionMenu from '../components/ui/ActionMenu.vue'
 import ProjectCreateModal from '../components/modals/ProjectCreateModal.vue'
+import EmailIngestionModal from '../components/modals/EmailIngestionModal.vue'
 
 // Icons
 const FolderPlusIcon = 'svg'
 
 // State
 const showCreateModal = ref(false)
+const showEmailIngestionModal = ref(false)
+const selectedProjectForEmail = ref<string>('')
 const searchQuery = ref('')
 const activeFilters = ref({})
 const currentView = ref('grid')
@@ -416,6 +456,33 @@ const handleSort = (sortBy: string) => {
 
 const handleStatClick = (stat: any) => {
   console.log('Stat clicked:', stat)
+}
+
+// Email Ingestion Methods
+const openEmailIngestionForProject = (projectId: string) => {
+  selectedProjectForEmail.value = projectId
+  showEmailIngestionModal.value = true
+}
+
+const closeEmailIngestionModal = () => {
+  showEmailIngestionModal.value = false
+  selectedProjectForEmail.value = ''
+}
+
+const handleEmailIngestionSuccess = async (result: any) => {
+  feedback.success('Email Ingestion', 'Emails have been processed successfully')
+  console.log('Email ingestion success:', result)
+  
+  // Refresh projects to update email stats
+  await refetch()
+  
+  // Keep modal open for potential additional processing
+  // User can manually close or start new processing
+}
+
+const handleEmailIngestionError = (error: any) => {
+  feedback.error('Email Ingestion Failed', 'There was an error processing the emails')
+  console.error('Email ingestion error:', error)
 }
 
 // Lifecycle
