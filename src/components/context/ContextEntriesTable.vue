@@ -71,13 +71,13 @@
         <table class="table table-zebra">
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Type</th>
-              <th>Tags</th>
-              <th>Created</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="w-1/4">Title</th>
+              <th class="w-1/6">Category</th>
+              <th class="w-1/8">Type</th>
+              <th class="w-1/4">Tags</th>
+              <th class="w-1/8">Created</th>
+              <th class="w-1/12">Status</th>
+              <th class="w-1/12">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -104,20 +104,95 @@
                 </div>
               </td>
               <td>
-                <div v-if="context.tags?.length" class="flex flex-wrap gap-1">
-                  <div 
-                    v-for="tag in context.tags.slice(0, 2)" 
-                    :key="tag" 
-                    class="badge badge-sm"
-                  >
-                    {{ tag }}
+                <div v-if="context.tags?.length || editingTags[context.id]" class="flex flex-wrap gap-1">
+                  <!-- Editing Mode -->
+                  <div v-if="editingTags[context.id]" class="w-full">
+                    <div class="flex flex-wrap gap-1 mb-2">
+                      <div 
+                        v-for="(tag, index) in editingTags[context.id]" 
+                        :key="index" 
+                        class="badge badge-sm gap-1"
+                      >
+                        {{ tag }}
+                        <button 
+                          @click="removeTag(context.id, index)"
+                          class="text-error hover:text-error-focus"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+                    <div class="flex gap-2">
+                      <input
+                        v-model="newTagInput[context.id]"
+                        type="text"
+                        placeholder="Add tag..."
+                        class="input input-xs input-bordered flex-1"
+                        @keyup.enter="addTag(context.id)"
+                        @keyup.escape="cancelEditTags(context.id)"
+                      />
+                      <button 
+                        @click="addTag(context.id)"
+                        class="btn btn-xs btn-primary"
+                        :disabled="!newTagInput[context.id]?.trim()"
+                      >
+                        Add
+                      </button>
+                      <button 
+                        @click="saveTagChanges(context)"
+                        class="btn btn-xs btn-success"
+                      >
+                        Save
+                      </button>
+                      <button 
+                        @click="cancelEditTags(context.id)"
+                        class="btn btn-xs btn-ghost"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                  <div 
-                    v-if="context.tags.length > 2" 
-                    class="badge badge-sm badge-ghost"
+                  
+                  <!-- Display Mode -->
+                  <template v-else>
+                    <div 
+                      v-for="tag in context.tags?.slice(0, 3)" 
+                      :key="tag" 
+                      class="badge badge-sm"
+                    >
+                      {{ tag }}
+                    </div>
+                    <div 
+                      v-if="(context.tags?.length || 0) > 3" 
+                      class="badge badge-sm badge-ghost"
+                      :title="`${context.tags?.length} total tags`"
+                    >
+                      +{{ (context.tags?.length || 0) - 3 }}
+                    </div>
+                    <button 
+                      @click="startEditTags(context)"
+                      class="btn btn-xs btn-ghost btn-circle ml-1"
+                      title="Edit tags"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                  </template>
+                </div>
+                
+                <!-- No tags state -->
+                <div v-else class="flex items-center gap-2">
+                  <span class="text-base-content/50 text-xs">No tags</span>
+                  <button 
+                    @click="startEditTags(context)"
+                    class="btn btn-xs btn-ghost btn-circle"
+                    title="Add tags"
                   >
-                    +{{ context.tags.length - 2 }}
-                  </div>
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
                 </div>
               </td>
               <td class="text-sm text-base-content/70">
@@ -165,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useFeedback } from '@/composables/useFeedback'
 import {
   useProjectContextsQuery,
@@ -189,6 +264,10 @@ const filters = reactive({
   typeId: '',
   status: ''
 })
+
+// Tag editing state
+const editingTags = ref<Record<string, string[]>>({})
+const newTagInput = ref<Record<string, string>>({})
 
 // GraphQL
 const { result: contextsResult, loading: contextsLoading, refetch: refetchContexts } = useProjectContextsQuery({
@@ -253,6 +332,49 @@ const formatDate = (dateString: string) => {
 const viewContext = (_context: any) => {
   // TODO: Implement context detail view
   feedback.info('Coming Soon', 'Context detail view will be available soon')
+}
+
+// Tag editing methods
+const startEditTags = (context: any) => {
+  editingTags.value[context.id] = [...(context.tags || [])]
+  newTagInput.value[context.id] = ''
+}
+
+const cancelEditTags = (contextId: string) => {
+  delete editingTags.value[contextId]
+  delete newTagInput.value[contextId]
+}
+
+const addTag = (contextId: string) => {
+  const tag = newTagInput.value[contextId]?.trim()
+  if (tag && editingTags.value[contextId]) {
+    // Check for duplicates (case-insensitive)
+    const existingTags = editingTags.value[contextId].map(t => t.toLowerCase())
+    if (!existingTags.includes(tag.toLowerCase())) {
+      editingTags.value[contextId].push(tag)
+      newTagInput.value[contextId] = ''
+    } else {
+      feedback.warning('Duplicate Tag', 'This tag already exists')
+    }
+  }
+}
+
+const removeTag = (contextId: string, index: number) => {
+  if (editingTags.value[contextId]) {
+    editingTags.value[contextId].splice(index, 1)
+  }
+}
+
+const saveTagChanges = async (context: any) => {
+  // TODO: Implement when backend API supports updating context tags
+  feedback.info('Coming Soon', 'Tag editing will be available when the backend API supports updating context tags')
+  
+  // For now, just show what would be saved
+  const newTags = editingTags.value[context.id]
+  console.log('Would save tags for context:', context.id, newTags)
+  
+  // Cancel editing mode
+  cancelEditTags(context.id)
 }
 
 const archiveContext = async (context: any) => {
