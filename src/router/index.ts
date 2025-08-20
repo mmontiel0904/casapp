@@ -69,6 +69,15 @@ const routes = [
     }
   },
   {
+    path: '/projects/:id',
+    name: 'ProjectContext',
+    component: () => import('@/views/ProjectContextPage.vue'),
+    meta: { 
+      requiresAuth: true,
+      requiresPermission: 'project_read'
+    }
+  },
+  {
     path: '/my-tasks',
     name: 'MyTasks',
     component: MyTasksPage,

@@ -229,6 +229,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { taskPermissionService } from '../services/taskPermissions'
 import { useMyProjectsQuery } from '../generated/graphql'
 import { useApolloFeedback } from '../composables/useApolloFeedback'
@@ -246,6 +247,7 @@ import EmailIngestionModal from '../components/modals/EmailIngestionModal.vue'
 const FolderPlusIcon = 'svg'
 
 // State
+const router = useRouter()
 const showCreateModal = ref(false)
 const showEmailIngestionModal = ref(false)
 const selectedProjectForEmail = ref<string>('')
@@ -408,8 +410,8 @@ const getProjectActions = (project: any) => [
 
 // Event Handlers
 const handleProjectClick = (project: any) => {
-  // Navigate to project detail page
-  console.log('Opening project:', project.name)
+  // Navigate to project context page
+  router.push(`/projects/${project.id}`)
 }
 
 const handleProjectAction = (action: any, project: any) => {
