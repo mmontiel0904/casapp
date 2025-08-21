@@ -199,8 +199,22 @@
                 {{ formatDate(context.createdAt) }}
               </td>
               <td>
-                <div class="badge" :class="context.isArchived ? 'badge-warning' : 'badge-success'">
-                  {{ context.isArchived ? 'Archived' : 'Active' }}
+                <div class="flex flex-col gap-1">
+                  <div class="badge" :class="context.isArchived ? 'badge-warning' : 'badge-success'">
+                    {{ context.isArchived ? 'Archived' : 'Active' }}
+                  </div>
+                  <!-- Task Indicator -->
+                  <div v-if="context.task" 
+                       class="badge badge-sm gap-1 cursor-pointer hover:badge-info" 
+                       :class="getTaskBadgeClass(context.task.status)"
+                       :title="`Task: ${context.task.name} (${getTaskStatusDisplay(context.task.status)})`"
+                       @click="viewLinkedTasks(context)"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Task
+                  </div>
                 </div>
               </td>
               <td>
@@ -278,6 +292,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useFeedback } from '@/composables/useFeedback'
 import CreateTaskFromContextModal from '@/components/modals/CreateTaskFromContextModal.vue'
 import {
@@ -420,9 +435,38 @@ const saveTagChanges = async (context: any) => {
 }
 
 // Task navigation methods
-const viewLinkedTasks = (_context: any) => {
-  // TODO: Implement task filtering by context
-  alert('Coming soon: View tasks linked to this context');
+const router = useRouter()
+
+const viewLinkedTasks = (context: any) => {
+  // Navigate to tasks page with context filter
+  router.push({
+    name: 'MyTasks',
+    query: { 
+      contextId: context.id, 
+      contextName: context.title 
+    }
+  })
+}
+
+// Task badge helper functions
+const getTaskBadgeClass = (status: string) => {
+  const statusMap: Record<string, string> = {
+    'TODO': 'badge-info',
+    'IN_PROGRESS': 'badge-warning', 
+    'COMPLETED': 'badge-success',
+    'CANCELLED': 'badge-error'
+  }
+  return statusMap[status] || 'badge-neutral'
+}
+
+const getTaskStatusDisplay = (status: string) => {
+  const statusMap: Record<string, string> = {
+    'TODO': 'To Do',
+    'IN_PROGRESS': 'In Progress',
+    'COMPLETED': 'Completed',
+    'CANCELLED': 'Cancelled'
+  }
+  return statusMap[status] || status
 }
 
 // Task creation methods

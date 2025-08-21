@@ -656,6 +656,7 @@ export type ProjectContext = {
   project: Project;
   projectId: Scalars['UUID']['output'];
   tags?: Maybe<Array<Scalars['String']['output']>>;
+  task?: Maybe<Task>;
   title: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -689,6 +690,7 @@ export type QueryRoot = {
   allRoles: Array<Role>;
   allRolesWithPermissions: Array<RoleWithPermissions>;
   allUsers: Array<UserWithRole>;
+  contextByTask?: Maybe<ProjectContext>;
   /** Get all available context types */
   contextTypes: Array<ContextType>;
   /** Get single email context by ID */
@@ -716,6 +718,7 @@ export type QueryRoot = {
   /** Search email contexts with full-text search */
   searchEmailContexts: Array<EmailContext>;
   task?: Maybe<Task>;
+  taskByContext?: Maybe<Task>;
   userById: UserWithRole;
   userDirectPermissions: Array<Permission>;
   userPermissions: Array<Scalars['String']['output']>;
@@ -733,6 +736,11 @@ export type QueryRootActivitiesArgs = {
 
 export type QueryRootAllPermissionsArgs = {
   resourceId?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+
+export type QueryRootContextByTaskArgs = {
+  taskId: Scalars['UUID']['input'];
 };
 
 
@@ -835,6 +843,11 @@ export type QueryRootSearchEmailContextsArgs = {
 
 export type QueryRootTaskArgs = {
   taskId: Scalars['UUID']['input'];
+};
+
+
+export type QueryRootTaskByContextArgs = {
+  contextId: Scalars['UUID']['input'];
 };
 
 
@@ -1149,7 +1162,7 @@ export type ProjectContextsQueryVariables = Exact<{
 }>;
 
 
-export type ProjectContextsQuery = { projectContexts: { totalCount: number, edges: Array<{ id: any, title: string, description?: string | null, tags?: Array<string> | null, isArchived: boolean, createdAt: any, updatedAt: any, createdBy?: any | null, contextType: { id: any, name: string, description?: string | null }, category?: { id: any, name: string, color: string, description?: string | null } | null, emailContext?: { id: any, subject: string, fromEmail: string, messagePreview?: string | null } | null, project: { id: any, name: string } }> } };
+export type ProjectContextsQuery = { projectContexts: { totalCount: number, edges: Array<{ id: any, title: string, description?: string | null, tags?: Array<string> | null, isArchived: boolean, createdAt: any, updatedAt: any, createdBy?: any | null, contextType: { id: any, name: string, description?: string | null }, category?: { id: any, name: string, color: string, description?: string | null } | null, emailContext?: { id: any, subject: string, fromEmail: string, messagePreview?: string | null } | null, task?: { id: any, name: string, status: TaskStatus, priority: TaskPriority } | null, project: { id: any, name: string } }> } };
 
 export type ArchiveContextMutationVariables = Exact<{
   contextId: Scalars['UUID']['input'];
@@ -1514,6 +1527,20 @@ export type UsersByRoleQueryVariables = Exact<{
 
 
 export type UsersByRoleQuery = { usersByRole: Array<{ id: any, email: string, firstName?: string | null, lastName?: string | null, isEmailVerified: boolean, permissions: Array<string>, createdAt: any, updatedAt: any, role?: { id: any, name: string, level: number, description?: string | null } | null }> };
+
+export type ContextByTaskQueryVariables = Exact<{
+  taskId: Scalars['UUID']['input'];
+}>;
+
+
+export type ContextByTaskQuery = { contextByTask?: { id: any, title: string, description?: string | null, tags?: Array<string> | null, contextType: { id: any, name: string }, category?: { id: any, name: string, color: string } | null } | null };
+
+export type TaskByContextQueryVariables = Exact<{
+  contextId: Scalars['UUID']['input'];
+}>;
+
+
+export type TaskByContextQuery = { taskByContext?: { id: any, name: string, description?: string | null, status: TaskStatus, priority: TaskPriority, dueDate?: any | null } | null };
 
 export type AllRolesWithPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2083,6 +2110,12 @@ export const ProjectContextsDocument = gql`
         subject
         fromEmail
         messagePreview
+      }
+      task {
+        id
+        name
+        status
+        priority
       }
       project {
         id
@@ -4144,6 +4177,83 @@ export function useUsersByRoleLazyQuery(variables?: UsersByRoleQueryVariables | 
   return VueApolloComposable.useLazyQuery<UsersByRoleQuery, UsersByRoleQueryVariables>(UsersByRoleDocument, variables, options);
 }
 export type UsersByRoleQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<UsersByRoleQuery, UsersByRoleQueryVariables>;
+export const ContextByTaskDocument = gql`
+    query ContextByTask($taskId: UUID!) {
+  contextByTask(taskId: $taskId) {
+    id
+    title
+    description
+    contextType {
+      id
+      name
+    }
+    category {
+      id
+      name
+      color
+    }
+    tags
+  }
+}
+    `;
+
+/**
+ * __useContextByTaskQuery__
+ *
+ * To run a query within a Vue component, call `useContextByTaskQuery` and pass it any options that fit your needs.
+ * When your component renders, `useContextByTaskQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useContextByTaskQuery({
+ *   taskId: // value for 'taskId'
+ * });
+ */
+export function useContextByTaskQuery(variables: ContextByTaskQueryVariables | VueCompositionApi.Ref<ContextByTaskQueryVariables> | ReactiveFunction<ContextByTaskQueryVariables>, options: VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<ContextByTaskQuery, ContextByTaskQueryVariables>(ContextByTaskDocument, variables, options);
+}
+export function useContextByTaskLazyQuery(variables?: ContextByTaskQueryVariables | VueCompositionApi.Ref<ContextByTaskQueryVariables> | ReactiveFunction<ContextByTaskQueryVariables>, options: VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<ContextByTaskQuery, ContextByTaskQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<ContextByTaskQuery, ContextByTaskQueryVariables>(ContextByTaskDocument, variables, options);
+}
+export type ContextByTaskQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<ContextByTaskQuery, ContextByTaskQueryVariables>;
+export const TaskByContextDocument = gql`
+    query TaskByContext($contextId: UUID!) {
+  taskByContext(contextId: $contextId) {
+    id
+    name
+    description
+    status
+    priority
+    dueDate
+  }
+}
+    `;
+
+/**
+ * __useTaskByContextQuery__
+ *
+ * To run a query within a Vue component, call `useTaskByContextQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTaskByContextQuery` returns an object from Apollo Client that contains result, loading and error properties
+ * you can use to render your UI.
+ *
+ * @param variables that will be passed into the query
+ * @param options that will be passed into the query, supported options are listed on: https://v4.apollo.vuejs.org/guide-composable/query.html#options;
+ *
+ * @example
+ * const { result, loading, error } = useTaskByContextQuery({
+ *   contextId: // value for 'contextId'
+ * });
+ */
+export function useTaskByContextQuery(variables: TaskByContextQueryVariables | VueCompositionApi.Ref<TaskByContextQueryVariables> | ReactiveFunction<TaskByContextQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables>> = {}) {
+  return VueApolloComposable.useQuery<TaskByContextQuery, TaskByContextQueryVariables>(TaskByContextDocument, variables, options);
+}
+export function useTaskByContextLazyQuery(variables?: TaskByContextQueryVariables | VueCompositionApi.Ref<TaskByContextQueryVariables> | ReactiveFunction<TaskByContextQueryVariables>, options: VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables> | VueCompositionApi.Ref<VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables>> | ReactiveFunction<VueApolloComposable.UseQueryOptions<TaskByContextQuery, TaskByContextQueryVariables>> = {}) {
+  return VueApolloComposable.useLazyQuery<TaskByContextQuery, TaskByContextQueryVariables>(TaskByContextDocument, variables, options);
+}
+export type TaskByContextQueryCompositionFunctionResult = VueApolloComposable.UseQueryReturn<TaskByContextQuery, TaskByContextQueryVariables>;
 export const AllRolesWithPermissionsDocument = gql`
     query AllRolesWithPermissions {
   allRolesWithPermissions {

@@ -400,6 +400,7 @@ type ProjectContext {
   project: Project!
   projectId: UUID!
   tags: [String!]
+  task: Task
   title: String!
   updatedAt: DateTime!
 }
@@ -433,6 +434,7 @@ type QueryRoot {
   allRoles: [Role!]!
   allRolesWithPermissions: [RoleWithPermissions!]!
   allUsers: [UserWithRole!]!
+  contextByTask(taskId: UUID!): ProjectContext
 
   """Get all available context types"""
   contextTypes(activeOnly: Boolean): [ContextType!]!
@@ -467,6 +469,7 @@ type QueryRoot {
   """Search email contexts with full-text search"""
   searchEmailContexts(limit: Int, projectId: UUID!, query: String!): [EmailContext!]!
   task(taskId: UUID!): Task
+  taskByContext(contextId: UUID!): Task
   userById(userId: UUID!): UserWithRole!
   userDirectPermissions(userId: UUID!): [Permission!]!
   userPermissions(userId: UUID!): [String!]!

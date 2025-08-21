@@ -65,6 +65,7 @@
             <th v-if="context === 'projectTasks'" class="font-semibold text-sm text-base-content/80 py-4">Assignee</th>
             <th v-if="context === 'myTasks'" class="font-semibold text-sm text-base-content/80 py-4">Created By</th>
             <th v-if="showProject" class="font-semibold text-sm text-base-content/80 py-4">Project</th>
+            <th class="font-semibold text-sm text-base-content/80 py-4">Context</th>
             <th class="font-semibold text-sm text-base-content/80 py-4">Due Date</th>
             <th class="font-semibold text-sm text-base-content/80 py-4 text-right">Actions</th>
           </tr>
@@ -168,7 +169,7 @@ const emit = defineEmits<Emits>()
 
 // Computed properties
 const getColumnCount = computed(() => {
-  let count = 6 // Task, Status, Priority, Due Date, Actions + context-specific column
+  let count = 7 // Task, Status, Priority, Context, Due Date, Actions + context-specific column
   if (props.showProject) count += 1
   return count
 })

@@ -103,6 +103,16 @@
       </div>
     </td>
     
+    <!-- Context -->
+    <td class="py-4">
+      <div class="text-sm text-base-content/50">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1 text-base-content/40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h4a1 1 0 011 1v2h3a1 1 0 110 2h-1l-.117 2.338A3 3 0 0112 9H8a3 3 0 01-2.883-2.662L5 4H4a1 1 0 110-2h3zm2.5 5a.5.5 0 11-1 0 .5.5 0 011 0zm3 0a.5.5 0 11-1 0 .5.5 0 011 0z" />
+        </svg>
+        Context loading...
+      </div>
+    </td>
+    
     <!-- Due Date -->
     <td class="py-4">
       <div v-if="task.dueDate" class="text-sm font-mono" :class="{ 'text-error font-semibold': isOverdue(task) }">

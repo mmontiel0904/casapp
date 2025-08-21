@@ -138,3 +138,36 @@ export const USERS_BY_ROLE_QUERY = gql`
     }
   }
 `
+
+export const CONTEXT_BY_TASK_QUERY = gql`
+  query ContextByTask($taskId: UUID!) {
+    contextByTask(taskId: $taskId) {
+      id
+      title
+      description
+      contextType {
+        id
+        name
+      }
+      category {
+        id
+        name
+        color
+      }
+      tags
+    }
+  }
+`
+
+export const TASK_BY_CONTEXT_QUERY = gql`
+  query TaskByContext($contextId: UUID!) {
+    taskByContext(contextId: $contextId) {
+      id
+      name
+      description
+      status
+      priority
+      dueDate
+    }
+  }
+`

@@ -99,6 +99,12 @@ export const PROJECT_CONTEXTS_QUERY = gql`
           fromEmail
           messagePreview
         }
+        task {
+          id
+          name
+          status
+          priority
+        }
         project {
           id
           name
