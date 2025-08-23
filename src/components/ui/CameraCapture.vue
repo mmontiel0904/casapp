@@ -1,5 +1,5 @@
 <template>
-  <div class="camera-capture">
+  <div class="camera-capture" ref="captureRoot">
     <!-- Camera Button -->
     <button 
       v-if="!isActive && !capturedImage" 
@@ -121,6 +121,7 @@ const emit = defineEmits<Emits>()
 
 // Refs
 const videoElement = ref<HTMLVideoElement>()
+const captureRoot = ref<HTMLElement>()
 const isSupported = ref(false)
 const isActive = ref(false)
 const isReady = ref(false)
@@ -139,12 +140,37 @@ onUnmounted(() => {
 })
 
 // Start camera
+const isMobile = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
+const enterFullscreen = async () => {
+  if (isMobile() && captureRoot.value && captureRoot.value.requestFullscreen) {
+    try {
+      await captureRoot.value.requestFullscreen()
+    } catch (e) {
+      // Ignore if not allowed
+    }
+  }
+}
+
+const exitFullscreen = async () => {
+  if (document.fullscreenElement) {
+    try {
+      await document.exitFullscreen()
+    } catch (e) {}
+  }
+}
+
 const startCamera = async () => {
   try {
     error.value = ''
     isActive.value = true
     isReady.value = false
-    
+
+    // Enter fullscreen on mobile
+    await enterFullscreen()
+
     // Request camera access
     stream.value = await navigator.mediaDevices.getUserMedia({
       video: {
@@ -153,11 +179,11 @@ const startCamera = async () => {
         height: { ideal: 1080 }
       }
     })
-    
+
     // Set video source
     if (videoElement.value && stream.value) {
       videoElement.value.srcObject = stream.value
-      
+
       // Wait for video to be ready
       videoElement.value.onloadedmetadata = () => {
         isReady.value = true
@@ -167,49 +193,51 @@ const startCamera = async () => {
     console.error('Error accessing camera:', err)
     error.value = 'Could not access camera. Please check permissions and try again.'
     isActive.value = false
+    await exitFullscreen()
   }
 }
 
 // Stop camera
-const stopCamera = () => {
+const stopCamera = async () => {
   if (stream.value) {
     stream.value.getTracks().forEach(track => {
       track.stop()
     })
     stream.value = null
   }
-  
+
   if (videoElement.value) {
     videoElement.value.srcObject = null
   }
-  
+
   isActive.value = false
   isReady.value = false
+  await exitFullscreen()
 }
 
 // Capture photo
-const capturePhoto = () => {
+const capturePhoto = async () => {
   if (!videoElement.value || !isReady.value) return
-  
+
   try {
     // Create canvas to capture frame
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
-    
+
     if (!context) throw new Error('Could not get canvas context')
-    
+
     // Set canvas size to match video
     canvas.width = videoElement.value.videoWidth
     canvas.height = videoElement.value.videoHeight
-    
+
     // Draw current video frame to canvas
     context.drawImage(videoElement.value, 0, 0, canvas.width, canvas.height)
-    
+
     // Convert to data URL
     capturedImage.value = canvas.toDataURL('image/jpeg', 0.8)
-    
-    // Stop camera
-    stopCamera()
+
+    // Stop camera and exit fullscreen
+    await stopCamera()
   } catch (err) {
     console.error('Error capturing photo:', err)
     error.value = 'Failed to capture photo. Please try again.'
@@ -257,20 +285,47 @@ const retakePhoto = () => {
 </script>
 
 <style scoped>
+/* Fullscreen/mobile camera styles */
 .camera-capture {
-  @apply w-full;
+  width: 100%;
 }
-
+.camera-capture:fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #111;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .camera-view {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  margin: 0 auto;
 }
-
+.camera-capture:fullscreen .camera-view {
+  border-radius: 0;
+  height: 100vh;
+  max-height: 100vh;
+}
 .captured-image {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
-
-/* Ensure video maintains aspect ratio */
+.camera-capture:fullscreen .captured-image {
+  border-radius: 0;
+  height: 100vh;
+  max-height: 100vh;
+}
 video {
   object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 </style>
