@@ -121,8 +121,8 @@
 
               <!-- Camera Capture Tab -->
               <div v-show="uploadMethod === 'camera'">
-                <div class="border-2 border-dashed border-base-300 rounded-lg p-2 sm:p-6 flex flex-col items-center justify-center">
-                  <div class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto">
+                <div class="border-2 border-dashed border-base-300 rounded-lg p-2 sm:p-6 flex flex-col items-center justify-center min-h-[400px]">
+                  <div class="w-full mx-auto">
                     <CameraCapture 
                       @photo-captured="handlePhotoCaptured"
                       :disabled="!selectedProjectId || isProcessing"

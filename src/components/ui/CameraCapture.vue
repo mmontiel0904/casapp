@@ -21,21 +21,21 @@
 
     <!-- Camera View -->
     <div v-if="isActive" class="camera-view bg-base-300 rounded-lg overflow-hidden">
-      <div class="relative">
+      <div class="camera-container">
         <!-- Video Stream -->
         <video 
           ref="videoElement"
           autoplay
           playsinline
-          class="w-full h-64 bg-black object-cover"
+          class="camera-video bg-black object-cover"
         ></video>
         
         <!-- Camera Controls -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-3">
+        <div class="camera-controls">
           <!-- Capture Button -->
           <button 
             @click="capturePhoto"
-            class="btn btn-circle btn-primary btn-lg"
+            class="btn btn-circle btn-primary btn-lg capture-button"
             :disabled="!isReady"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@
           <!-- Cancel Button -->
           <button 
             @click="stopCamera"
-            class="btn btn-circle btn-ghost"
+            class="btn btn-circle btn-ghost cancel-button"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -55,7 +55,7 @@
         </div>
 
         <!-- Camera Status -->
-        <div v-if="!isReady && isActive" class="absolute inset-0 bg-black/50 flex items-center justify-center">
+        <div v-if="!isReady && isActive" class="camera-status">
           <div class="text-white text-center">
             <div class="loading loading-spinner loading-lg mb-2"></div>
             <p>Starting camera...</p>
@@ -66,19 +66,19 @@
 
     <!-- Captured Image Preview -->
     <div v-if="capturedImage" class="captured-image">
-      <div class="relative bg-base-300 rounded-lg overflow-hidden">
+      <div class="captured-container bg-base-300 rounded-lg overflow-hidden">
         <img 
           :src="capturedImage" 
           alt="Captured photo"
-          class="w-full h-64 object-cover"
+          class="captured-photo object-cover"
         />
         
         <!-- Image Controls -->
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-3">
+        <div class="image-controls">
           <!-- Use Photo Button -->
           <button 
             @click="usePhoto"
-            class="btn btn-success btn-sm gap-2"
+            class="btn btn-success btn-sm gap-2 use-button"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
@@ -89,7 +89,7 @@
           <!-- Retake Button -->
           <button 
             @click="retakePhoto"
-            class="btn btn-ghost btn-sm gap-2"
+            class="btn btn-ghost btn-sm gap-2 retake-button"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -323,47 +323,231 @@ const retakePhoto = () => {
 </script>
 
 <style scoped>
-/* Fullscreen/mobile camera styles */
+/* Mobile-first responsive camera styles */
 .camera-capture {
   width: 100%;
+  height: 100%;
 }
+
+/* Camera view container */
+.camera-view {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  height: 400px; /* Default height for desktop */
+}
+
+.camera-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Camera controls - always visible and properly positioned */
+.camera-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); /* Safe area support */
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 10;
+}
+
+.capture-button {
+  min-width: 4rem;
+  min-height: 4rem;
+  background: #ffffff;
+  color: #000000;
+  border: 3px solid #000000;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.capture-button:hover {
+  background: #f3f4f6;
+  transform: scale(1.05);
+}
+
+.capture-button:disabled {
+  opacity: 0.5;
+  transform: none;
+}
+
+.cancel-button {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000000;
+  backdrop-filter: blur(8px);
+}
+
+/* Camera status overlay */
+.camera-status {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+/* Captured image styles */
+.captured-image {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  height: 400px; /* Match camera view height */
+}
+
+.captured-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.captured-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+  z-index: 10;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .camera-view {
+    height: 70vh; /* Better mobile height */
+    min-height: 400px;
+  }
+  
+  .captured-image {
+    height: 70vh;
+    min-height: 400px;
+  }
+  
+  .camera-controls {
+    padding: 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
+  }
+  
+  .image-controls {
+    padding: 1.5rem;
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 20px));
+  }
+  
+  .capture-button {
+    min-width: 5rem;
+    min-height: 5rem;
+  }
+}
+
+/* Fullscreen mobile styles */
 .camera-capture:fullscreen {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #111;
+  background: #000000;
   width: 100vw;
   height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for mobile */
   max-width: 100vw;
   max-height: 100vh;
+  max-height: 100dvh;
   border-radius: 0 !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-.camera-view {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  width: 100%;
-  max-width: 100vw;
-  max-height: 100vh;
-  margin: 0 auto;
-}
+
 .camera-capture:fullscreen .camera-view {
   border-radius: 0;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
+  width: 100vw;
 }
-.captured-image {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+
 .camera-capture:fullscreen .captured-image {
   border-radius: 0;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
+  max-height: 100dvh;
+  width: 100vw;
 }
-video {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
+
+/* Fullscreen mobile controls positioning */
+.camera-capture:fullscreen .camera-controls {
+  padding: 2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 30px));
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.camera-capture:fullscreen .image-controls {
+  padding: 2rem;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 30px));
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+}
+
+.camera-capture:fullscreen .capture-button {
+  min-width: 6rem;
+  min-height: 6rem;
+  background: #ffffff;
+  border: 4px solid #000000;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
+}
+
+/* Landscape orientation adjustments */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .camera-capture:fullscreen .camera-controls {
+    padding: 1rem 2rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 20px));
+  }
+  
+  .camera-capture:fullscreen .image-controls {
+    padding: 1rem 2rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 20px));
+  }
+  
+  .camera-capture:fullscreen .capture-button {
+    min-width: 4rem;
+    min-height: 4rem;
+  }
+}
+
+/* Touch improvements */
+@media (pointer: coarse) {
+  .capture-button,
+  .cancel-button,
+  .use-button,
+  .retake-button {
+    min-height: 3rem;
+    touch-action: manipulation;
+  }
 }
 </style>
