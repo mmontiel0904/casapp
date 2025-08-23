@@ -129,14 +129,41 @@ const capturedImage = ref<string>('')
 const error = ref<string>('')
 const stream = ref<MediaStream | null>(null)
 
+// Orientation state
+const orientation = ref<'portrait' | 'landscape'>('portrait')
+
+function getOrientation() {
+  if (window.screen && window.screen.orientation && window.screen.orientation.type) {
+    return window.screen.orientation.type.startsWith('landscape') ? 'landscape' : 'portrait'
+  }
+  // Fallback for iOS
+  if (typeof window.orientation === 'number') {
+    return Math.abs(window.orientation as number) === 90 ? 'landscape' : 'portrait'
+  }
+  return 'portrait'
+}
+
+function updateOrientation() {
+  orientation.value = getOrientation()
+}
+
 // Check if camera is supported
 onMounted(() => {
   isSupported.value = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)
+  updateOrientation()
+  window.addEventListener('orientationchange', updateOrientation)
+  if (window.screen && window.screen.orientation) {
+    window.screen.orientation.addEventListener('change', updateOrientation)
+  }
 })
 
 // Cleanup on unmount
 onUnmounted(() => {
   stopCamera()
+  window.removeEventListener('orientationchange', updateOrientation)
+  if (window.screen && window.screen.orientation) {
+    window.screen.orientation.removeEventListener('change', updateOrientation)
+  }
 })
 
 // Start camera
@@ -221,17 +248,28 @@ const capturePhoto = async () => {
 
   try {
     // Create canvas to capture frame
+    let videoW = videoElement.value.videoWidth
+    let videoH = videoElement.value.videoHeight
+    let isLandscape = orientation.value === 'landscape'
     const canvas = document.createElement('canvas')
     const context = canvas.getContext('2d')
 
     if (!context) throw new Error('Could not get canvas context')
 
-    // Set canvas size to match video
-    canvas.width = videoElement.value.videoWidth
-    canvas.height = videoElement.value.videoHeight
-
-    // Draw current video frame to canvas
-    context.drawImage(videoElement.value, 0, 0, canvas.width, canvas.height)
+    // If landscape, rotate canvas
+    if (isLandscape) {
+      canvas.width = videoH
+      canvas.height = videoW
+      context.save()
+      context.translate(videoH, 0)
+      context.rotate(Math.PI / 2)
+      context.drawImage(videoElement.value, 0, 0, videoW, videoH)
+      context.restore()
+    } else {
+      canvas.width = videoW
+      canvas.height = videoH
+      context.drawImage(videoElement.value, 0, 0, videoW, videoH)
+    }
 
     // Convert to data URL
     capturedImage.value = canvas.toDataURL('image/jpeg', 0.8)
