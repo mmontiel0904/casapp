@@ -1,8 +1,8 @@
 <template>
   <dialog ref="modal" class="modal" :class="{ 'modal-open': isOpen }">
-    <div class="modal-box w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto">
+    <div class="modal-box w-full max-w-2xl sm:max-w-3xl md:max-w-4xl max-h-[98dvh] md:max-h-[90vh] overflow-y-auto px-2 sm:px-6 py-2 sm:py-6 rounded-none sm:rounded-2xl">
       <!-- Modal Header -->
-      <div class="flex items-center justify-between mb-6 sticky top-0 bg-base-100 pb-4 border-b border-base-300 z-10">
+  <div class="flex items-center justify-between mb-4 sm:mb-6 sticky top-0 bg-base-100 pb-4 border-b border-base-300 z-10">
         <div class="flex items-center space-x-3">
           <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,9 +26,9 @@
         </button>
       </div>
 
-      <div class="space-y-6">
+  <div class="space-y-4 sm:space-y-6">
         <!-- Step 1: Project Selection -->
-        <div class="card bg-base-100 border border-base-300">
+  <div class="card bg-base-100 border border-base-300 shadow-none sm:shadow">
           <div class="card-body">
             <div class="flex items-center space-x-3 mb-4">
               <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center text-sm font-bold">
@@ -50,7 +50,7 @@
         </div>
 
         <!-- Step 2: File Upload -->
-        <div class="card bg-base-100 border border-base-300">
+  <div class="card bg-base-100 border border-base-300 shadow-none sm:shadow">
           <div class="card-body">
             <div class="flex items-center space-x-3 mb-4">
               <div 
@@ -66,7 +66,7 @@
             
             <div :class="{ 'opacity-50 pointer-events-none': !selectedProjectId }">
               <!-- Upload Methods Tabs -->
-              <div class="tabs tabs-boxed mb-4">
+              <div class="tabs tabs-boxed mb-4 flex flex-wrap">
                 <a 
                   class="tab" 
                   :class="{ 'tab-active': uploadMethod === 'file' }"
@@ -121,12 +121,13 @@
 
               <!-- Camera Capture Tab -->
               <div v-show="uploadMethod === 'camera'">
-                <div class="border-2 border-dashed border-base-300 rounded-lg p-6">
-                  <CameraCapture 
-                    @photo-captured="handlePhotoCaptured"
-                    :disabled="!selectedProjectId || isProcessing"
-                  />
-                  
+                <div class="border-2 border-dashed border-base-300 rounded-lg p-2 sm:p-6 flex flex-col items-center justify-center">
+                  <div class="w-full max-w-xs sm:max-w-md md:max-w-lg mx-auto">
+                    <CameraCapture 
+                      @photo-captured="handlePhotoCaptured"
+                      :disabled="!selectedProjectId || isProcessing"
+                    />
+                  </div>
                   <div class="mt-4 text-center">
                     <p class="text-sm text-base-content/60 mb-2">Capture email screenshots with your camera</p>
                     <div class="text-xs text-base-content/50 space-y-1">
@@ -140,12 +141,14 @@
 
               <!-- File Preview -->
               <div v-if="filesWithPreview.length > 0" class="mt-6">
-                <FilePreviewGrid 
-                  :files="filesWithPreview"
-                  @remove="removeFile"
-                  @preview-loaded="handlePreviewLoaded"
-                  @preview-error="handlePreviewError"
-                />
+                <div class="overflow-x-auto">
+                  <FilePreviewGrid 
+                    :files="filesWithPreview"
+                    @remove="removeFile"
+                    @preview-loaded="handlePreviewLoaded"
+                    @preview-error="handlePreviewError"
+                  />
+                </div>
               </div>
 
               <!-- File upload error -->
@@ -186,7 +189,7 @@
       </div>
 
       <!-- Modal Actions -->
-      <div class="modal-action sticky bottom-0 bg-base-100 pt-4 border-t border-base-300 mt-6">
+  <div class="modal-action sticky bottom-0 bg-base-100 pt-4 border-t border-base-300 mt-6 z-20">
         <div class="flex justify-between items-center w-full">
           <!-- Progress info -->
           <div v-if="isProcessing" class="flex items-center space-x-2 text-sm text-base-content/70">
@@ -503,5 +506,33 @@ defineExpose({
 
 .modal-box::-webkit-scrollbar-thumb:hover {
   background-color: rgb(148 163 184);
+}
+
+@media (max-width: 640px) {
+  .modal-box {
+    max-width: 100vw;
+    min-width: 0;
+    border-radius: 0;
+    padding: 0.5rem;
+  }
+  .card {
+    box-shadow: none;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .tabs {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .camera-view, .captured-image {
+    min-height: 220px;
+    max-height: 60vw;
+    height: 48vw;
+  }
+  .modal-action {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 </style>
